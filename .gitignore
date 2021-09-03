@@ -2,6 +2,9 @@
 .Rhistory
 .Rapp.history
 
+# discard data directory files
+data/
+
 # Session Data files
 .RData
 
