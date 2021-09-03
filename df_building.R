@@ -17,6 +17,7 @@ DATA_IN_PATH = 'data/in/'
 BUILDING_SCRIPTS_PATH = 'building/' 
 PROJECT_RDATA = 'base_joinModel_artic3.rda.RData'
 PROJECT_DRUGS = c('ara2', 'ieca', 'bbloq')
+FOLLOW_UP = 365
 
 # load sources
 source(paste0(BUILDING_SCRIPTS_PATH, 'baseJoinModel_farmaco_fusion.R'), encoding = 'UTF-8')
@@ -34,7 +35,7 @@ df_farmacos <- constructedBases::farmacos_traye
 baseJoinModel_0 <- preprocess_baseJoinModel(baseJoinModel)
 df_farmacos <- preprocess_farmacos(df_farmacos, PROJECT_DRUGS)
 baseJoinModel_1 <- merge_farmacos(baseJoinModel_0, df_farmacos)
-baseJoinModel1 <- process_baseJoinModel1(baseJoinModel_1, df_farmacos)
+baseJoinModel1 <- process_baseJoinModel1(baseJoinModel_1)
 
 
 # df with drug prescriptions aggregated
