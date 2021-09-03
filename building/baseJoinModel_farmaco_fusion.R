@@ -1,4 +1,6 @@
 library(plyr)
+library(dplyr)
+
 print('baseJoinModel_farmaco_fusion OK')
 
 
@@ -43,7 +45,7 @@ preprocess_farmacos <- function(df, drugs){
 #'
 #' @examples
 merge_farmacos <- function(df1, df2){
-  df <- join(df1, df2, by='id', type='left')
+  df <- plyr::join(df1, df2, by='id', type='left')
   return (df)
 }
 
@@ -56,20 +58,30 @@ merge_farmacos <- function(df1, df2){
 #' @export
 #'
 #' @examples
-process_baseJoinModel1 <- function(df){
-  browser()
-  # Input Not available data if proceed
+process_baseJoinModel1 <- function(df, duration){
   
-  # filter patients that last in the cohort analyzed_period time
+  # filter patients with drug prescriptions
+  cols <- c('familia', 'end', 'dura', 'tip', 'estado_obje')
+  df <- df[!rowSums(is.na(df[cols])), ]
   
-  # filter prescriptions happened during analyzed_period
+  # filter, for each patient, prescriptions happened during follow up
+  ## id
+  df <- df %>%
+    group_by(id) %>% 
+    filter((end > falta_ing1) & (start < (falta_ing1 + duration)))
   
   # set prescription limits from falta_ing1 to analyzed_period/oneyear
-  
+  df <- df %>%
+    mutate(start = if_else(start < falta_ing1, falta_ing1, start)) %>%
+    mutate(end = if_else(end > (falta_ing1 + duration), falta_ing1 + duration, end)) %>%
+    mutate(end = if_else(end > fmort2, fmort2, end))
+
+  # filter prescription periods where end > start
+  df <- df[(df['end'] > df['start']) | is.na(df['end']),]
 }
 
 
-
+df = data.frame(c(0,1,2,3,4,5))
 
 
 
