@@ -4,6 +4,7 @@
 
 # discard data directory files
 data/
+library/
 
 # Session Data files
 .RData
