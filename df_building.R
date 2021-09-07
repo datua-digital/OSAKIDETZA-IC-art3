@@ -12,7 +12,7 @@ library(constructedBases) # it needs to be installed constructedBases_0.1.1.tar.
 
 # global environment variables
 DATA_IN_PATH = 'data/in/'
-BUILDING_SCRIPTS_PATH = 'building/' 
+BUILDING_SCRIPTS_PATH = 'building/'
 PROJECT_RDATA = 'base_joinModel_artic3.rda.RData'
 PROJECT_DRUGS = c('ara2', 'ieca', 'bbloq')
 FOLLOW_UP = 365
@@ -47,11 +47,4 @@ baseJoinModel3 <- rearranged_in_months(baseJoinModel1)
 baseJoinModel3_0 <- timevarying1(baseJoinModel2)
 baseJoinModel3_1 <- timevarying2(baseJoinModel2_0)
 baseJoinModel3_2 <- timevarying2(baseJoinModel2_0)
-
-
-
 # write.csv(baseJoinModel3_2, file='final_data.csv', row.names=FALSE)
-
-
-
-

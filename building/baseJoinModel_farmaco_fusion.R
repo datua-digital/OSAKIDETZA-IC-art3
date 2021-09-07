@@ -59,7 +59,6 @@ merge_farmacos <- function(df1, df2){
 #'
 #' @examples
 process_baseJoinModel1 <- function(df, duration){
-  
   # filter patients with drug prescriptions
   cols <- c('familia', 'end', 'dura', 'tip', 'estado_obje')
   df <- df[!rowSums(is.na(df[cols])), ]
@@ -75,13 +74,10 @@ process_baseJoinModel1 <- function(df, duration){
     mutate(start = if_else(start < falta_ing1, falta_ing1, start)) %>%
     mutate(end = if_else(end > (falta_ing1 + duration), falta_ing1 + duration, end)) %>%
     mutate(end = if_else(end > fmort2, fmort2, end))
-
+  
   # filter prescription periods where end > start
   df <- df[(df['end'] > df['start']) | is.na(df['end']),]
 }
-
-
-df = data.frame(c(0,1,2,3,4,5))
 
 
 
