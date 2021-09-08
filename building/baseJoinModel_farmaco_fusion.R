@@ -59,10 +59,11 @@ merge_farmacos <- function(df1, df2){
 #'
 #' @examples
 process_baseJoinModel1 <- function(df, duration){
+
   # filter patients with drug prescriptions
   cols <- c('familia', 'end', 'dura', 'tip', 'estado_obje')
   df <- df[!rowSums(is.na(df[cols])), ]
-  
+
   # filter, for each patient, prescriptions happened during follow up
   ## id
   df <- df %>%
@@ -73,10 +74,12 @@ process_baseJoinModel1 <- function(df, duration){
   df <- df %>%
     mutate(start = if_else(start < falta_ing1, falta_ing1, start)) %>%
     mutate(end = if_else(end > (falta_ing1 + duration), falta_ing1 + duration, end)) %>%
-    mutate(end = if_else(end > fmort2, fmort2, end))
+    mutate(end = if_else(end > fmort2, fmort2, end, missing = end))
   
-  # filter prescription periods where end > start
-  df <- df[(df['end'] > df['start']) | is.na(df['end']),]
+  # filter prescription periods where end >= start
+  df <- df[(df['end'] >= df['start']) | is.na(df['end']),]
+  
+  # TODO: ajustar duración!
 }
 
 
