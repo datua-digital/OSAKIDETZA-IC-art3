@@ -79,9 +79,8 @@ process_baseJoinModel1 <- function(df, duration){
   # filter prescription periods where end >= start
   df <- df[(df['end'] >= df['start']) | is.na(df['end']),]
   
-  # TODO: ajustar duración!
-}
-
-
-
+  # adjust duration
+  df['duration'] <- df['end'] - df['start']
   
+  return(df)
+}
