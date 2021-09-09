@@ -11,7 +11,7 @@ print ('montly_arrangement OK')
 #'
 #' @examples
 rearranged_in_months <- function(df){
-  baseJoinModel1 <- scale_startend(baseJoinModel_2)
+  baseJoinModel1 <- scale_startend(df)
   baseJoinModel2 <- divide_monthly_periods(baseJoinModel1)
   baseJoinModel2 <- build_monthly_data(baseJoinModel1)
   return (df)
@@ -36,6 +36,42 @@ scale_startend <- function(df){
 }
 
 
+split_inside_months <- function(x){
+  
+  start_month <- floor(x$start_time)
+  final_month <- floor(x$end_time)
+  count = 0
+  for (m in c(start_month:final_month)) {
+
+    new_row <- x
+    if (m < x$start_time) {
+      low_limit <- x$start_time
+    } else {
+      low_limit <- m
+    }
+
+    if (m + 1 > x$end_time) {
+      high_limit <- x$end_time
+    } else {
+      high_limit <- m + 1
+    }
+    
+    new_row$month <- m + 1
+    new_row$start_time <- low_limit
+    new_row$end_time <- high_limit
+
+    if (count >= 1) {
+      x_final <- rbind(x_final, new_row)
+    } else {
+      x_final <- new_row
+    }
+    count = count + 1
+    
+  }
+  return (x_final)
+}
+
+
 #' divide records in monthly periods
 #'
 #' @param df 
@@ -45,6 +81,9 @@ scale_startend <- function(df){
 #'
 #' @examples
 divide_monthly_periods <- function(df){
+  
+  df <- df %>% group_by(id) %>% mutate(group_id = row_number())
+  df <- df %>% group_by(id, group_id) %>% group_modify(~split_inside_months(.x))
   return (df)
 }
 
