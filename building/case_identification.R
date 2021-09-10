@@ -35,7 +35,7 @@ case_identification <- function(df, early_death_patients_days, drugs){
 #' @examples
 identify_early_death_patients <- function(df_, early_death_patients_days, outcome){
   fallecidos<-outcome %>% filter(dias_hasta_muerte<=early_death_patients_days)
-  df_<-df_ %>% mutate(early_death_patient=dplyr::if_else(!id %in% fallecidos$id, TRUE, FALSE))
+  df_<-df_ %>% mutate(early_death_patient=dplyr::if_else(id %in% fallecidos$id, TRUE, FALSE))
   colnames(df_)[which(colnames(df_) %in% 'early_death_patient')] <- paste0("early_death_patient_", early_death_patients_days)
   return(df_)
 }
@@ -132,7 +132,8 @@ identify_TT_denovopatients <- function(df_, presc, ing_pri, drugs){
   presc_ing3 <- presc_ing %>% filter(fecha_inicio<fing_ing1)
   
   df_ <- df_ %>% 
-    mutate(denovo_tt_paciente = dplyr::if_else((!id %in% presc_ing2$id), TRUE, FALSE))
+    mutate(denovo_tt_paciente_fing = dplyr::if_else((!id %in% presc_ing3$id), TRUE, FALSE),
+           denovo_tt_paciente_falta = dplyr::if_else((!id %in% presc_ing2$id), TRUE, FALSE),)
   return (df_)
 }
 
