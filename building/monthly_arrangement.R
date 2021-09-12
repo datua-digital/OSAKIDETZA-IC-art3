@@ -18,11 +18,11 @@ rearranged_in_months <- function(df){
 }
 
 
-#' Add time var
+#' scale_startend: add start_time and end_time in a numeric and relative scale 
 #'
 #' @param df 
 #'
-#' @return
+#' @return df 
 #' @export
 #'
 #' @examples
@@ -30,12 +30,20 @@ scale_startend <- function(df){
   df <- df %>%
     mutate(start_time = (start - falta_ing1 + 1)/30) %>%
     mutate(end_time = (end - falta_ing1 + 1)/30)
-  df$start_time <- as.numeric(df$start_time, units="days")
+  df$start_time <- as.numeric(df$start_time, units="days") # real scale is month, which is not covered by the library
   df$end_time <- as.numeric(df$end_time, units="days")
   return (df)
 }
 
 
+#' split_inside_months: split numeric start_time and end_time in ranges between integers (integers are months!)
+#'
+#' @param x (data.frame) Part of df
+#'
+#' @return
+#' @export
+#'
+#' @examples
 split_inside_months <- function(x){
   
   start_month <- floor(x$start_time)
@@ -72,7 +80,16 @@ split_inside_months <- function(x){
 }
 
 
+#' transform_to_days: transform periods between months in days of months
+#'
+#' @param x (data.frame)
+#'
+#' @return df (data.frame) Part of df
+#' @export
+#'
+#' @examples
 transform_to_days <- function(x){
+  
   days <- c()
   for (row in 1:nrow(x)) {
     month_floor <- floor(x[row, "start_time"])
@@ -105,16 +122,4 @@ divide_monthly_periods <- function(df){
   saveRDS(df, paste0(DATA_OUT_PATH, 'baseJoinModel_after_splitted_in_months.rds'))
   df <- df %>% group_by(id, familia, month) %>% group_modify(~transform_to_days(.x))
   return (df)
-}
-
-#' build monthly distributed data
-#'
-#' @param df 
-#'
-#' @return
-#' @export
-#'
-#' @examples
-fill_monthly_data <- function(df){
-  return(df)
 }
