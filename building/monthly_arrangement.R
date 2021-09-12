@@ -101,7 +101,7 @@ transform_to_days <- function(x){
   x$start_time <- NULL
   x$end_time <- NULL
   final_x <- x[1, ]
-  days <- unique(days[!(days %in% 0)])
+  days <- unique(days[!(days %in% c(0, 13))]) # month 0 and 13 are not allowed
   final_x$days <- vector_tocollapsedstring(days)
   return(final_x)
 }
