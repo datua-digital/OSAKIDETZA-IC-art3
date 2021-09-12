@@ -4,32 +4,6 @@ print('time_varying_covariates.R OK')
 source('utils/df_utils.R')
 
 
-
-#' reshape_towideformat
-#'
-#' @param df 
-#'
-#' @return df_reshaped (data.frame) 
-#' @export
-#'
-#' @examples
-reshape_towideformat <- function(df){
-  df$start <- NULL
-  df$end <- NULL
-  df$days <- NULL
-  df$group_id <- NULL
-  df$dura <- NULL
-  df$duration <- NULL
-  df$tip <- NULL
-  df_reshaped <- longtowide(as.data.frame(df), 
-                            idvar_=c('id', 'month'),
-                            timevar_=c("familia"),
-                            v.names=c("perc_adh", "estado_obje"),
-                            direction="wide")
-  return(df_reshaped)
-}
-
-
 #' Title
 #'
 #' @param df 
@@ -41,7 +15,20 @@ reshape_towideformat <- function(df){
 adherencia_farmacos <- function(df){
   df <- df %>% 
     mutate(perc_adh=dplyr::if_else(tip=='2a', length(collapsedstring_tovector(days))/30 * 100 , 0))
-  df <- reshape_towideformat(df)
+  
+  df$start <- NULL
+  df$end <- NULL
+  df$days <- NULL
+  df$group_id <- NULL
+  df$dura <- NULL
+  df$duration <- NULL
+  df$tip <- NULL
+  
+  df <- longtowide(as.data.frame(df), 
+                   idvar_=c('id', 'month'),
+                   timevar_=c("familia"),
+                   v.names=c("perc_adh", "estado_obje"),
+                   direction="wide")
   
   return(df)
 }
@@ -56,9 +43,25 @@ adherencia_farmacos <- function(df){
 #'
 #' @examples
 get_adherence_guia <- function(x){
-  list(unlist(strsplit(x$days, split=',')))
-  Reduce(intersect, list(c(1,2,3), c(1,3,4), c(1,3,4)))
-  
+  final_x <- x[1, ]
+  days_guia <- c()
+  if ((c('bbloq') %in% x$familia) & any(c('ieca', 'ara2') %in% x$familia)){
+    if (all(c('ieca', 'ara2') %in% x$familia)){
+      ieca_bbloq_adherent <- intersect(collapsedstring_tovector(as.character(x[which(x$familia %in% c('ieca')),'days'])),
+                                       collapsedstring_tovector(as.character(x[which(x$familia %in% c('bbloq')),'days'])))
+      ara2_bbloq_adherent <- intersect(collapsedstring_tovector(as.character(x[which(x$familia %in% c('ara2')),'days'])),
+                                       collapsedstring_tovector(as.character(x[which(x$familia %in% c('bbloq')),'days'])))
+      days_guia <- union(ieca_bbloq_adherent, ara2_bbloq_adherent)
+    } else if(c('ieca') %in% x$familia){
+      days_guia <- intersect(collapsedstring_tovector(as.character(x[which(x$familia %in% c('ieca')),'days'])),
+                             collapsedstring_tovector(as.character(x[which(x$familia %in% c('bbloq')),'days'])))
+    } else{ # ara2 in x$familia
+      days_guia <- intersect(collapsedstring_tovector(as.character(x[which(x$familia %in% c('ara2')),'days'])),
+                             collapsedstring_tovector(as.character(x[which(x$familia %in% c('bbloq')),'days'])))
+    }
+  }
+  final_x$days_guia <- vector_tocollapsedstring(days_guia)
+  return(final_x)
 }
 
 #' adherencia_farmacos_guia
@@ -73,16 +76,22 @@ adherencia_farmacos_guia <- function(df, drugs){
   # filter adherent patients: tip 2a
   PAUTA <- data.frame(bbloq='always', ieca='optional', ara2='optional')
   df <- df %>% 
-    filter(tip='2a') %>%
+    filter(tip=='2a') %>%
     group_by(id, month) %>% 
     group_modify(~get_adherence_guia(.x))
-  df <- df %>% group_by(id, month) %>% group_modify(~get_adherence_guia(.x))
   
-  # get adh_guia
+  df <- df %>% 
+    mutate(perc_adh_guia=dplyr::if_else(tip=='2a', length(collapsedstring_tovector(days_guia))/30 * 100 , 0))
   
-  
-  # fill empty months
-  
+  df$start <- NULL
+  df$end <- NULL
+  df$days <- NULL
+  df$group_id <- NULL
+  df$familia <- NULL
+  df$dura <- NULL
+  df$duration <- NULL
+  df$tip <- NULL
+  df$estado_obje <- NULL # is added with adherencia_farmacos
   return (df)
 }
 

@@ -70,11 +70,11 @@ baseJoinModel1_0 <- rearranged_in_months(baseJoinModel_3)
 saveRDS(baseJoinModel1_0, paste0(DATA_OUT_PATH, 'baseJoinModel_afterMonthlyRearrangement.rds'))
 # baseJoinModel1_0 <- readRDS('baseJoinModel_afterMonthlyRearrangement.rds')
 
-
+baseJoinModel1_0 <- readRDS('baseJoinModel_afterMonthlyRearrangement.rds')
 # df with time varying variables added ------------------------------------
 baseJoinModel3_0 <- adherencia_farmacos(baseJoinModel1_0)
-write.csv(baseJoinModel3_0, 'aaaaaaa.csv')
 baseJoinModel3_1 <- adherencia_farmacos_guia(baseJoinModel1_0, DRUGS)
 baseJoinModel3_2 <- adherencia_farmacos_medico(baseJoinModel1_0)
 
-
+# fill empty months IS NECESSARY
+View(baseJoinModel3_1)
