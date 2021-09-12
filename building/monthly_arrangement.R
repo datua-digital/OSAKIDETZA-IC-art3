@@ -1,6 +1,7 @@
 print ('montly_arrangement OK')
 
-
+# load sources ------------------------------------------------------------
+source('utils/df_utils.R')
 
 #' Rearrange prescription data in months
 #'
@@ -84,7 +85,7 @@ transform_to_days <- function(x){
   x$end_time <- NULL
   final_x <- x[1, ]
   days <- unique(days[!(days %in% 0)])
-  final_x$days <- paste(days, sep="", collapse=",")
+  final_x$days <- vector_tocollapsedstring(days)
   return(final_x)
 }
 
