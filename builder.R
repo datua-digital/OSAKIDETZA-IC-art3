@@ -17,6 +17,7 @@ library(constructedBases) # it needs to be installed constructedBases_0.1.1.tar.
 
 # path and files parameters
 DATA_IN_PATH = 'data/in/'
+DATA_OUT_PATH = 'data/out/'
 BUILDING_SCRIPTS_PATH = 'building/'
 PROJECT_RDATA = 'base_joinModel_artic3.rda.RData'
 
@@ -33,7 +34,7 @@ FILTER_DENOVO_TT_PATIENTS = TRUE
 source(paste0(BUILDING_SCRIPTS_PATH, 'preprocessing.R'), encoding = 'UTF-8')
 source(paste0(BUILDING_SCRIPTS_PATH, 'case_identification.R'), encoding = 'UTF-8')
 source(paste0(BUILDING_SCRIPTS_PATH, 'baseJoinModel_farmaco_fusion.R'), encoding = 'UTF-8')
-source(paste0(BUILDING_SCRIPTS_PATH, 'montly_arrangement.R'), encoding = 'UTF-8')
+source(paste0(BUILDING_SCRIPTS_PATH, 'monthly_arrangement.R'), encoding = 'UTF-8')
 source(paste0(BUILDING_SCRIPTS_PATH, 'time_varying_covariates.R'), encoding = 'UTF-8')
 
 
@@ -60,12 +61,20 @@ baseJoinModel_1 <- case_identification(baseJoinModel_0, EARLY_DEATH_PATIENT_DAYS
 baseJoinModel_2 <- merge_farmacos(baseJoinModel_1, df_farmacos)
 baseJoinModel_3 <- process_baseJoinModel1(baseJoinModel_2, duration=FOLLOW_UP)
 
+saveRDS(baseJoinModel_3,  paste0(DATA_OUT_PATH, 'baseJoinModel_and_famrmacos.rds'))
+# parece que necesito el dataframe no colapsado.
 
 # Data organized in monthly chunks ----------------------------------------
 baseJoinModel1_0 <- rearranged_in_months(baseJoinModel_3)
 
+saveRDS(baseJoinModel1_0, paste0(DATA_OUT_PATH, 'baseJoinModel_afterMonthlyRearrangement.rds'))
+# baseJoinModel1_0 <- readRDS('baseJoinModel_afterMonthlyRearrangement.rds')
+
 
 # df with time varying variables added ------------------------------------
-baseJoinModel3_0 <- timevarying1(baseJoinModel2)
-baseJoinModel3_1 <- timevarying2(baseJoinModel2_0)
-baseJoinModel3_2 <- timevarying2(baseJoinModel2_0)
+baseJoinModel3_0 <- adherencia_farmacos(baseJoinModel1_0)
+write.csv(baseJoinModel3_0, 'aaaaaaa.csv')
+baseJoinModel3_1 <- adherencia_farmacos_guia(baseJoinModel1_0, DRUGS)
+baseJoinModel3_2 <- adherencia_farmacos_medico(baseJoinModel1_0)
+
+
