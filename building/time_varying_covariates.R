@@ -3,12 +3,31 @@ print('time_varying_covariates.R OK')
 # load sources ------------------------------------------------------------
 source('utils/df_utils.R')
 
+#' merge_timevarying_vars
+#'
+#' @param df0 (data.frame) df with adherence of each drug
+#' @param df1 (data.frame) df with adherence of guide
+#' @param df2 (data.frame) df with adherence of doctor
+#'
+#' @return df (data.frame) data merged
+#' @export
+#'
+#' @examples
+merge_timevarying_vars <- function(df0, df1, df2){
+  df_ <- df0 %>% 
+    dplyr::left_join(df1[c('id', 'month', 'perc_adh_guia')], by=c('id', 'month'))
+  df <- df_ %>% 
+    dplyr::left_join(df2[c('id', 'month', 'perc_adh_doctor')], by=c('id', 'month'))
+  return(df)
+}
 
-#' Title
+# adherence of each drug --------------------------------------------------
+
+#' adherencia_farmacos
 #'
-#' @param df 
+#' @param df (data.frame)
 #'
-#' @return
+#' @return df (data.frame) data with adherence of each drug, all in wide format
 #' @export
 #'
 #' @examples
@@ -34,58 +53,29 @@ adherencia_farmacos <- function(df){
 }
 
 
-#' Title
-#'
-#' @param x 
-#'
-#' @return
-#' @export
-#'
-#' @examples
-get_adherence_guia <- function(x){
-  final_x <- x[1, ]
-  days_guia <- c()
-  if ((c('bbloq') %in% x$familia) & any(c('ieca', 'ara2') %in% x$familia)){
-    if (all(c('ieca', 'ara2') %in% x$familia)){
-      ieca_bbloq_adherent <- intersect(collapsedstring_tovector(as.character(x[which(x$familia %in% c('ieca')),'days'])),
-                                       collapsedstring_tovector(as.character(x[which(x$familia %in% c('bbloq')),'days'])))
-      ara2_bbloq_adherent <- intersect(collapsedstring_tovector(as.character(x[which(x$familia %in% c('ara2')),'days'])),
-                                       collapsedstring_tovector(as.character(x[which(x$familia %in% c('bbloq')),'days'])))
-      days_guia <- union(ieca_bbloq_adherent, ara2_bbloq_adherent)
-    } else if(c('ieca') %in% x$familia){
-      days_guia <- intersect(collapsedstring_tovector(as.character(x[which(x$familia %in% c('ieca')),'days'])),
-                             collapsedstring_tovector(as.character(x[which(x$familia %in% c('bbloq')),'days'])))
-    } else{ # ara2 in x$familia
-      days_guia <- intersect(collapsedstring_tovector(as.character(x[which(x$familia %in% c('ara2')),'days'])),
-                             collapsedstring_tovector(as.character(x[which(x$familia %in% c('bbloq')),'days'])))
-    }
-  }
-  final_x$days_guia <- vector_tocollapsedstring(days_guia)
-  return(final_x)
-}
+# adherence of the guide --------------------------------------------------
 
 #' adherencia_farmacos_guia
 #'
-#' @param df 
+#' @param df (data.frame)
 #'
 #' @return
 #' @export
 #'
 #' @examples
-adherencia_farmacos_guia <- function(df, drugs){
+adherencia_farmacos_guia <- function(df){
   # filter adherent patients: tip 2a
   PAUTA <- data.frame(bbloq='always', ieca='optional', ara2='optional')
   df <- df %>% 
-    filter(tip=='2a') %>%
     group_by(id, month) %>% 
-    group_modify(~get_adherence_guia(.x))
-  
+    group_modify(~get_days_adhguia(.x))
   df <- df %>% 
-    mutate(perc_adh_guia=dplyr::if_else(tip=='2a', length(collapsedstring_tovector(days_guia))/30 * 100 , 0))
+    mutate(perc_adh_guia=length(collapsedstring_tovector(days_adhguia))/30 * 100)
   
   df$start <- NULL
   df$end <- NULL
   df$days <- NULL
+  df$days_adhguia <- NULL
   df$group_id <- NULL
   df$familia <- NULL
   df$dura <- NULL
@@ -96,19 +86,105 @@ adherencia_farmacos_guia <- function(df, drugs){
 }
 
 
-#' adherencia_farmacos_medico
+#' get_days_adhguia
 #'
-#' @param df 
+#' @param x (data.frame) Part of df
 #'
-#' @return
+#' @return final_x x with a new column days_adhguia
 #' @export
 #'
 #' @examples
-adherencia_farmacos_medico <- function(df, drugs){
-  # filtrar adherentes + 1c?
+get_days_adhguia <- function(x){
+  final_x <- x[1, ]
+  days_adhguia <- c()
+  if (any(x$tip %in% c('2a'))){
+    x <- x[x$tip %in% c('2a'),]
+    
+    if ((c('bbloq') %in% x$familia) & any(c('ieca', 'ara2') %in% x$familia)){
+      if (all(c('ieca', 'ara2') %in% x$familia)){
+        ieca_bbloq_adherent <- intersect(collapsedstring_tovector(as.character(x[which(x$familia %in% c('ieca')),'days'])),
+                                         collapsedstring_tovector(as.character(x[which(x$familia %in% c('bbloq')),'days'])))
+        ara2_bbloq_adherent <- intersect(collapsedstring_tovector(as.character(x[which(x$familia %in% c('ara2')),'days'])),
+                                         collapsedstring_tovector(as.character(x[which(x$familia %in% c('bbloq')),'days'])))
+        days_adhguia <- union(ieca_bbloq_adherent, ara2_bbloq_adherent)
+      } else if(c('ieca') %in% x$familia){
+        days_adhguia <- intersect(collapsedstring_tovector(as.character(x[which(x$familia %in% c('ieca')),'days'])),
+                                  collapsedstring_tovector(as.character(x[which(x$familia %in% c('bbloq')),'days'])))
+      } else{ # ara2 in x$familia
+        days_adhguia <- intersect(collapsedstring_tovector(as.character(x[which(x$familia %in% c('ara2')),'days'])),
+                                  collapsedstring_tovector(as.character(x[which(x$familia %in% c('bbloq')),'days'])))
+      }
+    }
+    
+  } 
   
-  # get adh_medico
+  final_x$days_adhguia <- vector_tocollapsedstring(days_adhguia)
+  return(final_x)
+}
+
+# adherence of the doctor's prescription --------------------------------------------------
+
+#' adherencia_farmacos_medico
+#'
+#' @param df (data.frame)
+#'
+#' @return df 
+#' @export
+#'
+#' @examples
+adherencia_farmacos_medico <- function(df){
+  df <- df %>% 
+    group_by(id, month) %>% 
+    group_modify(~get_days_adhdoctor(.x))
+  df <- df %>% 
+    mutate(perc_adh_doctor=length(collapsedstring_tovector(days_adhdoctor))/30 * 100)
+  
+  df$start <- NULL
+  df$end <- NULL
+  df$days <- NULL
+  df$days_adhdoctor <- NULL
+  df$group_id <- NULL
+  df$familia <- NULL
+  df$dura <- NULL
+  df$duration <- NULL
+  df$tip <- NULL
+  df$estado_obje <- NULL # is added with adherencia_farmacos
   
   return (df)
 }
 
+
+#' get_days_adhdoctor
+#'
+#' @param x (data.frame) Part of df
+#'
+#' @return final_x (data.frame) final_x x with a new column days_adhdoctor
+#' @export
+#'
+#' @examples
+get_days_adhdoctor <- function(x){
+  final_x <- x[1, ]
+  days_adhdoctor <- c()
+  if(any(x$tip %in% c('1c', '2a'))){
+    
+    # days not beeing adherent in some drugs
+    days_not_beeing_completely_adherent <- c()
+    block_days_not_beeing_completely_adherent <- x[!x$tip %in% c('1c', '2a'), 'days']
+    for (days in block_days_not_beeing_completely_adherent){
+      days_not_beeing_completely_adherent <- c(days_not_beeing_completely_adherent, collapsedstring_tovector(days))
+    }
+    days_not_beeing_completely_adherent <- unique(days_not_beeing_completely_adherent)
+    
+    # days beeing adherent in some drugs:
+    days_beeing_partially_adherent <- c()
+    block_days_beeing_partially_adherent <- x[x$tip %in% c('1c', '2a'), 'days']
+    for (days in block_days_beeing_partially_adherent){
+      days_beeing_partially_adherent <- c(days_beeing_partially_adherent, collapsedstring_tovector(days))
+    }
+    days_beeing_partially_adherent <- unique(days_beeing_partially_adherent)
+    
+    days_adhdoctor <- setdiff(unique(days_beeing_partially_adherent), unique(days_not_beeing_completely_adherent))
+  }  
+  final_x$days_adhdoctor <- vector_tocollapsedstring(days_adhdoctor)
+  return(final_x)
+}

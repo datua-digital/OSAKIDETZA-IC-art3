@@ -56,25 +56,23 @@ df_farmacos <- preprocess_farmacos(df_farmacos, PROJECT_DRUGS)
 baseJoinModel_1 <- case_identification(baseJoinModel_0, EARLY_DEATH_PATIENT_DAYS, PROJECT_DRUGS)
 
 
-
 # df_farmacos and baseJoinModel fusion ------------------------------------
 baseJoinModel_2 <- merge_farmacos(baseJoinModel_1, df_farmacos)
 baseJoinModel_3 <- process_baseJoinModel1(baseJoinModel_2, duration=FOLLOW_UP)
-
 saveRDS(baseJoinModel_3,  paste0(DATA_OUT_PATH, 'baseJoinModel_and_famrmacos.rds'))
-# parece que necesito el dataframe no colapsado.
+
 
 # Data organized in monthly chunks ----------------------------------------
 baseJoinModel1_0 <- rearranged_in_months(baseJoinModel_3)
-
 saveRDS(baseJoinModel1_0, paste0(DATA_OUT_PATH, 'baseJoinModel_afterMonthlyRearrangement.rds'))
-# baseJoinModel1_0 <- readRDS('baseJoinModel_afterMonthlyRearrangement.rds')
 
-baseJoinModel1_0 <- readRDS('baseJoinModel_afterMonthlyRearrangement.rds')
+
 # df with time varying variables added ------------------------------------
-baseJoinModel3_0 <- adherencia_farmacos(baseJoinModel1_0)
-baseJoinModel3_1 <- adherencia_farmacos_guia(baseJoinModel1_0, DRUGS)
-baseJoinModel3_2 <- adherencia_farmacos_medico(baseJoinModel1_0)
+baseJoinModel2_0 <- adherencia_farmacos(baseJoinModel1_0)
+baseJoinModel2_1 <- adherencia_farmacos_guia(baseJoinModel1_0)
+baseJoinModel2_2 <- adherencia_farmacos_medico(baseJoinModel1_0)
+baseJoinModel2_3 <- merge_timevarying_vars(baseJoinModel2_0, baseJoinModel2_1, baseJoinModel2_2)
+saveRDS(baseJoinModel2_3, paste0(DATA_OUT_PATH, 'baseJoinModel_afterTimevarying_vars.rds'))
 
 # fill empty months IS NECESSARY
 View(baseJoinModel3_1)
