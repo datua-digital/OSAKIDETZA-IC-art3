@@ -54,7 +54,7 @@ df_farmacos <- preprocess_farmacos(df_farmacos, PROJECT_DRUGS)
 
 # Case identification -----------------------------------------------------
 baseJoinModel_1 <- case_identification(baseJoinModel_0, EARLY_DEATH_PATIENT_DAYS, PROJECT_DRUGS)
-
+saveRDS(baseJoinModel_1, paste0(DATA_OUT_PATH, 'data_after_case_identification.rds'))
 
 # df_farmacos and baseJoinModel fusion ------------------------------------
 baseJoinModel_2 <- merge_farmacos(baseJoinModel_1, df_farmacos)
@@ -74,5 +74,4 @@ baseJoinModel2_2 <- adherencia_farmacos_medico(baseJoinModel1_0)
 baseJoinModel2_3 <- merge_timevarying_vars(baseJoinModel2_0, baseJoinModel2_1, baseJoinModel2_2)
 saveRDS(baseJoinModel2_3, paste0(DATA_OUT_PATH, 'baseJoinModel_afterTimevarying_vars.rds'))
 
-# fill empty months IS NECESSARY
-View(baseJoinModel3_1)
+write.csv(baseJoinModel2_3, paste0(DATA_OUT_PATH, 'df_JM.csv'))
