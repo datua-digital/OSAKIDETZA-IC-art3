@@ -33,11 +33,11 @@ process_baseJoinModel1 <- function(df, duration){
     group_by(id) %>% 
     filter((end > falta_ing1) & (start < (falta_ing1 + duration)))
   
-  # set prescription limits from falta_ing1 to analyzed_period/oneyear
+  # set prescription limits from falta_ing1 to analyzed_period (to MortOingIcc)/oneyear
   df <- df %>%
     mutate(start = if_else(start < falta_ing1, falta_ing1, start)) %>%
     mutate(end = if_else(end > (falta_ing1 + duration), falta_ing1 + duration, end)) %>%
-    mutate(end = if_else(end > fmort2, fmort2, end, missing = end))
+    mutate(end = if_else(end > MortOingIcc, MortOingIcc, end, missing = end))
   
   # filter prescription periods where end >= start
   df <- df[(df['end'] >= df['start']) | is.na(df['end']),]
