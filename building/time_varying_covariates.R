@@ -34,14 +34,8 @@ merge_timevarying_vars <- function(df0, df1, df2){
 adherencia_farmacos <- function(df){
   df <- df %>% 
     mutate(perc_adh=dplyr::if_else(tip=='2a', length(collapsedstring_tovector(days))/30 * 100 , 0))
-  
-  df$start <- NULL
-  df$end <- NULL
-  df$days <- NULL
-  df$group_id <- NULL
-  df$dura <- NULL
-  df$duration <- NULL
-  df$tip <- NULL
+
+  df <- deletemultiplecolumns(df, c('start', 'end', 'days', 'group_id', 'dura', 'duration', 'tip'))
   
   df <- longtowide(as.data.frame(df), 
                    idvar_=c('id', 'month'),
@@ -71,17 +65,10 @@ adherencia_farmacos_guia <- function(df){
     group_modify(~get_days_adhguia(.x))
   df <- df %>% 
     mutate(perc_adh_guia=length(collapsedstring_tovector(days_adhguia))/30 * 100)
+
+  df <- deletemultiplecolumns(df, c('start', 'end', 'days', 'days_adhguia', 'group_id', 'familia', 'dura', 'duration', 'tip', 'estado_obje'))
+  # estado_obje is added with adherencia_farmacos
   
-  df$start <- NULL
-  df$end <- NULL
-  df$days <- NULL
-  df$days_adhguia <- NULL
-  df$group_id <- NULL
-  df$familia <- NULL
-  df$dura <- NULL
-  df$duration <- NULL
-  df$tip <- NULL
-  df$estado_obje <- NULL # is added with adherencia_farmacos
   return (df)
 }
 
@@ -139,16 +126,8 @@ adherencia_farmacos_medico <- function(df){
   df <- df %>% 
     mutate(perc_adh_doctor=length(collapsedstring_tovector(days_adhdoctor))/30 * 100)
   
-  df$start <- NULL
-  df$end <- NULL
-  df$days <- NULL
-  df$days_adhdoctor <- NULL
-  df$group_id <- NULL
-  df$familia <- NULL
-  df$dura <- NULL
-  df$duration <- NULL
-  df$tip <- NULL
-  df$estado_obje <- NULL # is added with adherencia_farmacos
+  df <- deletemultiplecolumns(df, c('start', 'end', 'days', 'days_adhdoctor', 'group_id', 'familia', 'dura', 'duration', 'tip', 'estado_obje'))
+  # estado_obje is added with adherencia_farmacos
   
   return (df)
 }

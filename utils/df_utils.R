@@ -49,5 +49,12 @@ collapsedstring_tovector <- function(string){
   return(unlist(strsplit(string, split=',')))
 }
 
-
+#' deletemultiplecolumns
+#'
+#' @param df (data.frame)
+#' @param columns (vector) columns to be removed
+deletemultiplecolumns <- function(df, columns){
+  df[ ,columns] <- list(NULL)
+  return(df)
+}
 
