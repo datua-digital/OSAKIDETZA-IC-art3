@@ -47,7 +47,7 @@ scale_startend <- function(df){
 split_inside_months <- function(x){
   
   start_month <- floor(x$start_time)
-  final_month <- floor(x$end_time)
+  final_month <- min(floor(x$end_time), 11) # month 13 not allowed
   count = 0
   for (m in c(start_month:final_month)) {
 
@@ -101,7 +101,7 @@ transform_to_days <- function(x){
   x$start_time <- NULL
   x$end_time <- NULL
   final_x <- x[1, ]
-  days <- unique(days[!(days %in% c(0, 13))]) # month 0 and 13 are not allowed
+  days <- unique(days[!(days %in% c(0))]) # day 0 not allowed
   final_x$days <- vector_tocollapsedstring(days)
   return(final_x)
 }
