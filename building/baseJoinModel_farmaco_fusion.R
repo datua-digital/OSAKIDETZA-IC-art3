@@ -1,4 +1,3 @@
-library(plyr)
 library(dplyr)
 library(cohorteicc2)
 
@@ -15,7 +14,7 @@ print('baseJoinModel_farmaco_fusion OK')
 #'
 #' @examples
 merge_farmacos <- function(df1, df2){
-  df <- plyr::join(df1, df2, by='id', type='left')
+  df <- df1 %>% dplyr::left_join(df2, by='id')
   return (df)
 }
 
