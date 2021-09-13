@@ -6,12 +6,8 @@ print('df utils OK')
 #' @param idvar_ the variable that identifies your groups
 #' @param timevar_ the variables that will become multiple columns in wide format
 #' @param v.names_ the variable containing the values that will be appended to v.names in wide format
-#' @param direction_ wide/long
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return df reshaped in wide format
 longtowide <- function(df, idvar_, timevar_, v.names_, direction_){
   
   return(reshape(df,
@@ -19,18 +15,15 @@ longtowide <- function(df, idvar_, timevar_, v.names_, direction_){
                  timevar = timevar_,
                  v.names = v.names_,
                  sep = "_",
-                 direction = direction_)
+                 direction = 'wide')
          )
 }
 
 #' vector_tocollapsedstring
 #'
-#' @param vector 
+#' @param vector (character vector)
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return character
 vector_tocollapsedstring <- function(vector){
   return(paste(vector, sep="", collapse=","))
 }
@@ -38,9 +31,9 @@ vector_tocollapsedstring <- function(vector){
 
 #' collapsedstring_tovector
 #'
-#' @param string 
+#' @param string (character)
 #'
-#' @return
+#' @return character vector
 #' @export
 #'
 #' @examples
@@ -52,7 +45,9 @@ collapsedstring_tovector <- function(string){
 #' deletemultiplecolumns
 #'
 #' @param df (data.frame)
-#' @param columns (vector) columns to be removed
+#' @param columns (character vector) columns to be removed
+#' 
+#' @return (data.frame) df without 'columns' columns
 deletemultiplecolumns <- function(df, columns){
   df[ ,columns] <- list(NULL)
   return(df)

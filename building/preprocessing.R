@@ -2,27 +2,22 @@ print('preprocessing OK')
 
 #' preprocess baseJoinModel before manipulating it
 #'
-#' @param df
+#' @param df (data.frame)
 #'
-#' @return df
-#' @export
-#'
-#' @examples
+#' @return df (data.frame) with columns types set
 preprocess_baseJoinModel <- function(df){
   # Establecer tipo de datos:
   df$id <- as.character(df$id)
   return (df)
 }
 
+
 #' preprocess farmacos_traye before manipulating it 
 #'
-#' @param df
-#' @param drugs 
+#' @param df (data.frame)
+#' @param drugs (character vector) DRUG global parameter
 #'
-#' @return df
-#' @export
-#'
-#' @examples
+#' @return df (data.frame) data with selected drugs
 preprocess_farmacos <- function(df, drugs){
   # seleccionar fármacos:
   df <- df[df$familia %in% drugs,]

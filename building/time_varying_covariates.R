@@ -10,9 +10,6 @@ source('utils/df_utils.R')
 #' @param df2 (data.frame) df with adherence of doctor
 #'
 #' @return df (data.frame) data merged
-#' @export
-#'
-#' @examples
 merge_timevarying_vars <- function(df0, df1, df2){
   df_ <- df0 %>% 
     dplyr::left_join(df1[c('id', 'month', 'perc_adh_guia')], by=c('id', 'month'))
@@ -28,9 +25,6 @@ merge_timevarying_vars <- function(df0, df1, df2){
 #' @param df (data.frame)
 #'
 #' @return df (data.frame) data with adherence of each drug, all in wide format
-#' @export
-#'
-#' @examples
 adherencia_farmacos <- function(df){
   df <- df %>% 
     mutate(perc_adh=dplyr::if_else(tip=='2a', length(collapsedstring_tovector(days))/30 * 100 , 0))
@@ -40,8 +34,8 @@ adherencia_farmacos <- function(df){
   df <- longtowide(as.data.frame(df), 
                    idvar_=c('id', 'month'),
                    timevar_=c("familia"),
-                   v.names=c("perc_adh", "estado_obje"),
-                   direction="wide")
+                   v.names=c("perc_adh", "estado_obje")
+                   )
   
   return(df)
 }
@@ -53,13 +47,9 @@ adherencia_farmacos <- function(df){
 #'
 #' @param df (data.frame)
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return df (data.frame ) data with adherence respect to guide
 adherencia_farmacos_guia <- function(df){
   # filter adherent patients: tip 2a
-  PAUTA <- data.frame(bbloq='always', ieca='optional', ara2='optional')
   df <- df %>% 
     group_by(id, month) %>% 
     group_modify(~get_days_adhguia(.x))
@@ -68,7 +58,6 @@ adherencia_farmacos_guia <- function(df){
 
   df <- deletemultiplecolumns(df, c('start', 'end', 'days', 'days_adhguia', 'group_id', 'familia', 'dura', 'duration', 'tip', 'estado_obje'))
   # estado_obje is added with adherencia_farmacos
-  
   return (df)
 }
 
@@ -78,9 +67,6 @@ adherencia_farmacos_guia <- function(df){
 #' @param x (data.frame) Part of df
 #'
 #' @return final_x x with a new column days_adhguia
-#' @export
-#'
-#' @examples
 get_days_adhguia <- function(x){
   final_x <- x[1, ]
   days_adhguia <- c()
@@ -115,10 +101,7 @@ get_days_adhguia <- function(x){
 #'
 #' @param df (data.frame)
 #'
-#' @return df 
-#' @export
-#'
-#' @examples
+#' @return df (data.frame) data with adherence respect to doctor's prescriptions
 adherencia_farmacos_medico <- function(df){
   df <- df %>% 
     group_by(id, month) %>% 
@@ -137,10 +120,7 @@ adherencia_farmacos_medico <- function(df){
 #'
 #' @param x (data.frame) Part of df
 #'
-#' @return final_x (data.frame) final_x x with a new column days_adhdoctor
-#' @export
-#'
-#' @examples
+#' @return final_x (data.frame) x with a new column days_adhdoctor
 get_days_adhdoctor <- function(x){
   final_x <- x[1, ]
   days_adhdoctor <- c()

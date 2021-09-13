@@ -6,13 +6,10 @@ print('baseJoinModel_farmaco_fusion OK')
 
 #' Merge farmacos_traye and baseJoinModel by id
 #'
-#' @param df1
-#' @param df2 
+#' @param df1 (data.frame)
+#' @param df2 (data.frame)
 #'
-#' @return df
-#' @export
-#'
-#' @examples
+#' @return df (data.frame) merged df
 merge_farmacos <- function(df1, df2){
   df <- df1 %>% dplyr::left_join(df2, by='id')
   return (df)
@@ -21,12 +18,10 @@ merge_farmacos <- function(df1, df2){
 
 #' process resultant data frame from merging baseJoinModel and farmacos_traye
 #'
-#' @param df 
+#' @param df (data.frame)
+#' @param duration (numeric) global param FOLLOW_UP
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return df processed
 process_baseJoinModel1 <- function(df, duration){
 
   # filter patients with drug prescriptions
@@ -34,7 +29,6 @@ process_baseJoinModel1 <- function(df, duration){
   df <- df[!rowSums(is.na(df[cols])), ]
 
   # filter, for each patient, prescriptions happened during follow up
-  ## id
   df <- df %>%
     group_by(id) %>% 
     filter((end > falta_ing1) & (start < (falta_ing1 + duration)))

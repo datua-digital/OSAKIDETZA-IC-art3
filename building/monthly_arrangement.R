@@ -5,12 +5,9 @@ source('utils/df_utils.R')
 
 #' Rearrange prescription data in months
 #'
-#' @param df 
+#' @param df (data.frame)
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return (data.frame)
 rearranged_in_months <- function(df){
   baseJoinModel1 <- scale_startend(df)
   baseJoinModel2 <- divide_monthly_periods(baseJoinModel1)
@@ -20,12 +17,9 @@ rearranged_in_months <- function(df){
 
 #' scale_startend: add start_time and end_time in a numeric and relative scale 
 #'
-#' @param df 
+#' @param df (data.frame)
 #'
-#' @return df 
-#' @export
-#'
-#' @examples
+#' @return df (data.frame) start time and end time columns added
 scale_startend <- function(df){
   df <- df %>%
     mutate(start_time = (start - falta_ing1 + 1)/30) %>%
@@ -40,10 +34,7 @@ scale_startend <- function(df){
 #'
 #' @param x (data.frame) Part of df
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return x_final (data.frame) month column added, start time and end time modified
 split_inside_months <- function(x){
   
   start_month <- floor(x$start_time)
@@ -82,12 +73,9 @@ split_inside_months <- function(x){
 
 #' transform_to_days: transform periods between months in days of months
 #'
-#' @param x (data.frame)
+#' @param x (data.frame) Part of df
 #'
-#' @return df (data.frame) Part of df
-#' @export
-#'
-#' @examples
+#' @return final_x (data.frame) days column added
 transform_to_days <- function(x){
   
   days <- c()
@@ -110,12 +98,9 @@ transform_to_days <- function(x){
 
 #' divide records in monthly periods
 #'
-#' @param df 
+#' @param df (data.frame)
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return df (data.frame) arranged in monthly chunks
 divide_monthly_periods <- function(df){
   df <- df %>% group_by(id) %>% mutate(group_id = row_number())
   df <- df %>% group_by(id, group_id) %>% group_modify(~split_inside_months(.x))
