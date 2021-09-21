@@ -39,34 +39,47 @@ split_inside_months <- function(x){
   
   start_month <- floor(x$start_time)
   final_month <- min(floor(x$end_time), 11) # month 13 not allowed
-  count = 0
-  for (m in c(start_month:final_month)) {
-
+  
+  if (final_month >= start_month){
+    count = 0
+    for (m in c(start_month:final_month)) {
+      # lower bound 
+      new_row <- x
+      if (m < x$start_time) {
+        low_limit <- x$start_time
+      } else {
+        low_limit <- m
+      }
+      
+      # upper bound 
+      if (m + 1 > x$end_time) {
+        high_limit <- x$end_time
+      } else {
+        high_limit <- m + 1
+      }
+      
+      # define new row columns
+      new_row$month <- m + 1
+      new_row$start_time <- low_limit
+      new_row$end_time <- high_limit
+      
+      # bind row
+      if (count >= 1) {
+        x_final <- rbind(x_final, new_row)
+      } else {
+        x_final <- new_row
+      }
+      count = count + 1
+      
+    }
+  } else{
     new_row <- x
-    if (m < x$start_time) {
-      low_limit <- x$start_time
-    } else {
-      low_limit <- m
-    }
-
-    if (m + 1 > x$end_time) {
-      high_limit <- x$end_time
-    } else {
-      high_limit <- m + 1
-    }
-    
-    new_row$month <- m + 1
-    new_row$start_time <- low_limit
-    new_row$end_time <- high_limit
-
-    if (count >= 1) {
-      x_final <- rbind(x_final, new_row)
-    } else {
-      x_final <- new_row
-    }
-    count = count + 1
-    
+    new_row$month <- NA
+    new_row$start_time <- NA
+    new_row$end_time <- NA
+    x_final <- new_row
   }
+  
   return (x_final)
 }
 
@@ -95,16 +108,22 @@ transform_to_days <- function(x){
 }
 
 
-
 #' divide records in monthly periods
 #'
 #' @param df (data.frame)
 #'
 #' @return df (data.frame) arranged in monthly chunks
 divide_monthly_periods <- function(df){
-  df <- df %>% group_by(id) %>% mutate(group_id = row_number())
-  df <- df %>% group_by(id, group_id) %>% group_modify(~split_inside_months(.x))
+  df <- df %>% 
+    group_by(id) %>% 
+    mutate(group_id = row_number())
+  df <- df %>% 
+    group_by(id, group_id, .drop=FALSE) %>%
+    group_modify(~split_inside_months(.x))
+  df <- df[!is.na(df[c('month')]), ]
   saveRDS(df, paste0(DATA_OUT_PATH, 'baseJoinModel_after_splitted_in_months.rds'))
-  df <- df %>% group_by(id, familia, month) %>% group_modify(~transform_to_days(.x))
+  df <- df %>%
+    group_by(id, familia, month) %>%
+    group_modify(~transform_to_days(.x))
   return (df)
 }
