@@ -25,8 +25,6 @@ PROJECT_RDATA = 'base_joinModel_artic3.rda.RData'
 PROJECT_DRUGS = c('ara2', 'ieca', 'bbloq')# , 'arm', 'ado')
 FOLLOW_UP = 365
 EARLY_DEATH_PATIENT_DAYS = 30
-FILTER_DENOVO_IC_PATIENTS = TRUE
-FILTER_DENOVO_TT_PATIENTS = TRUE
 
 
 # load sources ------------------------------------------------------------
