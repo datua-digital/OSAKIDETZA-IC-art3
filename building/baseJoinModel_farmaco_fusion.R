@@ -27,7 +27,8 @@ process_baseJoinModel1 <- function(df, duration){
   # filter patients with drug prescriptions
   cols <- c('familia', 'end', 'dura', 'tip', 'estado_obje')
   df <- df[!rowSums(is.na(df[cols])), ]
-
+  df$PATIENT_WITH_PRESCRIPTION <- TRUE
+  
   # filter, for each patient, prescriptions happened during follow up
   df <- df %>%
     group_by(id) %>% 
