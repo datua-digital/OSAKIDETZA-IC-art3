@@ -1,7 +1,7 @@
 library(dplyr)
 library(cohorteicc2)
 
-print('baseJoinModel_farmaco_fusion OK')
+print("baseJoinModel_farmaco_fusion OK")
 
 
 #' Merge farmacos_traye and baseJoinModel by id
@@ -11,8 +11,8 @@ print('baseJoinModel_farmaco_fusion OK')
 #'
 #' @return df (data.frame) merged df
 merge_farmacos <- function(df1, df2){
-  df <- df1 %>% dplyr::left_join(df2, by='id')
-  return (df)
+  df <- df1 %>% dplyr::left_join(df2, by = 'id')
+  return(df)
 }
 
 
@@ -22,7 +22,7 @@ merge_farmacos <- function(df1, df2){
 #' @param duration (numeric) global param FOLLOW_UP
 #'
 #' @return df processed
-process_baseJoinModel1 <- function(df, duration){
+process_base_join_model <- function(df, duration){
 
   # filter patients with drug prescriptions
   cols <- c('familia', 'end', 'dura', 'tip', 'estado_obje')

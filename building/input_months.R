@@ -26,26 +26,28 @@ input_patients_withoutprescriptions <- function(df, allid_df){
     
   # find ids withoout prescription
   ids_withoutprescription <- base::setdiff(allid_df$id, df$id)
-  colnames(df)
   
   # complete druginfo_cols
   druginfo_cols <- base::setdiff(colnames(df), colnames(allid_df))
-  allid_df[druginfo_cols] <- NA
+  allid_df[druginfo_cols] <- as.numeric(0)
   
   # build df-s of ids withoout prescription
   l_df_rows <- list()
   count <- 1
-  for (id_withoutprescription in ids_withoutprescription){
+  for (id_withoutprescription in ids_withoutprescription) {
       df_row <- allid_df[allid_df$id == id_withoutprescription, ]
       df_rows <- df_row[rep(1, 12), ]
       df_rows$month <- c(1:12)
+      df_rows$last_month <- NA
+      df_rows$last_day <- NA
+      df_rows$dura_in_months <- NA
       df_rows$PATIENT_WITH_PRESCRIPTION <- FALSE
       l_df_rows[[count]] <- df_rows
       count = count + 1
   }
   # bind df rows with ids without description
   df <- dplyr::bind_rows(df, l_df_rows)
-  return (df)
+  return(df)
   
 }
 
@@ -118,9 +120,9 @@ input_patients_withnofinalprescriptions <- function(df, FOLLOW_UP){
 #'
 #' @return a patient with intermediate months inputed
 input_intermediate_months <- function(x, months_toadd=c()){
-  if(length(x$month) != (max(x$month) - min(x$month) + 1) ){
-    for (n_month in c(min(x$month): max(x$month))){
-      if (! n_month %in% x$month){
+  if (length(x$month) != (max(x$month) - min(x$month) + 1) ) {
+    for (n_month in c(min(x$month):max(x$month))) {
+      if (!n_month %in% x$month) {
         months_toadd <- c(months_toadd, n_month)
       }
     }

@@ -12,9 +12,9 @@ source('utils/df_utils.R')
 #' @return df (data.frame) data merged
 merge_timevarying_vars <- function(df0, df1, df2){
   df_ <- df0 %>% 
-    dplyr::left_join(df1[c('id', 'month', 'perc_adh_guia')], by=c('id', 'month'))
+    dplyr::left_join(df1[c('id', 'month', 'perc_adh_guia')], by = c('id', 'month'))
   df <- df_ %>% 
-    dplyr::left_join(df2[c('id', 'month', 'perc_adh_doctor')], by=c('id', 'month'))
+    dplyr::left_join(df2[c('id', 'month', 'perc_adh_doctor')], by = c('id', 'month'))
   return(df)
 }
 
@@ -59,9 +59,10 @@ adherencia_farmacos_guia <- function(df){
   df <- df %>% 
     mutate(perc_adh_guia=length(collapsedstring_tovector(days_adhguia))/last_day * 100)
 
-  df <- deletemultiplecolumns(df, c('start', 'end', 'days', 'days_adhguia', 'group_id', 'familia', 'dura', 'duration', 'tip', 'estado_obje'))
-  # estado_obje is added with adherencia_farmacos
-  return (df)
+  df <- deletemultiplecolumns(df, 
+                              c('start', 'end', 'days', 'days_adhguia', 'group_id',
+                                'familia', 'dura', 'duration', 'tip', 'estado_obje'))
+  return(df)
 }
 
 
@@ -73,17 +74,17 @@ adherencia_farmacos_guia <- function(df){
 get_days_adhguia <- function(x){
   final_x <- x[1, ]
   days_adhguia <- c()
-  if (any(x$tip %in% c('2a'))){
+  if (any(x$tip %in% c('2a'))) {
     x <- x[x$tip %in% c('2a'),]
     
-    if ((c('bbloq') %in% x$familia) & any(c('ieca', 'ara2') %in% x$familia)){
-      if (all(c('ieca', 'ara2') %in% x$familia)){
+    if ((c('bbloq') %in% x$familia) & any(c('ieca', 'ara2') %in% x$familia)) {
+      if (all(c('ieca', 'ara2') %in% x$familia)) {
         ieca_bbloq_adherent <- intersect(collapsedstring_tovector(as.character(x[which(x$familia %in% c('ieca')),'days'])),
                                          collapsedstring_tovector(as.character(x[which(x$familia %in% c('bbloq')),'days'])))
         ara2_bbloq_adherent <- intersect(collapsedstring_tovector(as.character(x[which(x$familia %in% c('ara2')),'days'])),
                                          collapsedstring_tovector(as.character(x[which(x$familia %in% c('bbloq')),'days'])))
         days_adhguia <- union(ieca_bbloq_adherent, ara2_bbloq_adherent)
-      } else if(c('ieca') %in% x$familia){
+      } else if (c('ieca') %in% x$familia) {
         days_adhguia <- intersect(collapsedstring_tovector(as.character(x[which(x$familia %in% c('ieca')),'days'])),
                                   collapsedstring_tovector(as.character(x[which(x$familia %in% c('bbloq')),'days'])))
       } else{ # ara2 in x$familia
@@ -110,12 +111,12 @@ adherencia_farmacos_medico <- function(df){
     group_by(id, month) %>% 
     group_modify(~get_days_adhdoctor(.x))
   df <- df %>% 
-    mutate(perc_adh_doctor=length(collapsedstring_tovector(days_adhdoctor))/last_day * 100)
+    mutate(perc_adh_doctor = length(collapsedstring_tovector(days_adhdoctor))/last_day * 100)
   
-  df <- deletemultiplecolumns(df, c('start', 'end', 'days', 'days_adhdoctor', 'group_id', 'familia', 'dura', 'duration', 'tip', 'estado_obje'))
-  # estado_obje is added with adherencia_farmacos
-  
-  return (df)
+  df <- deletemultiplecolumns(df, 
+                              c('start', 'end', 'days', 'days_adhdoctor', 'group_id',
+                                'familia', 'dura', 'duration', 'tip', 'estado_obje'))
+  return(df)
 }
 
 
@@ -133,7 +134,8 @@ get_days_adhdoctor <- function(x){
     days_not_beeing_completely_adherent <- c()
     block_days_not_beeing_completely_adherent <- x[!x$tip %in% c('1c', '2a'), 'days']
     for (days in block_days_not_beeing_completely_adherent){
-      days_not_beeing_completely_adherent <- c(days_not_beeing_completely_adherent, collapsedstring_tovector(days))
+      days_not_beeing_completely_adherent <- c(days_not_beeing_completely_adherent, 
+                                               collapsedstring_tovector(days))
     }
     days_not_beeing_completely_adherent <- unique(days_not_beeing_completely_adherent)
     
@@ -141,7 +143,8 @@ get_days_adhdoctor <- function(x){
     days_beeing_partially_adherent <- c()
     block_days_beeing_partially_adherent <- x[x$tip %in% c('1c', '2a'), 'days']
     for (days in block_days_beeing_partially_adherent){
-      days_beeing_partially_adherent <- c(days_beeing_partially_adherent, collapsedstring_tovector(days))
+      days_beeing_partially_adherent <- c(days_beeing_partially_adherent, 
+                                          collapsedstring_tovector(days))
     }
     days_beeing_partially_adherent <- unique(days_beeing_partially_adherent)
     

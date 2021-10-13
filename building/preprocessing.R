@@ -8,7 +8,7 @@ print('preprocessing OK')
 preprocess_baseJoinModel <- function(df){
   # Establecer tipo de datos:
   df$id <- as.character(df$id)
-  return (df)
+  return(df)
 }
 
 
@@ -21,5 +21,5 @@ preprocess_baseJoinModel <- function(df){
 preprocess_farmacos <- function(df, drugs){
   # seleccionar fármacos:
   df <- df[df$familia %in% drugs,]
-  return (df)
+  return(df)
 }

@@ -9,9 +9,9 @@ source('utils/df_utils.R')
 #'
 #' @return (data.frame)
 rearranged_in_months <- function(df){
-  baseJoinModel1 <- scale_startend(df)
-  baseJoinModel2 <- divide_monthly_periods(baseJoinModel1)
-  return (baseJoinModel2)
+  base_join_model1 <- scale_startend(df)
+  base_join_model2 <- divide_monthly_periods(base_join_model1)
+  return (base_join_model2)
 }
 
 
@@ -131,9 +131,9 @@ divide_monthly_periods <- function(df){
   df$last_day <- as.numeric(df$last_day, units = "days")
   
   df <- df[!is.na(df[c('month')]), ]
-  saveRDS(df, paste0(DATA_OUT_PATH, 'baseJoinModel_after_splitted_in_months.rds'))
+  saveRDS(df, paste0(DATAOUTPATH, 'baseJoinModel_after_splitted_in_months.rds'))
   df <- df %>%
     group_by(id, familia, month, tip) %>%
     group_modify(~transform_to_days(.x))
-  return (df)
+  return(df)
 }
