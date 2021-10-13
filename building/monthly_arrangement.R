@@ -123,7 +123,7 @@ divide_monthly_periods <- function(df){
   df <- df[!is.na(df[c('month')]), ]
   saveRDS(df, paste0(DATA_OUT_PATH, 'baseJoinModel_after_splitted_in_months.rds'))
   df <- df %>%
-    group_by(id, familia, month) %>%
+    group_by(id, familia, month, tip) %>%
     group_modify(~transform_to_days(.x))
   return (df)
 }
