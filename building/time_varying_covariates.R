@@ -149,3 +149,14 @@ get_days_adhdoctor <- function(x){
   final_x$days_adhdoctor <- vector_tocollapsedstring(days_adhdoctor)
   return(final_x)
 }
+
+
+acum_month <- function(df) { 
+  df <- df %>%
+    mutate(cum_perc_adh_ara2 = cumsum(perc_adh_ara2)/100,
+           cum_perc_adh_bbloq = cumsum(perc_adh_bbloq)/100,
+           cum_perc_adh_ieca = cumsum(perc_adh_ieca)/100,
+           cum_perc_adh_doctor = cumsum(perc_adh_doctor)/100,
+           cum_perc_adh_guia = cumsum(perc_adh_guia)/100)
+  return(df)
+}
