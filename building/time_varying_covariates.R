@@ -30,12 +30,13 @@ adherencia_farmacos <- function(df){
     mutate(perc_adh = dplyr::if_else(tip == '2a', length(collapsedstring_tovector(days))/last_day * 100 , 0))
 
   df <- deletemultiplecolumns(df, 
-                              c('start', 'end', 'days', 'group_id', 'dura', 'duration', 'tip'))
+                              c('start', 'end', 'days', 'group_id', 'dura',
+                                'duration', 'tip', 'estado_obje'))
   
   df <- longtowide(as.data.frame(df),
                    idvar_ = c('id', 'month'),
                    timevar_ = c("familia"),
-                   v.names_ = c("perc_adh", "estado_obje"),
+                   v.names_ = c("perc_adh"),
                    direction_ = 'wide'
                    )
   
