@@ -135,12 +135,24 @@ input_intermediate_months <- function(x, months_toadd=c()){
 #' @param df (data.frame) Most update data frame of the workflow
 #'
 #' @return df with new rows added for patients without intermediate prescriptions
-input_patients_withnointermediateprescriptions <- function(df){
+input_patients_withnointermediateprescriptions <- function(df) {
   df <- df %>%
     group_by(id) %>%
     group_modify(~input_intermediate_months(.x))
-  return (df)
+  
+  return(df)
 }
+
+
+input_adhvars <- function(df) {
+  df[is.na(df$perc_adh_ara2), 'perc_adh_ara2'] <- 0
+  df[is.na(df$perc_adh_bbloq), 'perc_adh_ara2'] <- 0
+  df[is.na(df$perc_adh_ieca), 'perc_adh_ieca'] <- 0
+  df[is.na(df$perc_adh_doctor), 'perc_adh_doctor'] <- 0
+  df[is.na(df$perc_adh_guia), 'perc_adh_guia'] <- 0
+  return(df)
+}
+
 
 
 print('input_months OK')
