@@ -56,7 +56,7 @@ adherencia_farmacos_guia <- function(df){
     group_by(id, month) %>% 
     group_modify(~get_days_adhguia(.x))
   df <- df %>% 
-    mutate(perc_adh_guia=length(collapsedstring_tovector(days_adhguia))/30 * 100)
+    mutate(perc_adh_guia=length(collapsedstring_tovector(days_adhguia))/last_day * 100)
 
   df <- deletemultiplecolumns(df, c('start', 'end', 'days', 'days_adhguia', 'group_id', 'familia', 'dura', 'duration', 'tip', 'estado_obje'))
   # estado_obje is added with adherencia_farmacos
@@ -109,7 +109,7 @@ adherencia_farmacos_medico <- function(df){
     group_by(id, month) %>% 
     group_modify(~get_days_adhdoctor(.x))
   df <- df %>% 
-    mutate(perc_adh_doctor=length(collapsedstring_tovector(days_adhdoctor))/30 * 100)
+    mutate(perc_adh_doctor=length(collapsedstring_tovector(days_adhdoctor))/last_day * 100)
   
   df <- deletemultiplecolumns(df, c('start', 'end', 'days', 'days_adhdoctor', 'group_id', 'familia', 'dura', 'duration', 'tip', 'estado_obje'))
   # estado_obje is added with adherencia_farmacos

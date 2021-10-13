@@ -22,11 +22,16 @@ rearranged_in_months <- function(df){
 #' @return df (data.frame) start time and end time columns added
 scale_startend <- function(df){
   df <- df %>%
-    mutate(start_time = (start - falta_ing1 + 1)/30) %>%
-    mutate(end_time = (end - falta_ing1 + 1)/30)
-  df$start_time <- as.numeric(df$start_time, units="days") # real scale is month, which is not covered by the library
-  df$end_time <- as.numeric(df$end_time, units="days")
-  return (df)
+    mutate(start_time = (start - falta_ing1)/30) %>%
+    mutate(end_time = (end - falta_ing1)/30) %>%
+    mutate(dura_in_months = if_else((MortOingIcc - falta_ing1)/30 < 12 , (MortOingIcc - falta_ing1)/30, 12)) %>%
+    mutate(last_month = if_else((MortOingIcc - falta_ing1)/30 < 12 ,
+                                ceiling((MortOingIcc - falta_ing1)/30),
+                                12)) 
+  
+  df$start_time <- as.numeric(df$start_time, units = "days") # real scale is month, which is not covered by the library
+  df$end_time <- as.numeric(df$end_time, units = "days")
+  return(df)
 }
 
 
@@ -118,8 +123,13 @@ divide_monthly_periods <- function(df){
     group_by(id) %>% 
     mutate(group_id = row_number())
   df <- df %>% 
-    group_by(id, group_id, .drop=FALSE) %>%
+    group_by(id, group_id, .drop = FALSE) %>%
     group_modify(~split_inside_months(.x))
+  # calcular last_day
+  df <- df %>%
+    mutate(last_day = if_else(last_month == month, ceiling((dura_in_months - (last_month - 1))*30), 30))
+  df$last_day <- as.numeric(df$last_day, units = "days")
+  
   df <- df[!is.na(df[c('month')]), ]
   saveRDS(df, paste0(DATA_OUT_PATH, 'baseJoinModel_after_splitted_in_months.rds'))
   df <- df %>%
