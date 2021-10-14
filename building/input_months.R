@@ -5,32 +5,30 @@ library(dplyr)
 #'
 #' @param x subset of df. One of the patient of the cohort.
 #' @param months_toadd (numeric vector) months should add for the patient
-add_months <- function(x, months_toadd){
-  if (length(months_toadd) > 0){
+add_months <- function(x, months_toadd) {
+  if (length(months_toadd) > 0) {
     df_row <- x[1, ]
-    df_rows <- df_row[rep(1, length(months_toadd)),]
+    df_rows <- df_row[rep(1, length(months_toadd)), ]
     df_rows[c("perc_adh_ara2", "perc_adh_bbloq", "perc_adh_ieca", "perc_adh_guia", "perc_adh_doctor")] <- 0
     df_rows$month <- c(months_toadd)
     final_x <- rbind(x, df_rows)
   } else{
     final_x <- x
   }
+  return(final_x)
 }
 
 
-#' input_patients_withoutprescriptions
+#' input_patients_noprescriptions
 #'
 #' @param df (data.frame) Most update data frame of the workflow
 #' @param allid_df (data.frame) data frame including all initial id-s (3188)
-input_patients_withoutprescriptions <- function(df, allid_df){
-    
+input_patients_noprescriptions <- function(df, allid_df) {
   # find ids withoout prescription
   ids_withoutprescription <- base::setdiff(allid_df$id, df$id)
-  
   # complete druginfo_cols
   druginfo_cols <- base::setdiff(colnames(df), colnames(allid_df))
   allid_df[druginfo_cols] <- as.numeric(0)
-  
   # build df-s of ids withoout prescription
   l_df_rows <- list()
   count <- 1
@@ -41,14 +39,13 @@ input_patients_withoutprescriptions <- function(df, allid_df){
       df_rows$last_month <- NA
       df_rows$last_day <- NA
       df_rows$dura_in_months <- NA
-      df_rows$PATIENT_WITH_PRESCRIPTION <- FALSE
+      df_rows$patient_with_prescription <- FALSE
       l_df_rows[[count]] <- df_rows
-      count = count + 1
+      count <- count + 1
   }
   # bind df rows with ids without description
   df <- dplyr::bind_rows(df, l_df_rows)
   return(df)
-  
 }
 
 
@@ -57,60 +54,60 @@ input_patients_withoutprescriptions <- function(df, allid_df){
 #' @param x subset of df. One of the patient of the cohort.
 #'
 #' @return a patient with initial months inputed
-input_initial_months <- function(x, months_toadd=c()){
-  if (min(x$month) > 1){
-    months_toadd <- c(1:(min(x$month) - 1 ))
+input_initial_months <- function(x, months_toadd=c()) {
+  if (min(x$month) > 1) {
+    months_toadd <- c(1:(min(x$month) - 1))
   }
   final_x <- add_months(x, months_toadd)
-  return (final_x)
+  return(final_x)
 }
 
 
-#' input_patients_withnoinitialprescriptions
+#' input_patients_noiniprescriptions
 #'
 #' @param df (data.frame) Most update data frame of the workflow
 #'
 #' @return df with new rows added for patients without initial prescriptions
-input_patients_withnoinitialprescriptions <- function(df){
+input_patients_noiniprescriptions <- function(df) {
   df <- df %>%
     group_by(id) %>%
     group_modify(~input_initial_months(.x))
-  return (df)
+  return(df)
 }
 
 
 #' input_final_months
 #'
 #' @param x subset of df. One of the patient of the cohort.
-#' @param FOLLOW_UP (numeric) global param FOLLOW_UP
-input_final_months <- function(x, FOLLOW_UP, months_toadd=c()){
-  if (!any(is.na(x$MortOingIcc))){
-    if (unique(x$MortOingIcc) < unique(x$falta_ing1 + FOLLOW_UP)){
-      max_month <- min(ceiling(as.numeric(unique(x$MortOingIcc - x$falta_ing1 + 1), units="days") / 30), 12)
+#' @param FOLLOWUP (numeric) global param FOLLOWUP
+input_final_months <- function(x, FOLLOWUP, months_toadd=c()) {
+  if (!any(is.na(x$MortOingIcc))) {
+    if (unique(x$MortOingIcc) < unique(x$falta_ing1 + FOLLOWUP)) {
+      max_month <- min(ceiling(as.numeric(unique(x$MortOingIcc - x$falta_ing1 + 1), units = "days") / 30), 12)
     } else {
       max_month <- 12
     }
   } else{
     max_month <- 12
   }
-  if (max(x$month) < max_month){
+  if (max(x$month) < max_month) {
     months_toadd <- c((max(x$month) + 1):max_month)
   }
   final_x <- add_months(x, months_toadd)
-  return (final_x)
+  return(final_x)
 }
 
 
-#' input_patients_withnofinalprescriptions
+#' input_patients_nofinprescriptions
 #'
 #' @param df (data.frame) Most update data frame of the workflow
 #'
 #' @return df with new rows added for patients without final prescriptions
-input_patients_withnofinalprescriptions <- function(df, FOLLOW_UP){
+input_patients_nofinprescriptions <- function(df, FOLLOWUP) {
   df <- df %>%
     group_by(id) %>%
-    group_modify(~input_final_months(.x, FOLLOW_UP))
-  return (df)
+    group_modify(~input_final_months(.x, FOLLOWUP))
+  return(df)
 }
 
 
@@ -119,8 +116,8 @@ input_patients_withnofinalprescriptions <- function(df, FOLLOW_UP){
 #' @param x subset of df. One of the patient of the cohort.
 #'
 #' @return a patient with intermediate months inputed
-input_intermediate_months <- function(x, months_toadd=c()){
-  if (length(x$month) != (max(x$month) - min(x$month) + 1) ) {
+input_intermediate_months <- function(x, months_toadd=c()) {
+  if (length(x$month) != (max(x$month) - min(x$month) + 1)) {
     for (n_month in c(min(x$month):max(x$month))) {
       if (!n_month %in% x$month) {
         months_toadd <- c(months_toadd, n_month)
@@ -132,29 +129,27 @@ input_intermediate_months <- function(x, months_toadd=c()){
 }
 
 
-#' input_patients_withnointermediateprescriptions
+#' input_patients_nointerprescriptions
 #'
 #' @param df (data.frame) Most update data frame of the workflow
 #'
 #' @return df with new rows added for patients without intermediate prescriptions
-input_patients_withnointermediateprescriptions <- function(df) {
+input_patients_nointerprescriptions <- function(df) {
   df <- df %>%
     group_by(id) %>%
     group_modify(~input_intermediate_months(.x))
-  
   return(df)
 }
 
 
 input_adhvars <- function(df) {
-  df[is.na(df$perc_adh_ara2), 'perc_adh_ara2'] <- 0
-  df[is.na(df$perc_adh_bbloq), 'perc_adh_ara2'] <- 0
-  df[is.na(df$perc_adh_ieca), 'perc_adh_ieca'] <- 0
-  df[is.na(df$perc_adh_doctor), 'perc_adh_doctor'] <- 0
-  df[is.na(df$perc_adh_guia), 'perc_adh_guia'] <- 0
+  df[is.na(df$perc_adh_ara2), "perc_adh_ara2"] <- 0
+  df[is.na(df$perc_adh_bbloq), "perc_adh_bbloq"] <- 0
+  df[is.na(df$perc_adh_ieca), "perc_adh_ieca"] <- 0
+  df[is.na(df$perc_adh_doctor), "perc_adh_doctor"] <- 0
+  df[is.na(df$perc_adh_guia), "perc_adh_guia"] <- 0
   return(df)
 }
 
 
-
-print('input_months OK')
+print("input_months OK")
