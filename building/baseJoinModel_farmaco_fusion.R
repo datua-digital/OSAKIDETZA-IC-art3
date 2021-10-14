@@ -47,13 +47,26 @@ process_base_join_model <- function(df, duration){
                            FALSE,
                            missing = FALSE)) %>%
     mutate(time_to_event = if_else(as.numeric(MortOingIcc - falta_ing1) <= 360, 
-                                   as.numeric(MortOingIcc - falta_ing1), 
-                                   360))
+                                   as.numeric(MortOingIcc - falta_ing1)/30 + 0.001, 
+                                   12.001))
   # filter prescription periods where end >= start
   df <- df[(df["end"] >= df["start"]) | is.na(df["end"]), ]
   
   # adjust duration
   df["duration"] <- df["end"] - df["start"]
   
+  return(df)
+}
+
+reset_timeevent_vars <- function(df) {
+  df <- df %>%
+    mutate(event = if_else((MortOingIcc - falta_ing1) <= 360,
+                           TRUE,
+                           FALSE,
+                           missing = FALSE)) %>%
+    mutate(time_to_event = if_else(as.numeric(MortOingIcc - falta_ing1) <= 360, 
+                                   as.numeric(MortOingIcc - falta_ing1)/30 + 0.001, 
+                                   12.001)) %>%
+    mutate(month = if_else(month >= time_to_event, time_to_event - 0.01, month))
   return(df)
 }
