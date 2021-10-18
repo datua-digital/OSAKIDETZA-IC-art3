@@ -1,12 +1,17 @@
 library(nlme)
 
-longitudinal_process <- function(variable, data_, tipo = 'splines_cubicas') {
+longitudinal_process <- function(LONGVAR, data_, tipo = 'splines_cubicas') {
   if (tipo == 'splines_cubicas') {
-    long_process <- nlme::lme(as.formula(paste(variable, paste('ns(month, 4)', collapse = '+'), sep = '~')),
-                              random = ~ ns(month, 4) | id,
-                              data = data_,
-                              control = lmeControl(opt = 'optim'))
+    long_process <- nlme::lme(
+      as.formula(paste(
+        eval(LONGVAR), paste('ns(month, 4)', collapse = '+'), sep = '~')
+      ),
+      random = ~ ns(month, 4) | id,
+      data = data_,
+      control = lmeControl(opt = 'optim')
+    )
   }
+  return(long_process)
 }
 
 # plot_longitudinal_process <- function(data_, id, variable )

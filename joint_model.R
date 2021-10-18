@@ -6,83 +6,110 @@ library(readr)
 library(nlme)
 library(tidyverse)
 # global environment variables --------------------------------------------
-OUTPATH = 'out/'
-
-
+OUTPATH = "out/"
 
 # load sources ------------------------------------------------------------
-source('utils/jm_utils.R')
-source('utils/table_utils.R')
+source("utils/jm_utils.R")
+source("utils/table_utils.R")
 
 
 # Selección de variables ---------------------------------------------------------------
-VARIABLESCOX_IND <- c('sexo', 'edad_ing1')
-VARIABLESCOX <- c('sexo', 'edad_ing1', 'cluster(id)')
-VARIABLESTOTAL <- c('id', VARIABLESCOX_IND, 'event', 'time_to_event', 'month', 'cum_perc_adh_ara2', 'last_month')
-DATAOUTPATH <- 'data/out/'
+VARIABLESCOX_IND <- c("sexo", "edad_ing1")
+VARIABLESCOX <- c("sexo", "edad_ing1", "cluster(id)")
+VARIABLESTODOS <- c("id", VARIABLESCOX_IND, "event", "time_to_event", "month", "cum_perc_adh_ara2", "last_month")
+df_jm <- readr::read_csv("data/out/df_JM.csv")
 
-# load data ---------------------------------------------------------------
-# 
+# functions ---------------------------------------------------------------
+generate_coxdf <- function(df_jm) {
+  cox_df <- df_jm[!duplicated(df_jm$id), ]
+  cox_df <- cox_df[VARIABLESTODOS]
+  cox_df <- cox_df %>% dplyr::arrange(id, month)
+  return(cox_df)
+}
 
-df_jm <- readr::read_csv('data/out/df_JM.csv')
-df_jm$id <- as.numeric(df_jm$id)
-# df_jm <- df_jm %>% mutate(time_to_event2 = if_else(event == 1, time_to_event, 12.01))
+preprocess_dfjm <- function(df) {
+  df_jm <- df_jm[VARIABLESTODOS]
+  df_jm <- df_jm %>% dplyr::arrange(id, month)
+  return(df)
+}
 
-cox_df <- df_jm[!duplicated(df_jm$id), ]
-cox_df$id <- as.numeric(cox_df$id)
-df_jm <- df_jm[VARIABLESTOTAL]
-cox_df <- cox_df[VARIABLESTOTAL]
-df_jm <- df_jm %>% dplyr::arrange(id, month)
-cox_df <- cox_df %>% dplyr::arrange(id, month)
+apply_JM <- function(df_jm, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR) {
+  
+  # build data ---------------------------------------------------------------
+  cox_df <- generate_coxdf(df_jm)
+  dfjm <- preprocess_dfjm(df_jm)
+  
+  # Modelización de la variable longitudinal y el evento---------------------------------------------------------------
+  long_proc <- longitudinal_process(LONGVAR = LONGVAR, data_ = df_jm, tipo = "splines_cubicas")
+  
+  surv_object <- Surv(time = cox_df$time_to_event,
+                      event = as.numeric(cox_df$event))
+  
+  coxFit.df_jm <- coxph(as.formula(paste("surv_object", paste(VARIABLESCOX, collapse = "+"), sep = "~")), 
+                        data = cox_df,
+                        x = TRUE,
+                        model = TRUE)
+  
+  # Modelización del proceso del evento ---------------------------------------------------------------
+  # M1: Fit JM with longitudinal process (4) and event process (6)
+  M1 <- JMbayes::jointModelBayes(
+    long_proc,
+    coxFit.df_jm,
+    timeVar = "month",
+    n.iter = 30000,
+    n.burnin = 3000)
+  saveRDS(M1, paste0(OUTPATH, paste0("JM_M1_", LONGVAR, ".rds")))
+  
+  
+  # M2: Fit JM with longitudinal process (4) y componentes de tendencia y valor actuales
+  dForm <- list(fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
+                indFixed = 2:5, indRandom = 2:5)
+  M2 <- update(M1, param = "td-both", extraForm = dForm)
+  saveRDS(M2, paste0(OUTPATH, "JM_M2_", LONGVAR, ".rds"))
+  
+  
+  # M3: Fit JM with longitudinal process (4) y componente de tendencia
+  dForm <- list(fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
+                indFixed = 2:5, indRandom = 2:5)
+  M3 <- update(M1, param = "td-extra", extraForm = dForm)
+  saveRDS(M3, paste0(OUTPATH, "JM_M3_", LONGVAR, ".rds"))
+  
+  # Generar tabla resultados ---------------------------------------------------------------
+  JM_table <- summary_table(M1, M2, M3)
+  saveRDS(JM_table, paste0(OUTPATH, "JM_table_", LONGVAR, ".rds"))
+  # Guardar datos
+  # save(M1, M2, M3, JM_table, file = paste0("JM_", LONGVAR, ".RData"))
+}
+M1 <- readRDS(paste0(OUTPATH, paste0("JM_M1_", LONGVAR, ".rds")))
+M2 <- readRDS(paste0(OUTPATH, "JM_M2_", LONGVAR, ".rds"))
+M3 <- readRDS(paste0(OUTPATH, "JM_M3_", LONGVAR, ".rds"))
 
-# Modelización de la variable longitudinal y el evento---------------------------------------------------------------
-# 
+# JM para data.frame completo ---------------------------------------------
+
+# JM para variable ara2:
+LONGVAR <- "cum_perc_adh_ara2"
+apply_JM(df_jm, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR)
+
+# JM para variable ieca:
+LONGVAR <- "cum_perc_adh_ieca"
+apply_JM(df_jm, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR)
+
+# JM para variable bbloq:
+LONGVAR <- "cum_perc_adh_bbloq"
+apply_JM(df_jm, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR)
+
+# JM para variable adh_doctor:
+LONGVAR <- "cum_perc_adh_doctor"
+apply_JM(df_jm, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR)
+
+# JM para variable adh_guia:
+LONGVAR <- "cum_perc_adh_guia"
+apply_JM(df_jm, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR)
 
 
-
-# long_proc_cum_perc_adh_ara2 <- longitudinal_process(variable = 'cum_perc_adh_ara2',
-#                                                     data = df_jm,
-#                                                     tipo = 'splines_cubicas')
-
-long_proc_cum_perc_adh_ara2 <- nlme::lme(as.formula(paste('cum_perc_adh_ara2', paste('ns(month, 4)', collapse = '+'), sep = '~')),
-                          random = ~ ns(month, 4) | id,
-                          data = df_jm,
-                          control = lmeControl(opt = 'optim'))
-surv_object <- Surv(time = cox_df$time_to_event,
-                    event = as.numeric(cox_df$event))
-
-coxFit.df_jm <- coxph(as.formula(paste('surv_object', paste(VARIABLESCOX, collapse = '+'), sep = '~')), 
-                      data = cox_df,
-                      x = TRUE,
-                      model = TRUE)
-
-# Modelización del proceso del evento ---------------------------------------------------------------
-# M1: Fit JM with longitudinal process (4) and event process (6)
-M1 <- JMbayes::jointModelBayes(long_proc_cum_perc_adh_ara2, 
-                               coxFit.df_jm, 
-                               timeVar = "month",
-                               n.iter = 30000, 
-                               n.burnin = 3000)
-saveRDS(M1, paste0(DATAOUTPATH, 'JM_1_ara2.rds'))
+# JM para data.frame sin prescripciones ---------------------------------------------
+# sin pacientes que no tienen prescripciones
 
 
-# M2: Fit JM with longitudinal process (4) y componentes de tendencia y valor actuales
-dForm <- list(fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4), 
-              indFixed = 2:5, indRandom = 2:5)
-M2 <- update(M1, param = 'td-both', extraForm = dForm)
-saveRDS(M2, paste0(DATAOUTPATH, 'JM_2_ara2.rds'))
-summary(M2)
-
-# M3: Fit JM with longitudinal process (4) y componente de tendencia
-dForm <- list(fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4), 
-              indFixed = 2:5, indRandom = 2:5)
-M3 <- update(M1, param = 'td-extra', extraForm = dForm)
-saveRDS(M3, paste0(DATAOUTPATH, 'JM_3_ara2.rds'))
-
-
-
-
-# Guardar resultados ---------------------------------------------------------------
-
-JM_table <- summary_table(M1, M2, M3)
-
+# JM para data.frame sin prescripciones ---------------------------------------------
+# sin pacientes que no tienen prescripciones

@@ -1,7 +1,7 @@
 
 
 
-table_C <- function(M1, M2, M3){
+summary_table <- function(M1, M2, M3){
   
   # Function for the generation of Table 3 of the manuscript.
   
@@ -32,8 +32,8 @@ table_C <- function(M1, M2, M3){
   TM1 <- data.frame('Mean' = round(value,4), CI)
   colnames(TM1) <- c('Mean', '95% CI')
   rownames(TM1) <- c('Intercept', '$B_n(t,lambda_1)$', '$B_n(t,lambda_2)$',
-                     '$B_n(t,lambda_3)$', '$B_n(t,lambda_4)$', 'comorbidity', 'sigma_eps',
-                     'Age', 'Gender (Male)', 'Comorbidity', 'Current Value', 'Slope')
+                     '$B_n(t,lambda_3)$', '$B_n(t,lambda_4)$', 'sigma_eps',
+                     'Edad', 'Sexo', 'Current Value', 'Slope')
   
   #----------------#
   # Central column #
@@ -62,8 +62,8 @@ table_C <- function(M1, M2, M3){
   TM2 <- data.frame('Mean' = round(value,4), CI)
   colnames(TM2) <- c('Mean', '95% CI')
   rownames(TM2) <- c('Intercept', '$B_n(t,lambda_1)$', '$B_n(t,lambda_2)$',
-                     '$B_n(t,lambda_3)$', '$B_n(t,lambda_4)$', 'comorbidity', 'sigma_eps',
-                     'Age', 'Gender (Male)', 'Comorbidity', 'Current Value', 'Slope')
+                     '$B_n(t,lambda_3)$', '$B_n(t,lambda_4)$', 'sigma_eps',
+                     'Edad', 'Sexo', 'Current Value', 'Slope')
   
   #--------------#
   # Right column #
@@ -92,9 +92,8 @@ table_C <- function(M1, M2, M3){
   TM3 <- data.frame('Mean' = round(value,4), CI)
   colnames(TM3) <- c('Mean', '95% CI')
   rownames(TM3) <- c('Intercept', '$B_n(t,lambda_1)$', '$B_n(t,lambda_2)$',
-                     '$B_n(t,lambda_3)$', '$B_n(t,lambda_4)$', 'comorbidity', 'sigma_eps',
-                     'Age', 'Gender (Male)', 'Comorbidity', 'Current Value', 'Slope')
-  summaryJM <- cbind(TM1,TM2)
+                     '$B_n(t,lambda_3)$', '$B_n(t,lambda_4)$', 'sigma_eps',
+                     'Edad', 'Sexo', 'Current Value', 'Slope')
   #---------#
   # Table C #
   #---------#
