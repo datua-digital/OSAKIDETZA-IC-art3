@@ -25,8 +25,8 @@ merge_timevarying_vars <- function(df0, df1, df2) {
 #' @return df (data.frame) data with adherence of each drug, all in wide format
 adherencia_farmacos <- function(df) {
   df <- df %>%
-    mutate(perc_adh = dplyr::if_else(tip == "2a",
-                                     length(collapsedstring_tovector(days)) / last_day * 100,
+    dplyr::mutate(perc_adh = dplyr::if_else(tip == "2a",
+                                     (length(collapsedstring_tovector(days)) / last_day) * 100,
                                      0))
   df <- deletemultiplecolumns(df,
                               c("start", "end", "days", "group_id", "dura",
@@ -51,10 +51,10 @@ adherencia_farmacos <- function(df) {
 adherencia_farmacos_guia <- function(df) {
   # filter adherent patients: tip 2a
   df <- df %>%
-    group_by(id, month) %>%
-    group_modify(~get_days_adhguia(.x))
+    dplyr::group_by(id, month) %>%
+    dplyr::group_modify(~get_days_adhguia(.x))
   df <- df %>%
-    mutate(perc_adh_guia = length(collapsedstring_tovector(days_adhguia)) / last_day * 100)
+    dplyr::mutate(perc_adh_guia = (length(collapsedstring_tovector(days_adhguia)) / last_day) * 100)
 
   df <- deletemultiplecolumns(df,
                               c("start", "end", "days", "days_adhguia", "group_id",
@@ -102,10 +102,10 @@ get_days_adhguia <- function(x) {
 #' @return df (data.frame) data with adherence respect to doctor's prescriptions
 adherencia_farmacos_medico <- function(df) {
   df <- df %>%
-    group_by(id, month) %>%
-    group_modify(~get_days_adhdoctor(.x))
+    dplyr::group_by(id, month) %>%
+    dplyr::group_modify(~get_days_adhdoctor(.x))
   df <- df %>%
-    mutate(perc_adh_doctor = length(collapsedstring_tovector(days_adhdoctor)) / last_day * 100)
+    dplyr::mutate(perc_adh_doctor = (length(collapsedstring_tovector(days_adhdoctor)) / last_day) * 100)
   df <- deletemultiplecolumns(df,
                               c("start", "end", "days", "days_adhdoctor", "group_id",
                                 "familia", "dura", "duration", "tip", "estado_obje"))
@@ -147,11 +147,11 @@ get_days_adhdoctor <- function(x) {
 
 acum_month <- function(df) {
   df <- df %>%
-    mutate(cum_perc_adh_ara2 = cumsum(perc_adh_ara2) / 100,
-           cum_perc_adh_bbloq = cumsum(perc_adh_bbloq) / 100,
-           cum_perc_adh_ieca = cumsum(perc_adh_ieca) / 100,
-           cum_perc_adh_doctor = cumsum(perc_adh_doctor) / 100,
-           cum_perc_adh_guia = cumsum(perc_adh_guia) / 100)
+    dplyr::mutate(cum_perc_adh_ara2 = cumsum(perc_adh_ara2) / 100,
+                  cum_perc_adh_bbloq = cumsum(perc_adh_bbloq) / 100,
+                  cum_perc_adh_ieca = cumsum(perc_adh_ieca) / 100,
+                  cum_perc_adh_doctor = cumsum(perc_adh_doctor) / 100,
+                  cum_perc_adh_guia = cumsum(perc_adh_guia) / 100)
   return(df)
 }
 

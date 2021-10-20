@@ -24,23 +24,23 @@ process_base_join_model <- function(df, duration) {
   # filter patients with drug prescriptions
   cols <- c("familia", "end", "dura", "tip", "estado_obje")
   df <- df[!rowSums(is.na(df[cols])), ]
-  df$patient_with_prescriptions <- TRUE
+  df$patient_with_prescription <- TRUE
   # filter, for each patient, prescriptions happened during follow up
   df <- df %>%
     group_by(id) %>% 
     filter((end > falta_ing1) & (start < (falta_ing1 + duration)))
   # set prescription limits from falta_ing1 to analyzed_period (to MortOingIcc)/oneyear
   df <- df %>%
-    mutate(start = if_else(start < falta_ing1, falta_ing1, start)) %>%
-    mutate(end = if_else(end > (falta_ing1 + duration), falta_ing1 + duration, end)) %>%
-    mutate(end = if_else(end > MortOingIcc, MortOingIcc, end, missing = end))
+    dplyr::mutate(start = if_else(start < falta_ing1, falta_ing1, start)) %>%
+    dplyr::mutate(end = if_else(end > (falta_ing1 + duration), falta_ing1 + duration, end)) %>%
+    dplyr::mutate(end = if_else(end > MortOingIcc, MortOingIcc, end, missing = end))
   # set time to event and set event
   df <- df %>%
-    mutate(event = if_else((MortOingIcc - falta_ing1) <= 360,
+    dplyr::mutate(event = if_else((MortOingIcc - falta_ing1) <= 360,
                            TRUE,
                            FALSE,
                            missing = FALSE)) %>%
-    mutate(time_to_event = if_else(as.numeric(MortOingIcc - falta_ing1) <= 360,
+    dplyr::mutate(time_to_event = if_else(as.numeric(MortOingIcc - falta_ing1) <= 360,
                                    as.numeric(MortOingIcc - falta_ing1) / 30 + 0.001,
                                    12.001))
   # filter prescription periods where end >= start
@@ -52,14 +52,14 @@ process_base_join_model <- function(df, duration) {
 
 reset_timeevent_vars <- function(df) {
   df <- df %>%
-    mutate(event = if_else((MortOingIcc - falta_ing1) <= 360,
+    dplyr::mutate(event = if_else((MortOingIcc - falta_ing1) <= 360,
                            TRUE,
                            FALSE,
                            missing = FALSE)) %>%
-    mutate(time_to_event = if_else(as.numeric(MortOingIcc - falta_ing1) <= 360,
+    dplyr::mutate(time_to_event = if_else(as.numeric(MortOingIcc - falta_ing1) <= 360,
                                    as.numeric(MortOingIcc - falta_ing1) / 30 + 0.001,
                                    12.001)) %>%
-    mutate(month = if_else(month >= time_to_event, time_to_event - 0.01, month))
+    dplyr::mutate(month = if_else(month >= time_to_event, time_to_event - 0.01, month))
   return(df)
 }
 
