@@ -1,0 +1,257 @@
+---
+title: "resultados de joint_model"
+author: "Asier Insausti Gonzalez"
+date: "20/10/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+OUTPATH <- "./../out/"
+```
+
+
+# Resultados de los joint models
+
+El objetivo de este script es mostrar de forma ordenada todos los resultados que se obtienen en distintas ejecuciones de los joint models. Los distintos resultados que se muestran tienen la siguiente estructura:
+- Datos: Difieren según las familias que se han tenido en cuenta para construir la tabla de datos. Afecta al volumen de la tabla de datos y en el cálculo de la adherencia a la guía
+- Subgrupo de pacientes: Difieren en función de las condiciones que se han tenido en cuenta para incluir a un paciente en los modelos. Las condiciones son:
+  - denovo_ic_paciente
+  - denovo_tt_paciente_fing
+  - denovo_tt_paciente_falta
+  - early_death_patient_30
+  - patient_with_prescription
+- Variable longitudinal y modelo de Cox: Variables longitudinales introducidos en el joint model.
+
+## Datos: Adherencia guia sin tener en cuenta la familia arm
+
+
+### Subset: Adherencia teniendo en cuenta todos los id-s
+
+```{r output0}
+output <- 'JM'
+```
+
+#### Resultados de JM con adherencia de ara2
+
+```{r varara2_0}
+LONGVAR <- "cum_perc_adh_ara2"
+```
+
+```{r ara2_0}
+# JM_table <- readRDS(paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
+```
+
+
+#### Resultados de JM con adherencia de ieca
+```{r varieca_0}
+LONGVAR <- "cum_perc_adh_ieca"
+```
+
+```{r ieca_0}
+JM_table <- readRDS(paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
+JM_table$summaryJM
+```
+
+#### Resultados de JM con adherencia de bbloq
+```{r var_bbloq_0}
+LONGVAR <- "cum_perc_adh_bbloq"
+```
+
+```{r bbloq_0}
+JM_table <- readRDS(paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
+JM_table$summaryJM
+```
+
+#### Resultados de JM con adherencia al médico
+```{r var_adhdoctor_0}
+LONGVAR <- "cum_perc_adh_doctor"
+```
+
+```{r adhdoctor_0}
+JM_table <- readRDS(paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
+JM_table$summaryJM
+```
+
+#### Resultados de JM con adherencia a la guía
+```{r var_adhguia}
+LONGVAR <- "cum_perc_adh_guia"
+```
+
+```{r adhguia_0}
+JM_table <- readRDS(paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
+JM_table$summaryJM
+```
+
+### Subset: Adherencia sin tener en cuenta pacientes sin prescripciones
+
+```{r output1}
+output <- 'JM_reducido1'
+```
+
+#### Resultados de JM con adherencia de ara2
+
+```{r varara2_1}
+LONGVAR <- "cum_perc_adh_ara2"
+```
+
+```{r ara2_1}
+# JM_table <- readRDS(paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
+```
+
+
+#### Resultados de JM con adherencia de ieca
+```{r varieca_1}
+LONGVAR <- "cum_perc_adh_ieca"
+```
+
+```{r ieca_1}
+JM_table <- readRDS(paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
+JM_table$summaryJM
+```
+
+#### Resultados de JM con adherencia de bbloq
+```{r var_bbloq_1}
+LONGVAR <- "cum_perc_adh_bbloq"
+```
+
+```{r bbloq_1}
+JM_table <- readRDS(paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
+JM_table$summaryJM
+```
+
+#### Resultados de JM con adherencia al médico
+```{r var_adhdoctor_1}
+LONGVAR <- "cum_perc_adh_doctor"
+```
+
+```{r adhdoctor_1}
+JM_table <- readRDS(paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
+JM_table$summaryJM
+```
+
+#### Resultados de JM con adherencia a la guía
+```{r var_adhguia_1}
+LONGVAR <- "cum_perc_adh_guia"
+```
+
+```{r adhguia_1}
+JM_table <- readRDS(paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
+JM_table$summaryJM
+```
+
+### Subset: Adherencia sin tener en cuenta pacientes sin prescripciones ni pacientes que fallecen los primeros 30 días
+
+```{r output2}
+output <- 'JM_reducido2'
+```
+
+#### Resultados de JM con adherencia de ara2
+
+```{r varara2_2}
+LONGVAR <- "cum_perc_adh_ara2"
+```
+
+```{r ara2_2}
+# JM_table <- readRDS(paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
+```
+
+
+#### Resultados de JM con adherencia de ieca
+```{r varieca_2}
+LONGVAR <- "cum_perc_adh_ieca"
+```
+
+```{r ieca_2}
+JM_table <- readRDS(paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
+JM_table$summaryJM
+```
+
+#### Resultados de JM con adherencia de bbloq
+```{r var_bbloq_2}
+LONGVAR <- "cum_perc_adh_bbloq"
+```
+
+```{r bbloq_2}
+JM_table <- readRDS(paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
+JM_table$summaryJM
+```
+
+#### Resultados de JM con adherencia al médico
+```{r var_adhdoctor_2}
+LONGVAR <- "cum_perc_adh_doctor"
+```
+
+```{r adhdoctor_2}
+JM_table <- readRDS(paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
+JM_table$summaryJM
+```
+
+#### Resultados de JM con adherencia a la guía
+```{r var_adhguia_2}
+LONGVAR <- "cum_perc_adh_guia"
+```
+
+```{r adhguia_2}
+JM_table <- readRDS(paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
+JM_table$summaryJM
+```
+
+### Subset: Adherencia sin tener en cuenta pacientes sin prescripciones, ni pacientes que fallecen los primeros 30 días, ni pacientes de novo en fecha ingreso
+
+```{r output3}
+output <- 'JM_reducido3'
+```
+
+#### Resultados de JM con adherencia de ara2
+
+```{r var_ara2_3}
+LONGVAR <- "cum_perc_adh_ara2"
+```
+
+```{r ara2_3}
+JM_table <- readRDS(paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
+JM_table$summaryJM
+```
+
+
+#### Resultados de JM con adherencia de ieca
+```{r varieca_3}
+LONGVAR <- "cum_perc_adh_ieca"
+```
+
+```{r ieca_3}
+JM_table <- readRDS(paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
+JM_table$summaryJM
+```
+
+#### Resultados de JM con adherencia de bbloq
+```{r var_bbloq_3}
+LONGVAR <- "cum_perc_adh_bbloq"
+```
+
+```{r bbloq_3}
+JM_table <- readRDS(paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
+JM_table$summaryJM
+```
+
+#### Resultados de JM con adherencia al médico
+```{r var_adhdoctor}
+LONGVAR <- "cum_perc_adh_doctor"
+```
+
+```{r adhdoctor_3}
+# JM_table <- readRDS(paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
+# JM_table$summaryJM
+```
+
+#### Resultados de JM con adherencia a la guía
+```{r var_adhguia_3}
+LONGVAR <- "cum_perc_adh_guia"
+```
+
+```{r adhguia_3}
+JM_table <- readRDS(paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
+JM_table$summaryJM
+```
+
