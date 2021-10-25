@@ -14,6 +14,38 @@ longitudinal_process <- function(LONGVAR, data_, tipo = 'splines_cubicas') {
   return(long_process)
 }
 
+generate_coxdf <- function(df_jm) {
+  cox_df <- df_jm[!duplicated(df_jm$id), ]
+  cox_df <- cox_df[VARIABLESTODOS]
+  cox_df <- cox_df %>% dplyr::arrange(id, year)
+  return(cox_df)
+}
+
+preprocess_dfjm <- function(df) {
+  df_jm <- df_jm[c(VARIABLESTODOS, LONGVAR)]
+  df_jm <- df_jm %>% dplyr::arrange(id, year)
+  return(df_jm)
+}
+
+filter_patients <- function(df, patients_conditions) {
+  if (!is.null(patients_conditions$denovo_ic_paciente)) {
+    df <- df[df$denovo_ic_paciente == patients_conditions$denovo_ic_paciente, ]
+  }
+  if (!is.null(patients_conditions$denovo_tt_paciente_fing)) {
+    df <- df[df$denovo_tt_paciente_fing == patients_conditions$denovo_tt_paciente_fing, ]
+  }
+  if (!is.null(patients_conditions$denovo_tt_paciente_falta)) {
+    df <- df[df$denovo_tt_paciente_falta == patients_conditions$denovo_tt_paciente_falta, ]
+  }
+  if (!is.null(patients_conditions$early_death_patient_30)) {
+    df <- df[df$early_death_patient_30 == patients_conditions$early_death_patient_30, ]
+  }
+  if (!is.null(patients_conditions$patient_with_prescription)) {
+    df <- df[df$patient_with_prescription == patients_conditions$patient_with_prescription, ]
+  }
+  return(df)
+}
+
 # plot_longitudinal_process <- function(data_, id, variable )
 # long_ids <- names(which(table(df_td$id) > 6))
 # ids <- sample(long_ids, 16)

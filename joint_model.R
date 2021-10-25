@@ -1,10 +1,10 @@
 # load libraries ----------------------------------------------------------
 # 
-library(JM)
 library(JMbayes)
 library(readr)
 library(nlme)
 library(tidyverse)
+library(splines)
 # global environment variables --------------------------------------------
 OUTPATH <- "out/"
 
@@ -16,7 +16,8 @@ source("utils/table_utils.R")
 # Selección de variables ---------------------------------------------------------------
 VARIABLESCOX_IND <- c("sexo", "edad_ing1")
 VARIABLESCOX <- c("sexo", "edad_ing1", "cluster(id)")
-VARIABLESTODOS <- c("id", VARIABLESCOX_IND, "event", "time_to_event", "month", "cum_perc_adh_ara2", "last_month")
+VARIABLESLONGS <- c("cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_ieca", "cum_perc_adh_doctor", "cum_perc_adh_guia")
+VARIABLESTODOS <- c("id", VARIABLESCOX_IND, "event","time_to_event", "month")
 df_jm <- readr::read_csv("data/out/df_JM.csv")
 patients_conditions <- list(
   denovo_ic_paciente = NULL,
@@ -27,50 +28,6 @@ patients_conditions <- list(
 )
 
 # functions ---------------------------------------------------------------
-generate_coxdf <- function(df_jm) {
-  cox_df <- df_jm[!duplicated(df_jm$id), ]
-  cox_df <- cox_df[VARIABLESTODOS]
-  cox_df <- cox_df %>% dplyr::arrange(id, month)
-  return(cox_df)
-}
-
-preprocess_dfjm <- function(df) {
-  df_jm <- df_jm[VARIABLESTODOS]
-  df_jm <- df_jm %>% dplyr::arrange(id, month)
-  return(df)
-}
-
-get_table <- function(OUTPATH, output, LONGVAR, save = FALSE) {
-  M1 <- readRDS(paste0(OUTPATH, output, "_M1_", LONGVAR, ".rds"))
-  M2 <- readRDS(paste0(OUTPATH, output, "_M2_", LONGVAR, ".rds"))
-  M3 <- readRDS(paste0(OUTPATH, output, "_M3_", LONGVAR, ".rds"))
-  JM_table <- summary_table(M1, M2, M3)
-  if (save) {
-    saveRDS(JM_table, paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
-  }
-  rm(M1, M2, M3)
-  return(JM_table)
-}
-saveRDS(JM_table, paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
-filter_patients <- function(df, patients_conditions) {
-  if (!is.null(patients_conditions$denovo_ic_paciente)) {
-    df <- df[df$denovo_ic_paciente == patients_conditions$denovo_ic_paciente, ]
-  }
-  if (!is.null(patients_conditions$denovo_tt_paciente_fing)) {
-    df <- df[df$denovo_tt_paciente_fing == patients_conditions$denovo_tt_paciente_fing, ]
-  }
-  if (!is.null(patients_conditions$denovo_tt_paciente_falta)) {
-    df <- df[df$denovo_tt_paciente_falta == patients_conditions$denovo_tt_paciente_falta, ]
-  }
-  if (!is.null(patients_conditions$early_death_patient_30)) {
-    df <- df[df$early_death_patient_30 == patients_conditions$early_death_patient_30, ]
-  }
-  if (!is.null(patients_conditions$patient_with_prescription)) {
-    df <- df[df$patient_with_prescription == patients_conditions$patient_with_prescription, ]
-  }
-  return(df)
-}
-
 apply_JM <- function(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX,
                      VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM') {
   
@@ -90,7 +47,7 @@ apply_JM <- function(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX,
                         data = cox_df,
                         x = TRUE,
                         model = TRUE)
-  
+
   # Modelización del proceso del evento ---------------------------------------------------------------
   # M1: Fit JM with longitudinal process (4) and event process (6)
   M1 <- JMbayes::jointModelBayes(
@@ -256,7 +213,7 @@ apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTO
 
 # JM para variable adh_guia:
 LONGVAR <- "cum_perc_adh_guia"
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido3')
+apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducidotest2')
 
 output <- 'JM_reducido3'
 get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_ara2", save = TRUE)
