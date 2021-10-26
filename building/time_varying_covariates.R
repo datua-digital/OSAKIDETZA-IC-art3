@@ -14,7 +14,7 @@ merge_timevarying_vars <- function(df0, df1, df2, df3, df4) {
   df_2 <- df_ %>%
     dplyr::left_join(df2[c("id", "month", "perc_adh_doctor")], by = c("id", "month"))
   df_3 <- df_2 %>%
-    dplyr::left_join(df3[c("id", "month", "perc_adh_ara2ieca")], by = c("id", "month"))
+    dplyr::left_join(df3[c("id", "month", "perc_adh_ara2oieca")], by = c("id", "month"))
   df <- df_3 %>%
     dplyr::left_join(df4[c("id", "month", "perc_adh_guia_arm")], by = c("id", "month"))
   
@@ -51,7 +51,7 @@ adherencia_farmacos_ara2ieca <- function(df) {
     dplyr::group_by(id, month) %>%
     dplyr::group_modify(~get_days_ara2orieca(.x))
   df <- df %>%
-    dplyr::mutate(perc_adh_ara2ieca = (length(collapsedstring_tovector(days_ara2orieca)) / last_day) * 100)
+    dplyr::mutate(perc_adh_ara2oieca = (length(collapsedstring_tovector(days_ara2orieca)) / last_day) * 100)
   
   df <- deletemultiplecolumns(df,
                               c("start", "end", "days", "days_ara2orieca", "group_id",

@@ -78,7 +78,7 @@ base_join_model2_5 <- merge_timevarying_vars(base_join_model2_0,
                                              base_join_model2_3,
                                              base_join_model2_4)
 saveRDS(base_join_model2_5, paste0(DATAOUTPATH, "baseJoinModel_afterTimevarying_vars.rds"))
-write.csv(base_join_model2_5, 'test_longvars.csv')
+
 # Input final df ------------------------------------
 base_join_model2_6 <- input_patients_noprescriptions(base_join_model2_5, base_join_model_1)
 base_join_model2_7 <- input_patients_noiniprescriptions(base_join_model2_6)
@@ -93,4 +93,4 @@ base_join_model3 <- acum_month(base_join_model2_11)
 # recalcular evento y tiempo hasta evento para los últimos:
 
 
-write.csv(base_join_model3, paste0(DATAOUTPATH, "df_JM3.csv"))
+write.csv(base_join_model3, paste0(DATAOUTPATH, "df_JM.csv"))
