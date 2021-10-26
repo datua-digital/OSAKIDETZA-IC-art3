@@ -24,10 +24,9 @@ merge_timevarying_vars <- function(df0, df1, df2) {
 #'
 #' @return df (data.frame) data with adherence of each drug, all in wide format
 adherencia_farmacos <- function(df) {
-  df <- df %>%
-    dplyr::mutate(perc_adh = dplyr::if_else(tip == "2a",
-                                     (length(collapsedstring_tovector(days)) / last_day) * 100,
-                                     0))
+  df <- df %>% 
+    filter(tip == "2a") %>%
+    dplyr::mutate(perc_adh = (length(collapsedstring_tovector(days)) / last_day) * 100, 0)
   df <- deletemultiplecolumns(df,
                               c("start", "end", "days", "group_id", "dura",
                                 "duration", "tip", "estado_obje"))
