@@ -22,7 +22,7 @@ BUILDINGSCRIPTSPATH <- "building/"
 PROJECTRDATA <- "base_joinModel_artic3.rda.RData"
 
 # case identification parameters
-PROJECTDRUGS <- c("ara2", "ieca", "bbloq")# , "arm", "ado")
+PROJECTDRUGS <- c("ara2", "ieca", "bbloq", "arm")# , "ado")
 FOLLOWUP <- 365
 EARLYDEATHPATIENTDAYS <- 30
 
@@ -44,7 +44,7 @@ df_farmacos <- constructedBases::farmacos_traye
 # preprocessing -----------------------------------------------------------
 
 # preprocess baseJoinModel
-base_join_model_0 <- preprocess_base_join_model(base_join_model)
+base_join_model_0 <- preprocess_base_join_model(baseJoinModel)
 
 # preprocess farmacos
 df_farmacos <- preprocess_farmacos(df_farmacos, PROJECTDRUGS)
@@ -70,22 +70,27 @@ saveRDS(base_join_model1_0, paste0(DATAOUTPATH, "baseJoinModel_afterMonthlyRearr
 base_join_model2_0 <- adherencia_farmacos(base_join_model1_0)
 base_join_model2_1 <- adherencia_farmacos_guia(base_join_model1_0)
 base_join_model2_2 <- adherencia_farmacos_medico(base_join_model1_0)
-base_join_model2_3 <- merge_timevarying_vars(base_join_model2_0,
-                                             base_join_model2_1, base_join_model2_2)
-saveRDS(base_join_model2_3, paste0(DATAOUTPATH, "baseJoinModel_afterTimevarying_vars.rds"))
-
+base_join_model2_3 <- adherencia_farmacos_ara2ieca(base_join_model1_0)
+base_join_model2_4 <- adherencia_farmacos_guia_arm(base_join_model1_0)
+base_join_model2_5 <- merge_timevarying_vars(base_join_model2_0,
+                                             base_join_model2_1, 
+                                             base_join_model2_2,
+                                             base_join_model2_3,
+                                             base_join_model2_4)
+saveRDS(base_join_model2_5, paste0(DATAOUTPATH, "baseJoinModel_afterTimevarying_vars.rds"))
+write.csv(base_join_model2_5, 'test_longvars.csv')
 # Input final df ------------------------------------
-base_join_model2_4 <- input_patients_noprescriptions(base_join_model2_3, base_join_model_1)
-base_join_model2_5 <- input_patients_noiniprescriptions(base_join_model2_4)
-base_join_model2_6 <- input_patients_nofinprescriptions(base_join_model2_5, FOLLOWUP)
-base_join_model2_7 <- input_patients_nointerprescriptions(base_join_model2_6)
-base_join_model2_8 <- input_adhvars(base_join_model2_7)
-base_join_model2_9 <- reset_timeevent_vars(base_join_model2_8)
- 
+base_join_model2_6 <- input_patients_noprescriptions(base_join_model2_5, base_join_model_1)
+base_join_model2_7 <- input_patients_noiniprescriptions(base_join_model2_6)
+base_join_model2_8 <- input_patients_nofinprescriptions(base_join_model2_7, FOLLOWUP)
+base_join_model2_9 <- input_patients_nointerprescriptions(base_join_model2_8)
+base_join_model2_10 <- input_adhvars(base_join_model2_9)
+base_join_model2_11 <- reset_timeevent_vars(base_join_model2_10)
+
 # calcular adherencias acumuladas en meses ------------------------------------
-base_join_model3 <- acum_month(base_join_model2_9)
+base_join_model3 <- acum_month(base_join_model2_11)
 
 # recalcular evento y tiempo hasta evento para los últimos:
 
 
-write.csv(base_join_model3, paste0(DATAOUTPATH, "df_JM.csv"))
+write.csv(base_join_model3, paste0(DATAOUTPATH, "df_JM3.csv"))
