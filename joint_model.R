@@ -77,6 +77,57 @@ apply_JM <- function(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX,
   saveRDS(JM_table, paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
 }
 
+# JM para adherencia guia (con arm) ---------------------------------------------
+LONGVAR <- "cum_perc_adh_guia_arm"
+# Subset: Muestra teniendo en cuenta todos los id-s
+apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR)
+
+
+# Subset: Muestra filtrando pacientes con prescripciones:
+patients_conditions <- list(
+  denovo_ic_paciente = NULL,
+  denovo_tt_paciente_fing = NULL,
+  denovo_tt_paciente_falta = NULL,
+  early_death_patient_30 = NULL,
+  patient_with_prescription = TRUE
+)
+apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM1')
+
+# Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días
+patients_conditions <- list(
+  denovo_ic_paciente = NULL,
+  denovo_tt_paciente_fing = NULL,
+  denovo_tt_paciente_falta = NULL,
+  early_death_patient_30 = FALSE,
+  patient_with_prescription = NULL
+)
+apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM2')
+
+# Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días 
+# y filtrando pacientes de novo en fecha ingreso
+patients_conditions <- list(
+  denovo_ic_paciente = TRUE,
+  denovo_tt_paciente_fing = TRUE,
+  denovo_tt_paciente_falta = NULL,
+  early_death_patient_30 = FALSE,
+  patient_with_prescription = NULL
+)
+apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM3')
+
+
+# Subset: Muestra filtrando pacientes con prescripciones, 
+# sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso
+patients_conditions <- list(
+  denovo_ic_paciente = TRUE,
+  denovo_tt_paciente_fing = TRUE,
+  denovo_tt_paciente_falta = NULL,
+  early_death_patient_30 = FALSE,
+  patient_with_prescription = TRUE
+)
+apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM4')
+
+
+
 # JM para data.frame completo ---------------------------------------------
 
 # JM para variable ara2:

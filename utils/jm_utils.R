@@ -17,13 +17,13 @@ longitudinal_process <- function(LONGVAR, data_, tipo = 'splines_cubicas') {
 generate_coxdf <- function(df_jm) {
   cox_df <- df_jm[!duplicated(df_jm$id), ]
   cox_df <- cox_df[VARIABLESTODOS]
-  cox_df <- cox_df %>% dplyr::arrange(id, year)
+  cox_df <- cox_df %>% dplyr::arrange(id, month)
   return(cox_df)
 }
 
 preprocess_dfjm <- function(df) {
   df_jm <- df_jm[c(VARIABLESTODOS, LONGVAR)]
-  df_jm <- df_jm %>% dplyr::arrange(id, year)
+  df_jm <- df_jm %>% dplyr::arrange(id, month)
   return(df_jm)
 }
 
@@ -43,6 +43,7 @@ filter_patients <- function(df, patients_conditions) {
   if (!is.null(patients_conditions$patient_with_prescription)) {
     df <- df[df$patient_with_prescription == patients_conditions$patient_with_prescription, ]
   }
+  print(dim(df))
   return(df)
 }
 
