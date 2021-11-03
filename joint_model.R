@@ -7,32 +7,24 @@ library(tidyverse)
 library(splines)
 # global environment variables --------------------------------------------
 OUTPATH <- "out/"
+rm(list = list("M1", "M2", "M3"))
 
 # load sources ------------------------------------------------------------
 source("utils/jm_utils.R")
 source("utils/table_utils.R")
-
 
 # Selección de variables ---------------------------------------------------------------
 VARIABLESCOX_IND <- c("sexo", "edad_ing1")
 VARIABLESCOX <- c("sexo", "edad_ing1", "cluster(id)")
 VARIABLESLONGS <- c("cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_ieca", "cum_perc_adh_doctor", "cum_perc_adh_guia")
 VARIABLESTODOS <- c("id", VARIABLESCOX_IND, "event","time_to_event", "month")
-df_jm <- readr::read_csv("data/out/df_JM.csv")
-patients_conditions <- list(
-  denovo_ic_paciente = NULL,
-  denovo_tt_paciente_fing = NULL,
-  denovo_tt_paciente_falta = NULL,
-  early_death_patient_30 = NULL,
-  patient_with_prescription = NULL
-)
 
 # functions ---------------------------------------------------------------
-apply_JM <- function(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX,
+apply_JM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX,
                      VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM') {
   
   # choose patients
-  df_jm <- filter_patients(df_jm, patients_conditions)
+  df_jm <- filter_patients(df_jm0, patients_conditions)
   # build data ---------------------------------------------------------------
   cox_df <- generate_coxdf(df_jm)
   df_jm <- preprocess_dfjm(df_jm)
@@ -79,10 +71,20 @@ apply_JM <- function(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX,
 
 # JM para adherencia guia (con arm) ---------------------------------------------
 LONGVAR <- "cum_perc_adh_guia_arm"
+
+df_jm <- readr::read_csv("data/out/df_JM.csv")
 # Subset: Muestra teniendo en cuenta todos los id-s
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR)
+patients_conditions <- list(
+  denovo_ic_paciente = NULL,
+  denovo_tt_paciente_fing = NULL,
+  denovo_tt_paciente_falta = NULL,
+  early_death_patient_30 = NULL,
+  patient_with_prescription = NULL
+)
 
+apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR)
 
+df_jm <- readr::read_csv("data/out/df_JM.csv")
 # Subset: Muestra filtrando pacientes con prescripciones:
 patients_conditions <- list(
   denovo_ic_paciente = NULL,
@@ -91,8 +93,9 @@ patients_conditions <- list(
   early_death_patient_30 = NULL,
   patient_with_prescription = TRUE
 )
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM1')
+apply_JM(df_jm0 = df_jm, patients_conditions=patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM1')
 
+df_jm <- readr::read_csv("data/out/df_JM.csv")
 # Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días
 patients_conditions <- list(
   denovo_ic_paciente = NULL,
@@ -101,9 +104,10 @@ patients_conditions <- list(
   early_death_patient_30 = FALSE,
   patient_with_prescription = NULL
 )
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM2')
+apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM2')
 
 # Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días 
+df_jm <- readr::read_csv("data/out/df_JM.csv")
 # y filtrando pacientes de novo en fecha ingreso
 patients_conditions <- list(
   denovo_ic_paciente = TRUE,
@@ -112,10 +116,11 @@ patients_conditions <- list(
   early_death_patient_30 = FALSE,
   patient_with_prescription = NULL
 )
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM3')
+apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM3')
 
 
 # Subset: Muestra filtrando pacientes con prescripciones, 
+df_jm <- readr::read_csv("data/out/df_JM.csv")
 # sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso
 patients_conditions <- list(
   denovo_ic_paciente = TRUE,
@@ -124,7 +129,7 @@ patients_conditions <- list(
   early_death_patient_30 = FALSE,
   patient_with_prescription = TRUE
 )
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM4')
+apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM4')
 
 
 

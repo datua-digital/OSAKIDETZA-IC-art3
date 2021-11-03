@@ -26,12 +26,12 @@ add_months <- function(x, months_toadd) {
 #' @param df (data.frame) Most update data frame of the workflow
 #' @param allid_df (data.frame) data frame including all initial id-s (3188)
 input_patients_noprescriptions <- function(df, allid_df) {
-  # find ids withoout prescription
+  # find ids without prescription
   ids_withoutprescription <- base::setdiff(allid_df$id, df$id)
   # complete druginfo_cols
   druginfo_cols <- base::setdiff(colnames(df), colnames(allid_df))
   allid_df[druginfo_cols] <- as.numeric(0)
-  # build df-s of ids withoout prescription
+  # build df-s of ids without prescription
   l_df_rows <- list()
   count <- 1
   for (id_withoutprescription in ids_withoutprescription) {
@@ -45,6 +45,7 @@ input_patients_noprescriptions <- function(df, allid_df) {
       l_df_rows[[count]] <- df_rows
       count <- count + 1
   }
+  
   # bind df rows with ids without description
   df <- dplyr::bind_rows(df, l_df_rows)
   return(df)

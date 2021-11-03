@@ -4,7 +4,6 @@ author: "Asier Insausti Gonzalez"
 date: "20/10/2021"
 output: html_document
 ---
-
 ```{r setup, include=FALSE}
 # options
 knitr::opts_chunk$set(echo = TRUE)
@@ -18,6 +17,7 @@ OUTPATH <- "./../out/"
 
 ```{r source, include=FALSE}
 source("./../utils/jm_utils.R")
+source("./../utils/table_utils.R")
 ```
 
 
@@ -40,9 +40,9 @@ df_jm <- readr::read_csv("../data/out/df_JM.csv")
 ```
 ## Cargas de data frames para subgrupos de pacientes
 
-* Adherencia sin tener en cuenta pacientes sin prescripciones
+* Adherencia filtrando pacientes con prescripciones
 
-```{r todos sin prescripciones}
+```{r con prescripciones}
 patients_conditions <- list(
   denovo_ic_paciente = NULL,
   denovo_tt_paciente_fing = NULL,
@@ -51,14 +51,14 @@ patients_conditions <- list(
   patient_with_prescription = TRUE
 )
 df_jm1 <- filter_patients(df_jm, patients_conditions)
-cantidad_pacientes <- length(unique(df_jm$id))
+cantidad_pacientes <- length(unique(df_jm1$id))
 ```
 
 Con las condiciones establecidas, en esta tabla de datos se incluyen `r cantidad_pacientes` pacientes
 
 * Adherencia sin tener en cuenta pacientes que fallecen los primeros 30 días
 
-```{r todos sin prescripciones}
+```{r todos sin pacientes duran poco}
 patients_conditions <- list(
   denovo_ic_paciente = NULL,
   denovo_tt_paciente_fing = NULL,
@@ -74,7 +74,7 @@ Con las condiciones establecidas, en esta tabla de datos se incluyen `r cantidad
 
 * Adherencia sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso
 
-```{r todos sin prescripciones}
+```{r todos con prescripciones y novo}
 patients_conditions <- list(
   denovo_ic_paciente = NULL,
   denovo_tt_paciente_fing = TRUE,
@@ -91,7 +91,7 @@ Con las condiciones establecidas, en esta tabla de datos se incluyen `r cantidad
 
 * Adherencia sin tener en cuenta pacientes sin prescripciones, ni pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso
 
-```{r todos sin prescripciones}
+```{r todos con prescripciones y novo y sin duran poco}
 patients_conditions <- list(
   denovo_ic_paciente = NULL,
   denovo_tt_paciente_fing = TRUE,
@@ -108,157 +108,211 @@ Con las condiciones establecidas, en esta tabla de datos se incluyen `r cantidad
 # Resultados
 ## Adherencia guia arm
 
-```{r var_adhguia}
+```{r var_adhguia_arm}
 LONGVAR <- "cum_perc_adh_guia_arm"
 ```
 
 
 ### Subset: Muestra teniendo en cuenta todos los id-s
 
-```{r adhguia_0}
-JM_table <- readRDS(paste0(OUTPATH, output = 'JM', "JM_table_", LONGVAR, ".rds"))
-JM_table$summaryJM
+```{r adhguia_arm_0}
+# JM_table <- readRDS(paste0(OUTPATH, output = 'JM', "JM_table_", LONGVAR, ".rds"))
+# JM_table$summaryJM
+M1 <- readRDS('./../out//JM_M1_cum_perc_adh_guia_arm.rds')
+M2 <- readRDS('./../out//JM_M2_cum_perc_adh_guia_arm.rds')
+M3 <- readRDS('./../out//JM_M3_cum_perc_adh_guia_arm.rds')
+JM_table <- summary_table(M1, M2, M3)
+JM_table
+rm("M1", "M2", "M3")
 ```
+```{r delete_adhgioa_arm_0}
+rm("M1", "M2", "M3")
+```
+
 
 ### Subset: Muestra filtrando pacientes con prescripciones
 
-```{r adhguia_1}
-JM_table <- readRDS(paste0(OUTPATH, output = 'JM1', "JM_table_", LONGVAR, ".rds"))
-JM_table$summaryJM
+```{r adhguia_arm_1}
+# JM_table <- readRDS(paste0(OUTPATH, output = 'JM1', "JM_table_", LONGVAR, ".rds"))
+# JM_table$summaryJM
+M1 <- readRDS('./../out//JM1_M1_cum_perc_adh_guia_arm.rds')
+M2 <- readRDS('./../out//JM1_M2_cum_perc_adh_guia_arm.rds')
+M3 <- readRDS('./../out//JM1_M3_cum_perc_adh_guia_arm.rds')
+
+JM_table <- summary_table(M1, M2, M3)
+JM_table
 ```
+
+```{r delete_adhgioa_arm_1}
+rm("M1", "M2", "M3")
+```
+
 
 ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días
 
-```{r adhguia_2}
-JM_table <- readRDS(paste0(OUTPATH, output = 'JM2', "JM_table_", LONGVAR, ".rds"))
-JM_table$summaryJM
+```{r adhguia_arm_2}
+# JM_table <- readRDS(paste0(OUTPATH, output = 'JM2', "JM_table_", LONGVAR, ".rds"))
+# JM_table$summaryJM
+M1 <- readRDS('./../out//JM2_M1_cum_perc_adh_guia_arm.rds')
+M2 <- readRDS('./../out//JM2_M2_cum_perc_adh_guia_arm.rds')
+M3 <- readRDS('./../out//JM2_M3_cum_perc_adh_guia_arm.rds')
+
+JM_table <- summary_table(M1, M2, M3)
+JM_table
 ```
+
+```{r delete_adhgioa_arm_2}
+rm("M1", "M2", "M3")
+```
+
 
 
 ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días y filtrando pacientes de novo en fecha ingreso
 
-```{r adhguia_3}
-JM_table <- readRDS(paste0(OUTPATH, output = 'JM3', "JM_table_", LONGVAR, ".rds"))
-JM_table$summaryJM
+```{r adhguia_arm_3}
+# JM_table <- readRDS(paste0(OUTPATH, output = 'JM3', "JM_table_", LONGVAR, ".rds"))
+# JM_table$summaryJM
+
+M1 <- readRDS('./../out//JM3_M1_cum_perc_adh_guia_arm.rds')
+M2 <- readRDS('./../out//JM3_M2_cum_perc_adh_guia_arm.rds')
+M3 <- readRDS('./../out//JM3_M3_cum_perc_adh_guia_arm.rds')
+
+JM_table <- summary_table(M1, M2, M3)
+JM_table
 ```
+
+```{r delete_adhgioa_arm_3}
+rm("M1", "M2", "M3")
+```
+
 
 ### Subset: Muestra filtrando pacientes con prescripciones, sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso
 
-```{r adhguia_4}
-JM_table <- readRDS(paste0(OUTPATH, output = 'JM4', "JM_table_", LONGVAR, ".rds"))
-JM_table$summaryJM
+```{r adhguia_arm_4}
+# JM_table <- readRDS(paste0(OUTPATH, output = 'JM4', "JM_table_", LONGVAR, ".rds"))
+# JM_table$summaryJM
+M1 <- readRDS('./../out//JM4_M1_cum_perc_adh_guia_arm.rds')
+M2 <- readRDS('./../out//JM4_M2_cum_perc_adh_guia_arm.rds')
+M3 <- readRDS('./../out//JM4_M3_cum_perc_adh_guia_arm.rds')
+
+JM_table <- summary_table(M1, M2, M3)
+JM_table
 ```
 
-## Adherencia guia sin arm
-
-```{r var_adhguia}
-LONGVAR <- "cum_perc_adh_guia"
+```{r delete_adhgioa_arm_4}
+rm("M1", "M2", "M3")
 ```
 
+<!-- ## Adherencia guia sin arm -->
 
-### Subset: Muestra teniendo en cuenta todos los id-s
-
-```{r adhguia_0}
-JM_table <- readRDS(paste0(OUTPATH, output = 'JM', "JM_table_", LONGVAR, ".rds"))
-JM_table$summaryJM
-```
-
-### Subset: Muestra filtrando pacientes con prescripciones
-
-```{r adhguia_1}
-JM_table <- readRDS(paste0(OUTPATH, output = 'JM1', "JM_table_", LONGVAR, ".rds"))
-JM_table$summaryJM
-```
-
-### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días
-
-```{r adhguia_2}
-JM_table <- readRDS(paste0(OUTPATH, output = 'JM2', "JM_table_", LONGVAR, ".rds"))
-JM_table$summaryJM
-```
+<!-- ```{r var_adhguia} -->
+<!-- LONGVAR <- "cum_perc_adh_guia" -->
+<!-- ``` -->
 
 
-### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días y filtrando pacientes de novo en fecha ingreso
+<!-- ### Subset: Muestra teniendo en cuenta todos los id-s -->
 
-```{r adhguia_3}
-JM_table <- readRDS(paste0(OUTPATH, output = 'JM3', "JM_table_", LONGVAR, ".rds"))
-JM_table$summaryJM
-```
+<!-- ```{r adhguia_0} -->
+<!-- JM_table <- readRDS(paste0(OUTPATH, output = 'JM', "JM_table_", LONGVAR, ".rds")) -->
+<!-- JM_table$summaryJM -->
+<!-- ``` -->
 
-### Subset: Muestra filtrando pacientes con prescripciones, sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso
+<!-- ### Subset: Muestra filtrando pacientes con prescripciones -->
 
-```{r adhguia_4}
-JM_table <- readRDS(paste0(OUTPATH, output = 'JM4', "JM_table_", LONGVAR, ".rds"))
-JM_table$summaryJM
-```
+<!-- ```{r adhguia_1} -->
+<!-- JM_table <- readRDS(paste0(OUTPATH,'JM1', "JM_table_", LONGVAR, ".rds")) -->
+<!-- JM_table$summaryJM -->
+<!-- ``` -->
 
+<!-- ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días -->
 
-## Adherencia médico
-
-```{r var_adhguia}
-LONGVAR <- "cum_perc_adh_doctor"
-```
-
-
-### Subset: Muestra teniendo en cuenta todos los id-s
-
-```{r adhguia_0}
-JM_table <- readRDS(paste0(OUTPATH, output = 'JM', "JM_table_", LONGVAR, ".rds"))
-JM_table$summaryJM
-```
-
-### Subset: Muestra filtrando pacientes con prescripciones
-
-```{r adhguia_1}
-JM_table <- readRDS(paste0(OUTPATH, output = 'JM1', "JM_table_", LONGVAR, ".rds"))
-JM_table$summaryJM
-```
-
-### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días
-
-```{r adhguia_2}
-JM_table <- readRDS(paste0(OUTPATH, output = 'JM2', "JM_table_", LONGVAR, ".rds"))
-JM_table$summaryJM
-```
+<!-- ```{r adhguia_2} -->
+<!-- JM_table <- readRDS(paste0(OUTPATH, output = 'JM2', "JM_table_", LONGVAR, ".rds")) -->
+<!-- JM_table$summaryJM -->
+<!-- ``` -->
 
 
-### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días y filtrando pacientes de novo en fecha ingreso
+<!-- ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días y filtrando pacientes de novo en fecha ingreso -->
 
-```{r adhguia_3}
-JM_table <- readRDS(paste0(OUTPATH, output = 'JM3', "JM_table_", LONGVAR, ".rds"))
-JM_table$summaryJM
-```
+<!-- ```{r adhguia_3} -->
+<!-- JM_table <- readRDS(paste0(OUTPATH, output = 'JM3', "JM_table_", LONGVAR, ".rds")) -->
+<!-- JM_table$summaryJM -->
+<!-- ``` -->
 
-### Subset: Muestra filtrando pacientes con prescripciones, sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso
+<!-- ### Subset: Muestra filtrando pacientes con prescripciones, sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso -->
 
-```{r adhguia_4}
-JM_table <- readRDS(paste0(OUTPATH, output = 'JM4', "JM_table_", LONGVAR, ".rds"))
-JM_table$summaryJM
-```
+<!-- ```{r adhguia_4} -->
+<!-- JM_table <- readRDS(paste0(OUTPATH, output = 'JM4', "JM_table_", LONGVAR, ".rds")) -->
+<!-- JM_table$summaryJM -->
+<!-- ``` -->
 
-## Adherencia ieca o ara2
 
-### Subset: Muestra teniendo en cuenta todos los id-s
-### Subset: Muestra filtrando pacientes con prescripciones
-### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días
-### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días y filtrando pacientes de novo en fecha ingreso
-### Subset: Muestra filtrando pacientes con prescripciones, sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso
+<!-- ## Adherencia médico -->
 
-## Adherencia bbloq
+<!-- ```{r var_adhdoctor} -->
+<!-- LONGVAR <- "cum_perc_adh_doctor" -->
+<!-- ``` -->
 
-### Subset: Muestra teniendo en cuenta todos los id-s
-### Subset: Muestra filtrando pacientes con prescripciones
-### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días
-### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días y filtrando pacientes de novo en fecha ingreso
-### Subset: Muestra filtrando pacientes con prescripciones, sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso
 
-## Adherencia arm
+<!-- ### Subset: Muestra teniendo en cuenta todos los id-s -->
 
-### Subset: Muestra teniendo en cuenta todos los id-s
-### Subset: Muestra filtrando pacientes con prescripciones
-### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días
-### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días y filtrando pacientes de novo en fecha ingreso
-### Subset: Muestra filtrando pacientes con prescripciones, sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso
+<!-- ```{r adhdoctor_0} -->
+<!-- JM_table <- readRDS(paste0(OUTPATH, output = 'JM', "JM_table_", LONGVAR, ".rds")) -->
+<!-- JM_table$summaryJM -->
+<!-- ``` -->
+
+<!-- ### Subset: Muestra filtrando pacientes con prescripciones -->
+
+<!-- ```{r adhdoctor_1} -->
+<!-- JM_table <- readRDS(paste0(OUTPATH, output = 'JM1', "JM_table_", LONGVAR, ".rds")) -->
+<!-- JM_table$summaryJM -->
+<!-- ``` -->
+
+<!-- ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días -->
+
+<!-- ```{r adhdoctor_2} -->
+<!-- JM_table <- readRDS(paste0(OUTPATH, output = 'JM2', "JM_table_", LONGVAR, ".rds")) -->
+<!-- JM_table$summaryJM -->
+<!-- ``` -->
+
+
+<!-- ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días y filtrando pacientes de novo en fecha ingreso -->
+
+<!-- ```{r adhdoctor_3} -->
+<!-- JM_table <- readRDS(paste0(OUTPATH, output = 'JM3', "JM_table_", LONGVAR, ".rds")) -->
+<!-- JM_table$summaryJM -->
+<!-- ``` -->
+
+<!-- ### Subset: Muestra filtrando pacientes con prescripciones, sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso -->
+
+<!-- ```{r adhdoctor_4} -->
+<!-- JM_table <- readRDS(paste0(OUTPATH, output = 'JM4', "JM_table_", LONGVAR, ".rds")) -->
+<!-- JM_table$summaryJM -->
+<!-- ``` -->
+
+<!-- ## Adherencia ieca o ara2 -->
+
+<!-- ### Subset: Muestra teniendo en cuenta todos los id-s -->
+<!-- ### Subset: Muestra filtrando pacientes con prescripciones -->
+<!-- ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días -->
+<!-- ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días y filtrando pacientes de novo en fecha ingreso -->
+<!-- ### Subset: Muestra filtrando pacientes con prescripciones, sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso -->
+
+<!-- ## Adherencia bbloq -->
+
+<!-- ### Subset: Muestra teniendo en cuenta todos los id-s -->
+<!-- ### Subset: Muestra filtrando pacientes con prescripciones -->
+<!-- ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días -->
+<!-- ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días y filtrando pacientes de novo en fecha ingreso -->
+<!-- ### Subset: Muestra filtrando pacientes con prescripciones, sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso -->
+
+<!-- ## Adherencia arm -->
+
+<!-- ### Subset: Muestra teniendo en cuenta todos los id-s -->
+<!-- ### Subset: Muestra filtrando pacientes con prescripciones -->
+<!-- ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días -->
+<!-- ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días y filtrando pacientes de novo en fecha ingreso -->
+<!-- ### Subset: Muestra filtrando pacientes con prescripciones, sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso -->
 
 
 

@@ -64,7 +64,6 @@ saveRDS(base_join_model_2,  paste0(DATAOUTPATH, "baseJoinModel_and_farmacos.rds"
 base_join_model1_0 <- rearranged_in_months(base_join_model_2)
 saveRDS(base_join_model1_0, paste0(DATAOUTPATH, "baseJoinModel_afterMonthlyRearrangement.rds"))
 
-
 # df with time varying variables added ------------------------------------
 
 base_join_model2_0 <- adherencia_farmacos(base_join_model1_0)
@@ -77,7 +76,7 @@ base_join_model2_5 <- merge_timevarying_vars(base_join_model2_0,
                                              base_join_model2_2,
                                              base_join_model2_3,
                                              base_join_model2_4)
-saveRDS(base_join_model2_5, paste0(DATAOUTPATH, "baseJoinModel_afterTimevarying_vars.rds"))
+# saveRDS(base_join_model2_5, paste0(DATAOUTPATH, "baseJoinModel_afterTimevarying_vars.rds"))
 
 # Input final df ------------------------------------
 base_join_model2_6 <- input_patients_noprescriptions(base_join_model2_5, base_join_model_1)
