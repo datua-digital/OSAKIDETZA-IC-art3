@@ -22,9 +22,9 @@ generate_coxdf <- function(df_jm) {
 }
 
 preprocess_dfjm <- function(df) {
-  df_jm <- df_jm[c(VARIABLESTODOS, LONGVAR)]
-  df_jm <- df_jm %>% dplyr::arrange(id, month)
-  return(df_jm)
+  df <- df[c(VARIABLESTODOS, LONGVAR)]
+  df <- df %>% dplyr::arrange(id, month)
+  return(df)
 }
 
 filter_patients <- function(df, patients_conditions) {

@@ -236,7 +236,8 @@ get_days_adhdoctor <- function(x) {
 
 
 acum_month <- function(df) {
-  df <- df %>%
+  df <- df %>% 
+    dplyr::arrange(id, month) %>%
     dplyr::mutate(cum_perc_adh_ara2 = cumsum(perc_adh_ara2) / 100,
                   cum_perc_adh_bbloq = cumsum(perc_adh_bbloq) / 100,
                   cum_perc_adh_ieca = cumsum(perc_adh_ieca) / 100,

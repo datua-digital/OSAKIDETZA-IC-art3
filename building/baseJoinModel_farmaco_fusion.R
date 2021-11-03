@@ -59,7 +59,8 @@ reset_timeevent_vars <- function(df) {
     dplyr::mutate(time_to_event = if_else(as.numeric(MortOingIcc - falta_ing1) <= 360,
                                    as.numeric(MortOingIcc - falta_ing1) / 30 + 0.001,
                                    12.001)) %>%
-    dplyr::mutate(month = if_else(month >= time_to_event, time_to_event - 0.01, month))
+    dplyr::mutate(month = if_else(month >= time_to_event, time_to_event - 0.01, month)) %>%
+    dplyr::distinct()
   return(df)
 }
 
