@@ -1,3 +1,5 @@
+#TODO: Replicar un modelo con la librería rstanarm
+
 # load libraries ----------------------------------------------------------
 # 
 library(JMbayes)
@@ -93,7 +95,7 @@ patients_conditions <- list(
   early_death_patient_30 = NULL,
   patient_with_prescription = TRUE
 )
-apply_JM(df_jm0 = df_jm, patients_conditions=patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM1')
+apply_JM(df_jm0 = df_jm, patients_conditions = patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM1')
 
 df_jm <- readr::read_csv("data/out/df_JM.csv")
 # Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días

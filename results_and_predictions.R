@@ -64,4 +64,4 @@ show_pred_plots(ndata, ndata2, name1 = "Patient - sexo0", name2 = "Patient - sex
 
 
 # TODO: Testear el shiny
-# runDynPred("lme")
+# runDynPred("JM")

@@ -58,3 +58,5 @@ obs_pred_plot(result$data, id_ = 14516937)
 obs_pred_plot(result$data, id_ = 764021079)
 obs_pred_plot(result$data, id_ = 844755579)
 
+# TODO: Testear el shiny
+# runDynPred("lme")
