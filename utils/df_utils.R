@@ -25,7 +25,7 @@ longtowide <- function(df, idvar_, timevar_, v.names_, direction_){
 #'
 #' @return character
 vector_tocollapsedstring <- function(vector){
-  return(paste(vector, sep="", collapse=","))
+  return(paste(vector, sep = "", collapse = ","))
 }
 
 
