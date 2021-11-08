@@ -15,7 +15,9 @@ VARIABLESCOX <- c("sexo", "edad_ing1", "cluster(id)")
 VARIABLESLONGS <- c("cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_ieca", "cum_perc_adh_doctor", "cum_perc_adh_guia")
 VARIABLESTODOS <- c("id", VARIABLESCOX_IND, "event","time_to_event", "month")
 LONGVAR <- "cum_perc_adh_guia_arm"
+
 df_jm <- readr::read_csv("data/out/df_JM.csv")
+
 patients_conditions <- list(
   denovo_ic_paciente = TRUE,
   denovo_tt_paciente_fing = TRUE,
