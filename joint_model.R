@@ -2,13 +2,14 @@
 
 # load libraries ----------------------------------------------------------
 # 
+library(rstanarm)
 library(JMbayes)
 library(readr)
 library(nlme)
 library(tidyverse)
 library(splines)
 # global environment variables --------------------------------------------
-OUTPATH <- "data/out/"
+OUTPATH <- "out/"
 rm(list = list("M1", "M2", "M3"))
 
 # load sources ------------------------------------------------------------
