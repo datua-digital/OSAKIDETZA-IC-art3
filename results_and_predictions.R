@@ -65,7 +65,6 @@ pred_plots <- function(ndata, name_v = NULL, evol_window = c(2, 12)){
   }
 }
 
-
 # slope effect
 ndata <- read_prepare('mockdata_slope_id1.csv', DATAINPATH)
 ndata2 <- read_prepare('mockdata_slope_id2.csv', DATAINPATH)
@@ -84,7 +83,7 @@ compare_pred_plots(ndata, ndata2, name1 = "Patient - edad50", name2 = "Patient -
 # sex effect
 ndata <- read_prepare('mockdata_sexo_id1.csv', DATAINPATH)
 ndata2 <- read_prepare('mockdata_sexo_id2.csv', DATAINPATH)
-compare_pred_plots(ndata, ndata2, name1 = "Patient - sexo0", name2 = "Patient - sexo1")
+compare_pred_plots(ndata, ndata2, name1 = "Patient - sexoMujer", name2 = "Patient - sexoHombre")
 
 # evolution
 
@@ -103,4 +102,4 @@ ndata <- read_prepare('mockdata_value_id2.csv', DATAINPATH)
 pred_plots(ndata, name_v = paste0('pred_in_obs', c(2:6)), evol_window = c(1, 6))
 
 # TODO: Testear el shiny
-# runDynPred("JM")
+# runDynPred()

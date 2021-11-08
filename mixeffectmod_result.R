@@ -48,11 +48,9 @@ result <- modelization_longproc(df_jm0 = df_jm,
                                 OUTPATH,
                                 LONGVAR)
 
-result$data$id
+
 # standardized residuals versus fitted values by gender
 plot(result, resid(., type = "p") ~ fitted(.), abline = 0)
-# box-plots of residuals by Subject
-plot(result, id ~ resid(.))
 # observed versus fitted values by Subject
 plot(result, cum_perc_adh_guia_arm ~ fitted(.))
 
