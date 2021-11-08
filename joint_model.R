@@ -8,7 +8,7 @@ library(nlme)
 library(tidyverse)
 library(splines)
 # global environment variables --------------------------------------------
-OUTPATH <- "out/"
+OUTPATH <- "data/out/"
 rm(list = list("M1", "M2", "M3"))
 
 # load sources ------------------------------------------------------------
@@ -66,12 +66,12 @@ apply_JM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX
   M3 <- update(M1, param = "td-extra", extraForm = dForm)
   saveRDS(M3, paste0(OUTPATH, output, "_M3_", LONGVAR, ".rds"))
   
-  # Generar tabla resultados ---------------------------------------------------------------
+  # Generar tabla resultados ----------------------------------------------------------------------------
   JM_table <- summary_table(M1, M2, M3)
   saveRDS(JM_table, paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
 }
 
-# JM para adherencia guia (con arm) ---------------------------------------------
+# JM para adherencia guia (con arm) ---------------------------------------------------------------------
 LONGVAR <- "cum_perc_adh_guia_arm"
 
 df_jm <- readr::read_csv("data/out/df_JM.csv")
@@ -108,6 +108,7 @@ patients_conditions <- list(
 )
 apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM2')
 
+# TODO Ejecutar joint model
 # Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días 
 df_jm <- readr::read_csv("data/out/df_JM.csv")
 # y filtrando pacientes de novo en fecha ingreso
