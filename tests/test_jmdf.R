@@ -178,3 +178,114 @@ for (i in unique(df_jm$id)) {
   count <- count + 1
 }
 
+# comprobar que el valor cum_perc_adh_ara2 tiene el rango correspondiente y que va aumentandose
+for (i in unique(df_jm$id)) {
+  df <- subset(df_jm, id == i)
+  if (!all(df$cum_perc_adh_ara2 <= 12 & df$cum_perc_adh_ara2 >= 0 )) {
+    print(i)
+  }
+  meses <- length(df$cum_perc_adh_ara2)
+  if(meses != 1){
+    for(a in 1:(meses - 1)){
+      if(df$cum_perc_adh_ara2[a] > df$cum_perc_adh_ara2[a+1]){
+        print(i)
+      }
+    }
+  }
+}
+
+# comprobar que el valor cum_perc_adh_bbloq tiene el rango correspondiente y que va aumentandose
+for (i in unique(df_jm$id)) {
+  df <- subset(df_jm, id == i)
+  if (!all(df$cum_perc_adh_bbloq <= 12 & df$cum_perc_adh_bbloq >= 0 )) {
+    print(i)
+  }
+  meses <- length(df$cum_perc_adh_bbloq)
+  if(meses != 1){
+    for(a in 1:(meses - 1)){
+      if(df$cum_perc_adh_bbloq[a] > df$cum_perc_adh_bbloq[a+1]){
+        print(i)
+      }
+    }
+  }
+}
+
+# comprobar que el valor cum_perc_adh_ieca tiene el rango correspondiente y que va aumentandose
+for (i in unique(df_jm$id)) {
+  df <- subset(df_jm, id == i)
+  if (!all(df$cum_perc_adh_ieca <= 12 & df$cum_perc_adh_ieca >= 0 )) {
+    print(i)
+  }
+  meses <- length(df$cum_perc_adh_ieca)
+  if(meses != 1){
+    for(a in 1:(meses - 1)){
+      if(df$cum_perc_adh_ieca[a] > df$cum_perc_adh_ieca[a+1]){
+        print(i)
+      }
+    }
+  }
+}
+
+# comprobar que el valor cum_perc_adh_doctor tiene el rango correspondiente y que va aumentandose
+for (i in unique(df_jm$id)) {
+  df <- subset(df_jm, id == i)
+  if (!all(df$cum_perc_adh_doctor <= 12 & df$cum_perc_adh_doctor >= 0 )) {
+    print(i)
+  }
+  meses <- length(df$cum_perc_adh_doctor)
+  if(meses != 1){
+    for(a in 1:(meses - 1)){
+      if(df$cum_perc_adh_doctor[a] > df$cum_perc_adh_doctor[a+1]){
+        print(i)
+      }
+    }
+  }
+}
+
+# comprobar que el valor cum_perc_adh_guia tiene el rango correspondiente y que va aumentandose
+for (i in unique(df_jm$id)) {
+  df <- subset(df_jm, id == i)
+  if (!all(df$cum_perc_adh_guia <= 12 & df$cum_perc_adh_guia >= 0 )) {
+    print(i)
+  }
+  meses <- length(df$cum_perc_adh_guia)
+  if(meses != 1){
+    for(a in 1:(meses - 1)){
+      if(df$cum_perc_adh_guia[a] > df$cum_perc_adh_guia[a+1]){
+        print(i)
+      }
+    }
+  }
+}
+
+# comprobar que el valor cum_perc_adh_ara2oieca tiene el rango correspondiente y que va aumentandose
+for (i in unique(df_jm$id)) {
+  df <- subset(df_jm, id == i)
+  if (!all(df$cum_perc_adh_ara2oieca <= 12 & df$cum_perc_adh_ara2oieca >= 0 )) {
+    print(i)
+  }
+  meses <- length(df$cum_perc_adh_ara2oieca)
+  if(meses != 1){
+    for(a in 1:(meses - 1)){
+      if(df$cum_perc_adh_ara2oieca[a] > df$cum_perc_adh_ara2oieca[a+1]){
+        print(i)
+      }
+    }
+  }
+}
+
+# comprobar que el valor cum_perc_adh_guia_arm tiene el rango correspondiente y que va aumentandose
+for (i in unique(df_jm$id)) {
+  df <- subset(df_jm, id == i)
+  if (!all(df$cum_perc_adh_guia_arm <= 12 & df$cum_perc_adh_guia_arm >= 0 )) {
+    print(i)
+  }
+  meses <- length(df$cum_perc_adh_guia_arm)
+  if(meses != 1){
+    for(a in 1:(meses - 1)){
+      if(df$cum_perc_adh_guia_arm[a] > df$cum_perc_adh_guia_arm[a+1]){
+        print(i)
+      }
+    }
+  }
+}
