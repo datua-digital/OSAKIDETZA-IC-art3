@@ -149,11 +149,11 @@ input_adhvars <- function(df) {
   df[is.na(df$perc_adh_ara2), "perc_adh_ara2"] <- 0
   df[is.na(df$perc_adh_bbloq), "perc_adh_bbloq"] <- 0
   df[is.na(df$perc_adh_ieca), "perc_adh_ieca"] <- 0
-  df[is.na(df$perc_adh_guia), "perc_adh_arm"] <- 0
+  df[is.na(df$perc_adh_arm), "perc_adh_arm"] <- 0
   df[is.na(df$perc_adh_doctor), "perc_adh_doctor"] <- 0
   df[is.na(df$perc_adh_guia), "perc_adh_guia"] <- 0
-  df[is.na(df$perc_adh_ara2), "perc_adh_ara2oieca"] <- 0
-  df[is.na(df$perc_adh_ara2), "perc_adh_guia_arm"] <- 0
+  df[is.na(df$perc_adh_ara2oieca), "perc_adh_ara2oieca"] <- 0
+  df[is.na(df$perc_adh_guia_arm), "perc_adh_guia_arm"] <- 0
   
   return(df)
 }
