@@ -89,16 +89,18 @@ transform_to_days <- function(x) {
   days <- c()
   for (row in seq_len(nrow(x))) {
     month_floor <- floor(x[row, "start_time"])
-    first_day <- ceiling((x[row, "start_time"] - month_floor) * 30)
-    last_day <- ceiling((x[row, "end_time"] - month_floor) * 30)
+    # first day is not taken account. Last day yes. It avoids counting one more day
+    first_day <- ceiling(round((x[row, "start_time"] - month_floor) * 30, 2)) + 1 
+    last_day <- ceiling(round((x[row, "end_time"] - month_floor) * 30, 2))
     appending_days <- c(as.numeric(first_day):as.numeric(last_day))
     days <- c(days, appending_days)
     }
   x$start_time <- NULL
   x$end_time <- NULL
   final_x <- x[1, ]
-  days <- unique(days[!(days %in% c(0))]) # day 0 not allowed
+  # days <- unique(days[!(days %in% c(0))]) # day 0 not allowed
   final_x$days <- vector_tocollapsedstring(days)
+  final_x$duration <- as.numeric(sum(x$duration))
   return(final_x)
 }
 

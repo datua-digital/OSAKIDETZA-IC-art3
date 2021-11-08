@@ -21,6 +21,7 @@ merge_farmacos <- function(df1, df2) {
 #'
 #' @return df processed
 process_base_join_model <- function(df, duration) {
+  adjusted_factor <- 0.001
   # filter patients with drug prescriptions
   cols <- c("familia", "end", "dura", "tip", "estado_obje")
   df <- df[!rowSums(is.na(df[cols])), ]
@@ -41,25 +42,26 @@ process_base_join_model <- function(df, duration) {
                            FALSE,
                            missing = FALSE)) %>%
     dplyr::mutate(time_to_event = if_else(as.numeric(MortOingIcc - falta_ing1) <= 360,
-                                   as.numeric(MortOingIcc - falta_ing1) / 30 + 0.001,
-                                   12.001))
-  # filter prescription periods where end >= start
-  df <- df[(df["end"] >= df["start"]) | is.na(df["end"]), ]
+                                   as.numeric(MortOingIcc - falta_ing1) / 30 + adjusted_factor,
+                                   12 + adjusted_factor))
+  # filter prescription periods where end > start. end == start is also discarded.
+  df <- df[(df["end"] > df["start"]) | is.na(df["end"]), ]
   # adjust duration
   df["duration"] <- df["end"] - df["start"]
   return(df)
 }
 
 reset_timeevent_vars <- function(df) {
+  adjusted_factor <- 0.001
   df <- df %>%
     dplyr::mutate(event = if_else((MortOingIcc - falta_ing1) <= 360,
                            TRUE,
                            FALSE,
                            missing = FALSE)) %>%
     dplyr::mutate(time_to_event = if_else(as.numeric(MortOingIcc - falta_ing1) <= 360,
-                                   as.numeric(MortOingIcc - falta_ing1) / 30 + 0.001,
-                                   12.001)) %>%
-    dplyr::mutate(month = if_else(month >= time_to_event, time_to_event - 0.01, month)) %>%
+                                   as.numeric(MortOingIcc - falta_ing1) / 30 + adjusted_factor,
+                                   12 + adjusted_factor)) %>%
+    dplyr::mutate(month = if_else(month >= time_to_event, time_to_event - adjusted_factor, month)) %>%
     dplyr::distinct()
   return(df)
 }
