@@ -80,6 +80,8 @@ comprobar_valores <- function (){
   }
   
   # *****************************OTRAS COMPROBACIONES***********************************
+  factor_ajuste <- 0.001
+  
   # Comprobar que el valor mes de falta_ing1 es menor a MortOingl*****************
   for (i in unique(df_jm$id)) {
     df <- subset(df_jm, id == i)
@@ -90,276 +92,42 @@ comprobar_valores <- function (){
     }
   }
   
-  # Comprobar perc_adh_guia está entre los umbrales establecidos
+  # Comprobar perc_adh_guia está entre los umbrales establecidos upper and lower boundaries
   for (x in 1:nrow(df_jm)){
     if (!all(
-        df_jm[[x, "perc_adh_guia"]] >= min(max(df_jm[[x, "perc_adh_ieca"]], df_jm[[x, "perc_adh_ara2"]]), df_jm[[x, "perc_adh_bbloq"]]))
-        & df_jm[[x, "perc_adh_guia"]] <= min(df_jm[[x, "perc_adh_ieca"]] + df_jm[[x, "perc_adh_ara2"]], df_jm[[x, "perc_adh_bbloq"]])
+          (df_jm[[x, "perc_adh_guia"]] >= (max(df_jm[[x, "perc_adh_ieca"]], df_jm[[x, "perc_adh_ara2"]]) + df_jm[[x, "perc_adh_bbloq"]] - 100 - factor_ajuste))
+          & (df_jm[[x, "perc_adh_guia"]] <= min(df_jm[[x, "perc_adh_ieca"]] + df_jm[[x, "perc_adh_ara2"]], df_jm[[x, "perc_adh_bbloq"]]) + factor_ajuste))
         ) {
-      print(paste(df_jm[x, "id"], df_jm[x, "month"]))
+      print(paste(df_jm[x, "id"], df_jm[x, "month"], x))
     }
   }
   
-  # Comprobar perc_adh_guia_arm está entre los umbrales establecidos
+  # Comprobar perc_adh_doctor está entre el umbral upper boundary
   for (x in 1:nrow(df_jm)){
-    
-    if (!all(
-      df_jm[[x, "perc_adh_guia_arm"]] >= min(max(df_jm[[x, "perc_adh_ieca"]], df_jm[[x, "perc_adh_ara2"]]), df_jm[[x, "perc_adh_bbloq"]], df_jm[[x, "perc_adh_arm"]]))
-      & df_jm[[x, "perc_adh_guia_arm"]] <= min(df_jm[[x, "perc_adh_ieca"]] + df_jm[[x, "perc_adh_ara2"]], df_jm[[x, "perc_adh_bbloq"]], df_jm[[x, "perc_adh_arm"]])
+    maximo <- max(ieca, ara2, bbloq, arm)
+      if (!all(df_jm[[x, "perc_adh_doctor"]] <= maximo)) {
+        print(paste(df_jm[x, "id"], df_jm[x, "month"]))
+      }
+  }
+  
+  
+  # Comprobar perc_adh_guia_arm está entre los umbrales establecidos upper boundary
+  for (x in 1:nrow(df_jm)){
+    if (!all(df_jm[[x, "perc_adh_guia_arm"]] <= max(df_jm[[x, "perc_adh_ieca"]], df_jm[[x, "perc_adh_ara2"]], df_jm[[x, "perc_adh_bbloq"]], df_jm[[x, "perc_adh_arm"]]))
     ) {
       print(paste(df_jm[x, "id"], df_jm[x, "month"]))
     }
   }
+  
+  
+  # Comprobar perc_adh_ara2oieca está entre los umbrales establecidos low boundary
+  for (x in 1:nrow(df_jm)){
+    if (!all(
+      df_jm[[x, "perc_adh_ara2oieca"]] >= max(df_jm[[x, "perc_adh_ieca"]], df_jm[[x, "perc_adh_ara2"]])))
+    {
+      print(paste(df_jm[x, "id"], df_jm[x, "month"]))
+    }
+  }
+
 }
 
-
-# 
-# # comprobar que los meses están ordenados:
-# for (i in unique(df_jm$id)) {
-#   df <- subset(df_jm, id == i)
-#   if (!all(df$month == sort(df$month))) {
-#     print(i)
-#   }
-# }
-# 
-# # comprobar que cum_perc_adh_guia_arm está ordenado:
-# for (i in unique(df_jm$id)) {
-#   df <- subset(df_jm, id == i)
-#   if (!all(df$cum_perc_adh_guia_arm == sort(df$cum_perc_adh_guia_arm))) {
-#     print(i)
-#     browser()
-#   }
-# }
-# 
-# # comprobar que el rango de años está bien
-# for (i in unique(df_jm$id)) {
-#   df <- subset(df_jm, id == i)
-#   if (!all(df$edad_ing1 >= 0)) {
-#     print(i)
-#   }
-# }
-# 
-# # comprobar que el valor sexo tiene los valores correspondientes
-# for (i in unique(df_jm$id)) {
-#   df <- subset(df_jm, id == i)
-#   if (!all(df$sexo == "Hombre" | df$sexo == "Mujer")) {
-#     print(i)
-#   }
-# }
-# 
-# # comprobar que el valor mes tiene los valores correspondientes
-# for (i in unique(df_jm$id)) {
-#   df <- subset(df_jm, id == i)
-#   if (!all(df$month <= 12 & df$month >= 0 )) {
-#     print(i)
-#   }
-# }
-# 
-
-# 
-# # comprobar que el valor time_to_event tiene los valores correspondientes
-# for (i in unique(df_jm$id)) {
-#   df <- subset(df_jm, id == i)
-#   if (!all(df$time_to_event <= 12.001 & df$time_to_event >= 0.001 )) {
-#     print(i)
-#   }
-# }
-# 
-# # comprobar que el valor dura_in_months tiene los valores correspondientes
-# for (i in unique(df_jm$id)) {
-#   df <- subset(df_jm, id == i)
-#   if(!all(is.na(df$dura_in_months))){
-#     if (!all(df$dura_in_months <= 12 & df$dura_in_months >= 0 )) {
-#       print(i)
-#     }
-#   }
-# }
-# 
-# # comprobar que el valor last_month tiene los valores correspondientes
-# for (i in unique(df_jm$id)) {
-#   df <- subset(df_jm, id == i)
-#   if(!all(is.na(df$last_month))){
-#     if (!all(df$last_month <= 12.001 & df$last_month >= 0 )) {
-#       print(i)
-#     }
-#   }
-# }
-# 
-# # comprobar que el valor perc_adh_ara2 tiene el rango correspondiente
-# for (i in unique(df_jm$id)) {
-#   df <- subset(df_jm, id == i)
-#   if (!all(df$perc_adh_ara2 <= 100 & df$perc_adh_ara2 >= 0 )) {
-#     print(i)
-#   }
-# }
-# 
-# # comprobar que el valor perc_adh_bloq tiene el rango correspondiente
-# for (i in unique(df_jm$id)) {
-#   df <- subset(df_jm, id == i)
-#   if (!all(df$perc_adh_bbloq <= 100 & df$perc_adh_bbloq >= 0 )) {
-#     print(i)
-#   }
-# }
-# 
-# # comprobar que el valor perc_adh_arm tiene el rango correspondiente
-# for (i in unique(df_jm$id)) {
-#   df <- subset(df_jm, id == i)
-#   if(!any(is.na(df$perc_adh_arm))){
-#     if (!all(df$perc_adh_arm <= 100 & df$perc_adh_arm >= 0 )) {
-#       print(i)
-#     }
-#   }
-# }
-# 
-# # comprobar que el valor perc_adh_ieca tiene el rango correspondiente
-# for (i in unique(df_jm$id)) {
-#   df <- subset(df_jm, id == i)
-#   if (!all(df$perc_adh_ieca <= 100 & df$perc_adh_ieca >= 0 )) {
-#     print(i)
-#   }
-# }
-# 
-# # comprobar que el valor perc_adh_guia tiene el rango correspondiente
-# for (i in unique(df_jm$id)) {
-#   df <- subset(df_jm, id == i)
-#   if (!all(df$perc_adh_guia <= 100 & df$perc_adh_guia >= 0 )) {
-#     print(i)
-#   }
-# }
-# 
-# # comprobar que el valor perc_adh_doctor tiene el rango correspondiente
-# for (i in unique(df_jm$id)) {
-#   df <- subset(df_jm, id == i)
-#   if (!all(df$perc_adh_doctor <= 100 & df$perc_adh_doctor >= 0 )) {
-#     print(i)
-#   }
-# }
-# 
-# # comprobar que el valor perc_adh_ara2oieca tiene el rango correspondiente
-# for (i in unique(df_jm$id)) {
-#   df <- subset(df_jm, id == i)
-#   if (!all(df$perc_adh_ara2oieca <= 100 & df$perc_adh_ara2oieca >= 0 )) {
-#     print(i)
-#   }
-# }
-# 
-# # comprobar que el valor perc_adh_guia_arm tiene el rango correspondiente
-# for (i in unique(df_jm$id)) {
-#   df <- subset(df_jm, id == i)
-#   if (!all(df$perc_adh_guia_arm <= 100 & df$perc_adh_guia_arm >= 0 )) {
-#     print(i)
-#   }
-# }
-# 
-# # comprobar que el valor cum_perc_adh_ara2 tiene el rango correspondiente y que va aumentandose
-# for (i in unique(df_jm$id)) {
-#   df <- subset(df_jm, id == i)
-#   if (!all(df$cum_perc_adh_ara2 <= 12 & df$cum_perc_adh_ara2 >= 0 )) {
-#     print(i)
-#   }
-#   meses <- length(df$cum_perc_adh_ara2)
-#   if(meses != 1){
-#     for(a in 1:(meses - 1)){
-#       if(df$cum_perc_adh_ara2[a] > df$cum_perc_adh_ara2[a+1]){
-#         print(i)
-#       }
-#     }
-#   }
-# }
-# 
-# # comprobar que el valor cum_perc_adh_bbloq tiene el rango correspondiente y que va aumentandose
-# for (i in unique(df_jm$id)) {
-#   df <- subset(df_jm, id == i)
-#   if (!all(df$cum_perc_adh_bbloq <= 12 & df$cum_perc_adh_bbloq >= 0 )) {
-#     print(i)
-#   }
-#   meses <- length(df$cum_perc_adh_bbloq)
-#   if(meses != 1){
-#     for(a in 1:(meses - 1)){
-#       if(df$cum_perc_adh_bbloq[a] > df$cum_perc_adh_bbloq[a+1]){
-#         print(i)
-#       }
-#     }
-#   }
-# }
-# 
-# # comprobar que el valor cum_perc_adh_ieca tiene el rango correspondiente y que va aumentandose
-# for (i in unique(df_jm$id)) {
-#   df <- subset(df_jm, id == i)
-#   if (!all(df$cum_perc_adh_ieca <= 12 & df$cum_perc_adh_ieca >= 0 )) {
-#     print(i)
-#   }
-#   meses <- length(df$cum_perc_adh_ieca)
-#   if(meses != 1){
-#     for(a in 1:(meses - 1)){
-#       if(df$cum_perc_adh_ieca[a] > df$cum_perc_adh_ieca[a+1]){
-#         print(i)
-#       }
-#     }
-#   }
-# }
-# 
-# # comprobar que el valor cum_perc_adh_doctor tiene el rango correspondiente y que va aumentandose
-# for (i in unique(df_jm$id)) {
-#   df <- subset(df_jm, id == i)
-#   if (!all(df$cum_perc_adh_doctor <= 12 & df$cum_perc_adh_doctor >= 0 )) {
-#     print(i)
-#   }
-#   meses <- length(df$cum_perc_adh_doctor)
-#   if(meses != 1){
-#     for(a in 1:(meses - 1)){
-#       if(df$cum_perc_adh_doctor[a] > df$cum_perc_adh_doctor[a+1]){
-#         print(i)
-#       }
-#     }
-#   }
-# }
-# 
-# 
-# # comprobar que el valor cum_perc_adh_guia tiene el rango correspondiente y que va aumentandose
-# for (i in unique(df_jm$id)) {
-#   df <- subset(df_jm, id == i)
-#   if (!all(df$cum_perc_adh_guia <= 12 & df$cum_perc_adh_guia >= 0 )) {
-#     print(i)
-#   }
-#   meses <- length(df$cum_perc_adh_guia)
-#   if(meses != 1){
-#     for(a in 1:(meses - 1)){
-#       if(df$cum_perc_adh_guia[a] > df$cum_perc_adh_guia[a+1]){
-#         print(i)
-#       }
-#     }
-#   }
-# }
-# 
-# # comprobar que el valor cum_perc_adh_ara2oieca tiene el rango correspondiente y que va aumentandose
-# for (i in unique(df_jm$id)) {
-#   df <- subset(df_jm, id == i)
-#   if (!all(df$cum_perc_adh_ara2oieca <= 12 & df$cum_perc_adh_ara2oieca >= 0 )) {
-#     print(i)
-#   }
-#   meses <- length(df$cum_perc_adh_ara2oieca)
-#   if(meses != 1){
-#     for(a in 1:(meses - 1)){
-#       if(df$cum_perc_adh_ara2oieca[a] > df$cum_perc_adh_ara2oieca[a+1]){
-#         print(i)
-#       }
-#     }
-#   }
-# }
-# 
-# # comprobar que el valor cum_perc_adh_guia_arm tiene el rango correspondiente y que va aumentandose
-# for (i in unique(df_jm$id)) {
-#   df <- subset(df_jm, id == i)
-#   if (!all(df$cum_perc_adh_guia_arm <= 12 & df$cum_perc_adh_guia_arm >= 0 )) {
-#     print(i)
-#   }
-#   meses <- length(df$cum_perc_adh_guia_arm)
-#   if(meses != 1){
-#     for(a in 1:(meses - 1)){
-#       if(df$cum_perc_adh_guia_arm[a] > df$cum_perc_adh_guia_arm[a+1]){
-#         print(i)
-#       }
-#     }
-#   }
-# }
