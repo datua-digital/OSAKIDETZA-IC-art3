@@ -79,14 +79,35 @@ comprobar_valores <- function (){
     }
   }
   
-  
-  # comprobar que el valor mes de falta_ing1 es menor a MortOingl*****************
+  # *****************************OTRAS COMPROBACIONES***********************************
+  # Comprobar que el valor mes de falta_ing1 es menor a MortOingl*****************
   for (i in unique(df_jm$id)) {
     df <- subset(df_jm, id == i)
     if(!all(is.na(df$MortOingIcc))){
       if (!all(df$falta_ing1 <= df$MortOingIcc)) {
         print(i)
       }
+    }
+  }
+  
+  # Comprobar perc_adh_guia está entre los umbrales establecidos
+  for (x in 1:nrow(df_jm)){
+    if (!all(
+        df_jm[[x, "perc_adh_guia"]] >= min(max(df_jm[[x, "perc_adh_ieca"]], df_jm[[x, "perc_adh_ara2"]]), df_jm[[x, "perc_adh_bbloq"]]))
+        & df_jm[[x, "perc_adh_guia"]] <= min(df_jm[[x, "perc_adh_ieca"]] + df_jm[[x, "perc_adh_ara2"]], df_jm[[x, "perc_adh_bbloq"]])
+        ) {
+      print(paste(df_jm[x, "id"], df_jm[x, "month"]))
+    }
+  }
+  
+  # Comprobar perc_adh_guia_arm está entre los umbrales establecidos
+  for (x in 1:nrow(df_jm)){
+    
+    if (!all(
+      df_jm[[x, "perc_adh_guia_arm"]] >= min(max(df_jm[[x, "perc_adh_ieca"]], df_jm[[x, "perc_adh_ara2"]]), df_jm[[x, "perc_adh_bbloq"]], df_jm[[x, "perc_adh_arm"]]))
+      & df_jm[[x, "perc_adh_guia_arm"]] <= min(df_jm[[x, "perc_adh_ieca"]] + df_jm[[x, "perc_adh_ara2"]], df_jm[[x, "perc_adh_bbloq"]], df_jm[[x, "perc_adh_arm"]])
+    ) {
+      print(paste(df_jm[x, "id"], df_jm[x, "month"]))
     }
   }
 }
