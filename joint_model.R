@@ -10,7 +10,7 @@ library(tidyverse)
 library(splines)
 # global environment variables --------------------------------------------
 OUTPATH <- "out/"
-rm(list = list("M1", "M2", "M3"))
+rm("M1", "M2", "M3")
 
 # load sources ------------------------------------------------------------
 source("utils/jm_utils.R")
@@ -70,6 +70,7 @@ apply_JM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX
   # Generar tabla resultados ----------------------------------------------------------------------------
   JM_table <- summary_table(M1, M2, M3)
   saveRDS(JM_table, paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
+  rm("M1", "M2", "M3")
 }
 
 # JM para adherencia guia (con arm) ---------------------------------------------------------------------
@@ -85,7 +86,7 @@ patients_conditions <- list(
   patient_with_prescription = NULL
 )
 
-apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR)
+apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM')
 
 df_jm <- readr::read_csv("data/out/df_JM.csv")
 # Subset: Muestra filtrando pacientes con prescripciones:

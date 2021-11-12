@@ -40,7 +40,12 @@ scale_startend <- function(df) {
 #' @return x_final (data.frame) month column added, start time and end time modified
 split_inside_months <- function(x) {
   start_month <- floor(x$start_time)
-  final_month <- min(floor(x$end_time), 11) # month 13 not allowed
+  
+  if (x$end_time < 12) { # ajuste para que numeros enteros no sumen un mes más
+    final_month <- min(floor(x$end_time - 0.001), 11) # month 13 not allowed
+  } else{
+    final_month <- min(floor(x$end_time), 11) # month 13 not allowed
+  }
   if (final_month >= start_month) {
     count <- 0
     for (m in c(start_month:final_month)) {
