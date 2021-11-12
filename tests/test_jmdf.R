@@ -137,6 +137,7 @@ comprobar_valores_tiempo <- function (){
 
 # Comprobar que los valores calculados están en los rangos correspondientes***************************************
 comprobar_valores_perc <- function (){
+  factor_ajuste <- 0.001
   # Comprobar perc_adh_guia está entre los umbrales establecidos upper and lower boundaries
   for (x in 1:nrow(df_jm)){
     if (!all(
@@ -147,13 +148,18 @@ comprobar_valores_perc <- function (){
     }
   }
   
-  # Comprobar perc_adh_doctor está entre el umbral upper boundary
-  for (x in 1:nrow(df_jm)){
-    maximo <- max(ieca, ara2, bbloq, arm)
-      if (!all(df_jm[[x, "perc_adh_doctor"]] <= maximo)) {
-        print(paste(df_jm[x, "id"], df_jm[x, "month"]))
-      }
-  }
+  # # Comprobar perc_adh_doctor está entre el umbral upper boundary
+  # for (x in 1:nrow(df_jm)){
+  #   ieca <- df_jm[[x, "perc_adh_ieca"]]
+  #   ara2 <- df_jm[[x, "perc_adh_ara2"]]
+  #   bbloq <- df_jm[[x, "perc_adh_bbloq"]]
+  #   arm <- df_jm[[x, "perc_adh_arm"]]
+  #   
+  #   maximo <- max(ieca, ara2, bbloq, arm)
+  #   if (!all(df_jm[[x, "perc_adh_doctor"]] >= maximo)) {
+  #     print(paste(df_jm[x, "id"], df_jm[x, "month"]))
+  #   }
+  # }
   
   
   # Comprobar perc_adh_guia_arm está entre los umbrales establecidos upper boundary
