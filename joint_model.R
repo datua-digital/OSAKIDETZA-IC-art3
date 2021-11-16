@@ -17,10 +17,11 @@ source("utils/jm_utils.R")
 source("utils/table_utils.R")
 
 # Selección de variables ---------------------------------------------------------------
-VARIABLESCOX_IND <- c("sexo", "edad_ing1")
-VARIABLESCOX <- c("sexo", "edad_ing1", "cluster(id)")
+VARIABLESCOX_IND <- c("sexo", "edad_ing1", "charlson", "fe.reducida.severa")
+VARIABLESCOX <- c("sexo", "edad_ing1", "charlson", "fe.reducida.severa", "cluster(id)")
 VARIABLESLONGS <- c("cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_ieca", "cum_perc_adh_doctor", "cum_perc_adh_guia")
 VARIABLESTODOS <- c("id", VARIABLESCOX_IND, "event","time_to_event", "month")
+
 
 # functions ---------------------------------------------------------------
 apply_JM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX,
@@ -51,24 +52,24 @@ apply_JM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX
     timeVar = "month",
     n.iter = 30000,
     n.burnin = 3000)
-  saveRDS(M1, paste0(OUTPATH, paste0(output, "_M1_", LONGVAR, ".rds")))
+  # saveRDS(M1, paste0(OUTPATH, paste0(output, "_M1_", LONGVAR, ".rds")))
   
   
   # M2: Fit JM with longitudinal process (4) y componentes de tendencia y valor actuales
   dForm <- list(fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
                 indFixed = 2:5, indRandom = 2:5)
   M2 <- update(M1, param = "td-both", extraForm = dForm)
-  saveRDS(M2, paste0(OUTPATH, output, "_M2_", LONGVAR, ".rds"))
+  # saveRDS(M2, paste0(OUTPATH, output, "_M2_", LONGVAR, ".rds"))
   
   
   # M3: Fit JM with longitudinal process (4) y componente de tendencia
   dForm <- list(fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
                 indFixed = 2:5, indRandom = 2:5)
   M3 <- update(M1, param = "td-extra", extraForm = dForm)
-  saveRDS(M3, paste0(OUTPATH, output, "_M3_", LONGVAR, ".rds"))
+  # saveRDS(M3, paste0(OUTPATH, output, "_M3_", LONGVAR, ".rds"))
   
   # Generar tabla resultados ----------------------------------------------------------------------------
-  JM_table <- summary_table(M1, M2, M3)
+  JM_table <- summary_table(m1 = M1, m2 = M2, m3 = M3, cox_vars = VARIABLESCOX_IND)
   saveRDS(JM_table, paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
   rm("M1", "M2", "M3")
 }
@@ -86,7 +87,7 @@ patients_conditions <- list(
   patient_with_prescription = NULL
 )
 
-apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM')
+apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_charlson_fe')
 
 df_jm <- readr::read_csv("data/out/df_JM.csv")
 # Subset: Muestra filtrando pacientes con prescripciones:
@@ -97,7 +98,7 @@ patients_conditions <- list(
   early_death_patient_30 = NULL,
   patient_with_prescription = TRUE
 )
-apply_JM(df_jm0 = df_jm, patients_conditions = patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM1')
+apply_JM(df_jm0 = df_jm, patients_conditions = patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM1_charlson_fe')
 
 df_jm <- readr::read_csv("data/out/df_JM.csv")
 # Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días
@@ -108,7 +109,7 @@ patients_conditions <- list(
   early_death_patient_30 = FALSE,
   patient_with_prescription = NULL
 )
-apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM2')
+apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM2_charlson_fe')
 
 # TODO Ejecutar joint model
 # Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días 
@@ -121,7 +122,7 @@ patients_conditions <- list(
   early_death_patient_30 = FALSE,
   patient_with_prescription = NULL
 )
-apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM3')
+apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM3_charlson_fe')
 
 
 # Subset: Muestra filtrando pacientes con prescripciones, 
@@ -134,7 +135,7 @@ patients_conditions <- list(
   early_death_patient_30 = FALSE,
   patient_with_prescription = TRUE
 )
-apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM4')
+apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM4_charlson')
 
 
 

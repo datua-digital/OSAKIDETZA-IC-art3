@@ -6,7 +6,6 @@
 # Time varying variables are added
 
 
-
 # load libraries ----------------------------------------------------------
 
 rm(list = ls())
@@ -20,6 +19,7 @@ DATAINPATH <- "data/in/"
 DATAOUTPATH <- "data/out/"
 BUILDINGSCRIPTSPATH <- "building/"
 PROJECTRDATA <- "base_joinModel_artic3.rda.RData"
+CHARLSONDATA <- "IndiceCharlson.rda"
 
 # case identification parameters
 PROJECTDRUGS <- c("ara2", "ieca", "bbloq", "arm")# , "ado")
@@ -38,6 +38,7 @@ source(paste0(BUILDINGSCRIPTSPATH, "input_months.R"), encoding = "UTF-8")
 
 # load data ---------------------------------------------------------------
 load(paste0(DATAINPATH, PROJECTRDATA))
+load(paste0(DATAINPATH, CHARLSONDATA))
 df_farmacos <- constructedBases::farmacos_traye
 
 
@@ -49,14 +50,17 @@ base_join_model_0 <- preprocess_base_join_model(baseJoinModel)
 # preprocess farmacos
 df_farmacos <- preprocess_farmacos(df_farmacos, PROJECTDRUGS)
 
+# preprocess basal_ch
+basal_ch <- preprocess_basal_ch(basal_ch)
 
 # Case identification -----------------------------------------------------
 base_join_model_1 <- case_identification(base_join_model_0, EARLYDEATHPATIENTDAYS, PROJECTDRUGS)
 saveRDS(base_join_model_1, paste0(DATAOUTPATH, "data_after_case_identification.rds"))
 
-# df_farmacos and base_join_model fusion ------------------------------------
-base_join_model_merged <- merge_farmacos(base_join_model_1, df_farmacos)
-base_join_model_2 <- process_base_join_model(base_join_model_merged, duration = FOLLOWUP)
+# df_farmacos, base_join_model and Charlson index fusion ------------------------------------
+base_join_model_merged_0 <- merge_byid(base_join_model_1, df_farmacos)
+base_join_model_merged_1 <- merge_byid(base_join_model_merged_0, basal_ch)
+base_join_model_2 <- process_base_join_model(base_join_model_merged_1, duration = FOLLOWUP)
 saveRDS(base_join_model_2,  paste0(DATAOUTPATH, "baseJoinModel_and_farmacos.rds"))
 
 

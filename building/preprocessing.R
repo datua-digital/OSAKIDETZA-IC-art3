@@ -22,4 +22,17 @@ preprocess_farmacos <- function(df, drugs) {
   return(df)
 }
 
+#' preprocess basal_ch before manipulating it
+#'
+#' @param df (data.frame)
+#'
+#' @return df (data.frame) with columns types set
+preprocess_basal_ch <- function(df) {
+  # Establecer tipo de datos
+  df$id <- as.character(df$id)
+  df <- df[c('id', 'charlson')]
+  return(df)
+}
+
+
 print("preprocessing OK")
