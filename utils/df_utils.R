@@ -39,7 +39,7 @@ vector_tocollapsedstring <- function(vector){
 #' @examples
 collapsedstring_tovector <- function(string){
   
-  return(unlist(strsplit(string, split=',')))
+  return(unlist(strsplit(string, split = ',')))
 }
 
 #' deletemultiplecolumns

@@ -1,9 +1,8 @@
-
 # Test comprobar valores de rangos ***************************************************************************
-comprobar_valores_rango <- function (){
+comprobar_valores_rango <- function(df_jm){
   
   variables <- list(
-    "month"= c(12, 0),
+    "month" = c(12, 0),
     "edad_ing1" = c(1000, 0),
     "sexo" = c("Hombre", "Mujer"),
     "time_to_event" = c(12.001, 0.001),
@@ -49,24 +48,30 @@ comprobar_valores_rango <- function (){
       "perc_adh_guia_arm")
   v_categorico <-
     c("sexo")
-  
-  
-  
-  for( j in unique(df_jm$id)){
-    for (i in names(variables)){
-      df <- subset(df_jm, id == j)
-      # Comprobar los rangos de los valores de variables de tipo rango y tiempo
-      if (is.element(i, append(v_rango , v_tiempo))){
-        if (!(i == "perc_adh_arm" & any(is.na(df[[i]])))){
-          if (!all(df[i] <= variables[i][[1]][1] & df[i] >= variables[i][[1]][2])){
-            print(paste(i, j))
-          }
-        }
-      # Comprobar los valores de variables categóricas
-      }else if (is.element(i, v_categorico)){
-        if (!all(is.element(df[[i]], variables[i][[1]]))){
-          print(paste(i, j))
-        }
+
+  for (i in names(variables)) {
+    # Comprobar los rangos de los valores de variables de tipo rango y tiempo
+    if (is.element(i, append(v_rango , v_tiempo))) {
+      in_range <- (df_jm[i] <= variables[i][[1]][1] & df_jm[i] >= variables[i][[1]][2])
+      if (!all(in_range)) {
+        which_id <- as.character(
+          unique(
+            df_jm[which(!(in_range)), 'id']
+            )
+          )
+        print(paste(i, which_id))
+      }
+      
+    # Comprobar los valores de variables categóricas
+    }else if (is.element(i, v_categorico)) {
+      elements_in <- is.element(df_jm[[i]], variables[i][[1]])
+      if (!all(elements_in)) {
+        which_id <- as.character(
+          unique(
+            df_jm[which(!(elements_in)), 'id']
+          )
+        )
+        print(paste(i, which_id))
       }
     }
   }
@@ -74,9 +79,9 @@ comprobar_valores_rango <- function (){
 
 
 # Comprobar que los valores relacionados con el tiempo tienen los valores correspondientes********************
-comprobar_valores_tiempo <- function (){
+comprobar_valores_tiempo <- function(df_jm){
   variables <- list(
-    "month"= c(12, 0),
+    "month" = c(12, 0),
     "edad_ing1" = c(1000, 0),
     "sexo" = c("Hombre", "Mujer"),
     "time_to_event" = c(12.001, 0.001),
@@ -111,12 +116,12 @@ comprobar_valores_tiempo <- function (){
   factor_ajuste <- 0.001
   
   #Comprobar tiempo
-  for( j in unique(df_jm$id)){
-    for (i in v_tiempo){
+  for (j in unique(df_jm$id)) {
+    for (i in v_tiempo) {
       df <- subset(df_jm, id == j)
       # Comprobar valores con variables que tienen tiempo como meses
       # se comprueba el rango y el valor
-      if (!all(df[[i]] == sort(df[[i]]))){
+      if (!all(df[[i]] == sort(df[[i]]))) {
         print(paste(i, j))
       }
     }
@@ -126,7 +131,7 @@ comprobar_valores_tiempo <- function (){
   # la mortalidad tiene que ser mas tarde que cuando entrase en el proceso
   for (i in unique(df_jm$id)) {
     df <- subset(df_jm, id == i)
-    if(!all(is.na(df$MortOingIcc))){
+    if (!all(is.na(df$MortOingIcc))) {
       if (!all(df$falta_ing1 <= df$MortOingIcc)) {
         print(i)
       }
@@ -136,10 +141,10 @@ comprobar_valores_tiempo <- function (){
 
 
 # Comprobar que los valores calculados están en los rangos correspondientes***************************************
-comprobar_valores_perc <- function (){
+comprobar_valores_perc <- function(df_jm){
   factor_ajuste <- 0.001
   # Comprobar perc_adh_guia está entre los umbrales establecidos upper and lower boundaries
-  for (x in 1:nrow(df_jm)){
+  for (x in 1:nrow(df_jm)) {
     if (!all(
           (df_jm[[x, "perc_adh_guia"]] >= (max(df_jm[[x, "perc_adh_ieca"]], df_jm[[x, "perc_adh_ara2"]]) + df_jm[[x, "perc_adh_bbloq"]] - 100 - factor_ajuste))
           & (df_jm[[x, "perc_adh_guia"]] <= min(df_jm[[x, "perc_adh_ieca"]] + df_jm[[x, "perc_adh_ara2"]], df_jm[[x, "perc_adh_bbloq"]]) + factor_ajuste))
@@ -148,22 +153,9 @@ comprobar_valores_perc <- function (){
     }
   }
   
-  # # Comprobar perc_adh_doctor está entre el umbral upper boundary
-  # for (x in 1:nrow(df_jm)){
-  #   ieca <- df_jm[[x, "perc_adh_ieca"]]
-  #   ara2 <- df_jm[[x, "perc_adh_ara2"]]
-  #   bbloq <- df_jm[[x, "perc_adh_bbloq"]]
-  #   arm <- df_jm[[x, "perc_adh_arm"]]
-  #   
-  #   maximo <- max(ieca, ara2, bbloq, arm)
-  #   if (!all(df_jm[[x, "perc_adh_doctor"]] >= maximo)) {
-  #     print(paste(df_jm[x, "id"], df_jm[x, "month"]))
-  #   }
-  # }
-  
   
   # Comprobar perc_adh_guia_arm está entre los umbrales establecidos upper boundary
-  for (x in 1:nrow(df_jm)){
+  for (x in 1:nrow(df_jm)) {
     if (!all(df_jm[[x, "perc_adh_guia_arm"]] <= max(df_jm[[x, "perc_adh_ieca"]], df_jm[[x, "perc_adh_ara2"]], df_jm[[x, "perc_adh_bbloq"]], df_jm[[x, "perc_adh_arm"]]))
     ) {
       print(paste(df_jm[x, "id"], df_jm[x, "month"]))
@@ -172,7 +164,7 @@ comprobar_valores_perc <- function (){
   
   
   # Comprobar perc_adh_ara2oieca está entre los umbrales establecidos low boundary
-  for (x in 1:nrow(df_jm)){
+  for (x in 1:nrow(df_jm)) {
     if (!all(
       df_jm[[x, "perc_adh_ara2oieca"]] >= max(df_jm[[x, "perc_adh_ieca"]], df_jm[[x, "perc_adh_ara2"]])))
     {
@@ -182,3 +174,20 @@ comprobar_valores_perc <- function (){
 
 }
 
+
+# tests -------------------------------------------------------------------
+
+test_that("testear valores en rango", {
+  expect_success(expect_output(comprobar_valores_rango(df_jm), NA))
+  }
+)
+
+test_that("testear temporalidad y rango de variables acumuladas", {
+  expect_success(expect_output(comprobar_valores_tiempo(df_jm), NA))
+  }
+)
+
+test_that("testear coherencia en variables compuestas de porcentajes", {
+  expect_success(expect_output(comprobar_valores_perc(df_jm), NA))
+  }
+)
