@@ -8,7 +8,7 @@ library(cohorteicc2)
 #' @param df2 (data.frame)
 #'
 #' @return df (data.frame) merged df
-merge_farmacos <- function(df1, df2) {
+merge_byid <- function(df1, df2) {
   df <- df1 %>% dplyr::left_join(df2, by = "id")
   return(df)
 }
