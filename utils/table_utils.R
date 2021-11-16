@@ -1,7 +1,7 @@
 
 
 
-summary_table <- function(m1, m2, m3) {
+summary_table <- function(m1, m2, m3, cox_vars) {
   # Function for the generation of Table 3 of the manuscript.
   #-------------#
   # Left column #
@@ -24,14 +24,14 @@ summary_table <- function(m1, m2, m3) {
   intervals <- cbind(value, lower, upper)
   colnames(intervals) <- c("value", "lower", "upper")
   CI <- NULL
-  for (i in 1:10) {
+  for (i in 1:(8 + length(cox_vars))) {
     CI <- c(CI, paste0("(", round(lower[i], 4), ";", round(upper[i], 4), ")"))
   }
   Tm1 <- data.frame("Mean" = round(value, 4), CI)
   colnames(Tm1) <- c("Mean", "95% CI")
   rownames(Tm1) <- c("Intercept", "$B_n(t,lambda_1)$", "$B_n(t,lambda_2)$",
                      "$B_n(t,lambda_3)$", "$B_n(t,lambda_4)$", "sigma_eps",
-                     "Sexo", "Edad", "Current Value", "Slope")
+                     cox_vars, "Current Value", "Slope")
   #----------------#
   # Central column #
   #----------------#
@@ -53,14 +53,14 @@ summary_table <- function(m1, m2, m3) {
   intervals <- cbind(value, lower, upper)
   colnames(intervals) <- c("value", "lower", "upper")
   CI <- NULL
-  for (i in 1:10) {
+  for (i in 1:(8 + length(cox_vars))) {
     CI <- c(CI, paste0("(", round(lower[i], 4), ";", round(upper[i], 4), ")"))
   }
   Tm2 <- data.frame("Mean" = round(value, 4), CI)
   colnames(Tm2) <- c("Mean", "95% CI")
   rownames(Tm2) <- c("Intercept", "$B_n(t,lambda_1)$", "$B_n(t,lambda_2)$",
                      "$B_n(t,lambda_3)$", "$B_n(t,lambda_4)$", "sigma_eps",
-                     "Sexo", "Edad", "Current Value", "Slope")
+                     cox_vars, "Current Value", "Slope")
   #--------------#
   # Right column #
   #--------------#
@@ -82,14 +82,14 @@ summary_table <- function(m1, m2, m3) {
   intervals <- cbind(value, lower, upper)
   colnames(intervals) <- c("value", "lower", "upper")
   CI <- NULL
-  for (i in 1:10) {
+  for (i in 1:(8 + length(cox_vars))) {
     CI <- c(CI, paste0("(", round(lower[i], 4), ";", round(upper[i], 4), ")"))
   }
   Tm3 <- data.frame("Mean" = round(value, 4), CI)
   colnames(Tm3) <- c("Mean", "95% CI")
   rownames(Tm3) <- c("Intercept", "$B_n(t,lambda_1)$", "$B_n(t,lambda_2)$",
                      "$B_n(t,lambda_3)$", "$B_n(t,lambda_4)$", "sigma_eps",
-                     "Sexo", "Edad", "Current Value", "Slope")
+                     cox_vars, "Current Value", "Slope")
   #---------------#
   # summary table #
   #---------------#
