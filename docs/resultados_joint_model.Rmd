@@ -3,6 +3,8 @@ title: "resultados de joint_model"
 author: "Asier Insausti Gonzalez"
 date: "20/10/2021"
 output:
+  word_document:
+    toc: yes
   html_document:
     code_folding: show
     highlight: espresso
@@ -34,21 +36,35 @@ knitr::opts_chunk$set(eval = TRUE,
 ```
 
 ```{r setup, include=FALSE}
+
 # options
 knitr::opts_chunk$set(echo = TRUE)
 
 # libraries
 library(readr)
+library(knitr)
 
 # global variables
-OUTPATH <- "./../out/"
+# OUTPATH <- "./out" # /..
+# UTILSPATH <- "./utils" # /..
+# DATAOUTPATH <- "./data/out" # /..
+DATAFILENAME <- 'df_JM.csv'
+M1MODELFILENAME <- 'M1_cum_perc_adh_guia_arm.rds'
+M2MODELFILENAME <- 'M2_cum_perc_adh_guia_arm.rds'
+M3MODELFILENAME <- 'M3_cum_perc_adh_guia_arm.rds'
+JMFILENAME <- 'JM_table_cum_perc_adh_guia_arm.rds'
+
+# # global variables when knitting this file
+OUTPATH <- "./../out" #
+UTILSPATH <- "./../utils" # /..
+DATAOUTPATH <- "./../data/out" # /..
 ```
 
 
 
 ```{r source, include=FALSE}
-source("./../utils/jm_utils.R")
-source("./../utils/table_utils.R")
+source(paste(UTILSPATH, "jm_utils.R", sep = '/'))
+source(paste(UTILSPATH, "table_utils.R", sep = '/'))
 ```
 
 
@@ -62,12 +78,12 @@ El objetivo de este script es mostrar de forma ordenada todos los resultados que
   - denovo_tt_paciente_falta
   - early_death_patient_30
   - patient_with_prescription
-- Variable longitudinal y modelo de Cox: Variables longitudinales introducidos en el joint model.
+- Variable longitudinal y modelo de Cox: Variables longitudinales introducidos en el joint model y variables que se introducen en el modelo de Cox.
 
 Leemos los datos:
 
 ```{r datos0, warning=FALSE, message=FALSE}
-df_jm <- readr::read_csv("../data/out/df_JM.csv")
+df_jm <- readr::read_csv(paste(DATAOUTPATH, DATAFILENAME ,sep = '/'))
 ```
 ## Cargas de data frames para subgrupos de pacientes
 
@@ -103,7 +119,7 @@ cantidad_pacientes <- length(unique(df_jm2$id))
 
 Con las condiciones establecidas, en esta tabla de datos se incluyen `r cantidad_pacientes` pacientes
 
-* Adherencia sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso
+* Adherencia sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso (no han sufrido IC ni tampoco han sido tratados con los fármacos analizados)
 
 ```{r todos con prescripciones y novo}
 patients_conditions <- list(
@@ -120,7 +136,7 @@ cantidad_pacientes <- length(unique(df_jm3$id))
 Con las condiciones establecidas, en esta tabla de datos se incluyen `r cantidad_pacientes` pacientes
 
 
-* Adherencia sin tener en cuenta pacientes sin prescripciones, ni pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso
+* Adherencia filtrando pacientes con prescripciones, ni pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso (no han sufrido IC ni tampoco han sido tratados con los fármacos analizados)
 
 ```{r todos con prescripciones y novo y sin duran poco}
 patients_conditions <- list(
@@ -137,7 +153,7 @@ cantidad_pacientes <- length(unique(df_jm4$id))
 Con las condiciones establecidas, en esta tabla de datos se incluyen `r cantidad_pacientes` pacientes
 
 # Resultados
-## Adherencia guia arm
+## Adherencia guia arm con sexo y edad como variables del modelo de Cox
 
 ```{r var_adhguia_arm}
 LONGVAR <- "cum_perc_adh_guia_arm"
@@ -147,13 +163,13 @@ LONGVAR <- "cum_perc_adh_guia_arm"
 ### Subset: Muestra teniendo en cuenta todos los id-s
 
 ```{r adhguia_arm_0}
-# JM_table <- readRDS(paste0(OUTPATH, output = 'JM', "JM_table_", LONGVAR, ".rds"))
-# JM_table$summaryJM
-M1 <- readRDS('./../out//JM_M1_cum_perc_adh_guia_arm.rds')
-M2 <- readRDS('./../out//JM_M2_cum_perc_adh_guia_arm.rds')
-M3 <- readRDS('./../out//JM_M3_cum_perc_adh_guia_arm.rds')
-JM_table <- summary_table(M1, M2, M3)
-JM_table
+output <- 'JM'
+M1 <- readRDS(paste(OUTPATH, paste(output, M1MODELFILENAME, sep = '_'), sep = '/'))
+M2 <- readRDS(paste(OUTPATH, paste(output, M2MODELFILENAME, sep = '_'), sep = '/'))
+M3 <- readRDS(paste(OUTPATH, paste(output, M3MODELFILENAME, sep = '_'), sep = '/'))
+JM_table <- summary_table(M1, M2, M3, cox_vars = c("sexo", "edad_ing1"))
+kable(JM_table$summaryJM, format = 'markdown')
+JM_table$DIC
 ```
 ```{r delete_adhgioa_arm_0}
 rm("M1", "M2", "M3")
@@ -163,14 +179,14 @@ rm("M1", "M2", "M3")
 ### Subset: Muestra filtrando pacientes con prescripciones
 
 ```{r adhguia_arm_1}
-# JM_table <- readRDS(paste0(OUTPATH, output = 'JM1', "JM_table_", LONGVAR, ".rds"))
-# JM_table$summaryJM
-M1 <- readRDS('./../out//JM1_M1_cum_perc_adh_guia_arm.rds')
-M2 <- readRDS('./../out//JM1_M2_cum_perc_adh_guia_arm.rds')
-M3 <- readRDS('./../out//JM1_M3_cum_perc_adh_guia_arm.rds')
+output <- 'JM1'
+M1 <- readRDS(paste(OUTPATH, paste(output, M1MODELFILENAME, sep = '_'), sep = '/'))
+M2 <- readRDS(paste(OUTPATH, paste(output, M2MODELFILENAME, sep = '_'), sep = '/'))
+M3 <- readRDS(paste(OUTPATH, paste(output, M3MODELFILENAME, sep = '_'), sep = '/'))
 
-JM_table <- summary_table(M1, M2, M3)
-JM_table
+JM_table <- summary_table(M1, M2, M3, cox_vars = c("sexo", "edad_ing1"))
+kable(JM_table$summaryJM, format = 'markdown')
+JM_table$DIC
 ```
 
 ```{r delete_adhgioa_arm_1}
@@ -181,14 +197,14 @@ rm("M1", "M2", "M3")
 ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días
 
 ```{r adhguia_arm_2}
-# JM_table <- readRDS(paste0(OUTPATH, output = 'JM2', "JM_table_", LONGVAR, ".rds"))
-# JM_table$summaryJM
-M1 <- readRDS('./../out//JM2_M1_cum_perc_adh_guia_arm.rds')
-M2 <- readRDS('./../out//JM2_M2_cum_perc_adh_guia_arm.rds')
-M3 <- readRDS('./../out//JM2_M3_cum_perc_adh_guia_arm.rds')
+output <- 'JM2'
+M1 <- readRDS(paste(OUTPATH, paste(output, M1MODELFILENAME, sep = '_'), sep = '/'))
+M2 <- readRDS(paste(OUTPATH, paste(output, M2MODELFILENAME, sep = '_'), sep = '/'))
+M3 <- readRDS(paste(OUTPATH, paste(output, M3MODELFILENAME, sep = '_'), sep = '/'))
 
-JM_table <- summary_table(M1, M2, M3)
-JM_table
+JM_table <- summary_table(M1, M2, M3, cox_vars = c("sexo", "edad_ing1"))
+kable(JM_table$summaryJM, format = 'markdown')
+JM_table$DIC
 ```
 
 ```{r delete_adhgioa_arm_2}
@@ -200,15 +216,14 @@ rm("M1", "M2", "M3")
 ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días y filtrando pacientes de novo en fecha ingreso
 
 ```{r adhguia_arm_3}
-# JM_table <- readRDS(paste0(OUTPATH, output = 'JM3', "JM_table_", LONGVAR, ".rds"))
-# JM_table$summaryJM
+output <- 'JM3'
+M1 <- readRDS(paste(OUTPATH, paste(output, M1MODELFILENAME, sep = '_'), sep = '/'))
+M2 <- readRDS(paste(OUTPATH, paste(output, M2MODELFILENAME, sep = '_'), sep = '/'))
+M3 <- readRDS(paste(OUTPATH, paste(output, M3MODELFILENAME, sep = '_'), sep = '/'))
 
-M1 <- readRDS('./../out//JM3_M1_cum_perc_adh_guia_arm.rds')
-M2 <- readRDS('./../out//JM3_M2_cum_perc_adh_guia_arm.rds')
-M3 <- readRDS('./../out//JM3_M3_cum_perc_adh_guia_arm.rds')
-
-JM_table <- summary_table(M1, M2, M3)
-JM_table
+JM_table <- summary_table(M1, M2, M3, cox_vars = c("sexo", "edad_ing1"))
+kable(JM_table$summaryJM, format = 'markdown')
+JM_table$DIC
 ```
 
 ```{r delete_adhgioa_arm_3}
@@ -219,130 +234,65 @@ rm("M1", "M2", "M3")
 ### Subset: Muestra filtrando pacientes con prescripciones, sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso
 
 ```{r adhguia_arm_4}
-# JM_table <- readRDS(paste0(OUTPATH, output = 'JM4', "JM_table_", LONGVAR, ".rds"))
-# JM_table$summaryJM
-M1 <- readRDS('./../out//JM4_M1_cum_perc_adh_guia_arm.rds')
-M2 <- readRDS('./../out//JM4_M2_cum_perc_adh_guia_arm.rds')
-M3 <- readRDS('./../out//JM4_M3_cum_perc_adh_guia_arm.rds')
+output <- 'JM4'
+M1 <- readRDS(paste(OUTPATH, paste(output, M1MODELFILENAME, sep = '_'), sep = '/'))
+M2 <- readRDS(paste(OUTPATH, paste(output, M2MODELFILENAME, sep = '_'), sep = '/'))
+M3 <- readRDS(paste(OUTPATH, paste(output, M3MODELFILENAME, sep = '_'), sep = '/'))
 
-JM_table <- summary_table(M1, M2, M3)
-JM_table
+JM_table <- summary_table(M1, M2, M3, cox_vars = c("sexo", "edad_ing1"))
+kable(JM_table$summaryJM, format = 'markdown')
+JM_table$DIC
 ```
 
 ```{r delete_adhgioa_arm_4}
 rm("M1", "M2", "M3")
 ```
 
-<!-- ## Adherencia guia sin arm -->
+## Adherencia guia arm con sexo, edad y el índice de Charlson como variables del modelo de Cox
 
-<!-- ```{r var_adhguia} -->
-<!-- LONGVAR <- "cum_perc_adh_guia" -->
-<!-- ``` -->
+```{r var2_var_adhguia_arm}
+LONGVAR <- "cum_perc_adh_guia_arm"
+```
 
+### Subset: Muestra teniendo en cuenta todos los id-s
 
-<!-- ### Subset: Muestra teniendo en cuenta todos los id-s -->
-
-<!-- ```{r adhguia_0} -->
-<!-- JM_table <- readRDS(paste0(OUTPATH, output = 'JM', "JM_table_", LONGVAR, ".rds")) -->
-<!-- JM_table$summaryJM -->
-<!-- ``` -->
-
-<!-- ### Subset: Muestra filtrando pacientes con prescripciones -->
-
-<!-- ```{r adhguia_1} -->
-<!-- JM_table <- readRDS(paste0(OUTPATH,'JM1', "JM_table_", LONGVAR, ".rds")) -->
-<!-- JM_table$summaryJM -->
-<!-- ``` -->
-
-<!-- ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días -->
-
-<!-- ```{r adhguia_2} -->
-<!-- JM_table <- readRDS(paste0(OUTPATH, output = 'JM2', "JM_table_", LONGVAR, ".rds")) -->
-<!-- JM_table$summaryJM -->
-<!-- ``` -->
+```{r var2_adhguia_arm_0}
+output <- 'JM_charlson'
+JM_table <- readRDS(paste(OUTPATH, paste(output, JMFILENAME, sep = ''), sep = '/'))
+kable(JM_table$summaryJM, format = 'markdown')
+JM_table$DIC
+```
 
 
-<!-- ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días y filtrando pacientes de novo en fecha ingreso -->
+### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días y filtrando pacientes de novo en fecha ingreso
 
-<!-- ```{r adhguia_3} -->
-<!-- JM_table <- readRDS(paste0(OUTPATH, output = 'JM3', "JM_table_", LONGVAR, ".rds")) -->
-<!-- JM_table$summaryJM -->
-<!-- ``` -->
-
-<!-- ### Subset: Muestra filtrando pacientes con prescripciones, sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso -->
-
-<!-- ```{r adhguia_4} -->
-<!-- JM_table <- readRDS(paste0(OUTPATH, output = 'JM4', "JM_table_", LONGVAR, ".rds")) -->
-<!-- JM_table$summaryJM -->
-<!-- ``` -->
+```{r var2_adhguia_arm_3}
+output <- 'JM3_charlson'
+JM_table <- readRDS(paste(OUTPATH, paste(output, JMFILENAME, sep = ''), sep = '/'))
+kable(JM_table$summaryJM, format = 'markdown')
+JM_table$DIC
+```
 
 
-<!-- ## Adherencia médico -->
+## Adherencia guia arm con sexo, edad, el índice de Charlson y fracción de eyección severa como variables del modelo de Cox
 
-<!-- ```{r var_adhdoctor} -->
-<!-- LONGVAR <- "cum_perc_adh_doctor" -->
-<!-- ``` -->
+### Subset: Muestra teniendo en cuenta todos los id-s
 
-
-<!-- ### Subset: Muestra teniendo en cuenta todos los id-s -->
-
-<!-- ```{r adhdoctor_0} -->
-<!-- JM_table <- readRDS(paste0(OUTPATH, output = 'JM', "JM_table_", LONGVAR, ".rds")) -->
-<!-- JM_table$summaryJM -->
-<!-- ``` -->
-
-<!-- ### Subset: Muestra filtrando pacientes con prescripciones -->
-
-<!-- ```{r adhdoctor_1} -->
-<!-- JM_table <- readRDS(paste0(OUTPATH, output = 'JM1', "JM_table_", LONGVAR, ".rds")) -->
-<!-- JM_table$summaryJM -->
-<!-- ``` -->
-
-<!-- ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días -->
-
-<!-- ```{r adhdoctor_2} -->
-<!-- JM_table <- readRDS(paste0(OUTPATH, output = 'JM2', "JM_table_", LONGVAR, ".rds")) -->
-<!-- JM_table$summaryJM -->
-<!-- ``` -->
+```{r var3_adhguia_arm_0}
+output <- 'JM_charlson_fe'
+JM_table <- readRDS(paste(OUTPATH, paste(output, JMFILENAME, sep = ''), sep = '/'))
+kable(JM_table$summaryJM, format = 'markdown')
+JM_table$DIC
+```
 
 
-<!-- ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días y filtrando pacientes de novo en fecha ingreso -->
+### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días y filtrando pacientes de novo en fecha ingreso
 
-<!-- ```{r adhdoctor_3} -->
-<!-- JM_table <- readRDS(paste0(OUTPATH, output = 'JM3', "JM_table_", LONGVAR, ".rds")) -->
-<!-- JM_table$summaryJM -->
-<!-- ``` -->
-
-<!-- ### Subset: Muestra filtrando pacientes con prescripciones, sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso -->
-
-<!-- ```{r adhdoctor_4} -->
-<!-- JM_table <- readRDS(paste0(OUTPATH, output = 'JM4', "JM_table_", LONGVAR, ".rds")) -->
-<!-- JM_table$summaryJM -->
-<!-- ``` -->
-
-<!-- ## Adherencia ieca o ara2 -->
-
-<!-- ### Subset: Muestra teniendo en cuenta todos los id-s -->
-<!-- ### Subset: Muestra filtrando pacientes con prescripciones -->
-<!-- ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días -->
-<!-- ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días y filtrando pacientes de novo en fecha ingreso -->
-<!-- ### Subset: Muestra filtrando pacientes con prescripciones, sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso -->
-
-<!-- ## Adherencia bbloq -->
-
-<!-- ### Subset: Muestra teniendo en cuenta todos los id-s -->
-<!-- ### Subset: Muestra filtrando pacientes con prescripciones -->
-<!-- ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días -->
-<!-- ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días y filtrando pacientes de novo en fecha ingreso -->
-<!-- ### Subset: Muestra filtrando pacientes con prescripciones, sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso -->
-
-<!-- ## Adherencia arm -->
-
-<!-- ### Subset: Muestra teniendo en cuenta todos los id-s -->
-<!-- ### Subset: Muestra filtrando pacientes con prescripciones -->
-<!-- ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días -->
-<!-- ### Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días y filtrando pacientes de novo en fecha ingreso -->
-<!-- ### Subset: Muestra filtrando pacientes con prescripciones, sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso -->
-
+```{r var3_adhguia_arm_3}
+output <- 'JM3_charlson_fe'
+JM_table <- readRDS(paste(OUTPATH, paste(output, JMFILENAME, sep = ''), sep = '/'))
+kable(JM_table$summaryJM, format = 'markdown')
+JM_table$DIC
+```
 
 
