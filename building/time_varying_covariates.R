@@ -241,6 +241,7 @@ acum_month <- function(df) {
     dplyr::mutate(cum_perc_adh_ara2 = cumsum(perc_adh_ara2) / 100,
                   cum_perc_adh_bbloq = cumsum(perc_adh_bbloq) / 100,
                   cum_perc_adh_ieca = cumsum(perc_adh_ieca) / 100,
+                  cum_perc_adh_arm = cumsum(perc_adh_arm) / 100,
                   cum_perc_adh_doctor = cumsum(perc_adh_doctor) / 100,
                   cum_perc_adh_guia = cumsum(perc_adh_guia) / 100,
                   cum_perc_adh_ara2oieca = cumsum(perc_adh_ara2oieca) / 100,
