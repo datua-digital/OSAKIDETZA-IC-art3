@@ -19,7 +19,7 @@ source("utils/table_utils.R")
 # Selección de variables ---------------------------------------------------------------
 VARIABLESCOX_IND <- c("sexo", "edad_ing1")
 VARIABLESCOX <- c("sexo", "edad_ing1", "cluster(id)")
-VARIABLESLONGS <- c("cum_perc_adh_guia_arm","cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_ieca", "cum_perc_adh_doctor", "cum_perc_adh_guia")
+VARIABLESLONGS <- c("cum_perc_adh_arm","cum_perc_adh_ara2oieca","cum_perc_adh_guia_arm","cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_ieca", "cum_perc_adh_doctor", "cum_perc_adh_guia")
 VARIABLESTODOS <- c("id", VARIABLESCOX_IND, "event","time_to_event", "month")
 
 
@@ -60,15 +60,63 @@ apply_MVJM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESC
   cox_df <- generate_coxdf(df_jm)
   df_jm <- preprocess_dfjm(df_jm)
   
+  #PARA DOS VARIABLES LONGITUDINALES***********************************************************
+  ecuaciones <- list(
+    as.formula(paste(paste("cum_perc_adh_ara2oieca" ,paste('ns(month, 4)', collapse = '+'),  sep = '~'), "(ns(month, 4) | id)", sep = '+')),
+    as.formula(paste(paste("cum_perc_adh_bbloq" ,paste('ns(month, 4)', collapse = '+'),  sep = '~'), "(ns(month, 4) | id)", sep = '+'))
+  )
+  family <- list(gaussian, gaussian,gaussian)
   
+  # M1
+  set.seed(1000)
+  MixedModelFit1 <- mvglmer(ecuaciones,
+                            data = df_jm,
+                            families = family)
+  
+  surv_object <- Surv(time = cox_df$time_to_event,
+                      event = as.numeric(cox_df$event))
+  
+  coxFit.df_jm <- coxph(as.formula(paste("surv_object", paste(VARIABLESCOX, collapse = "+"), sep = "~")), 
+                        data = cox_df,
+                        x = TRUE,
+                        model = TRUE)
+  
+  M1 <- mvJointModelBayes(MixedModelFit1, coxFit.df_jm, timeVar = "month")
+  summary(M1)
+  saveRDS(M1, paste0("out/", "M1_MVJ_V2", ".rds"))
+  
+  
+  # M2
+  forms <- list(
+    "cum_perc_adh_ara2oieca" = "value",
+    "cum_perc_adh_ara2oieca" = list( fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
+                                     indFixed = 2:5, indRandom = 2:5 ),
+    "cum_perc_adh_bbloq"     = "value",
+    "cum_perc_adh_bbloq"     = list( fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
+                                     indFixed = 2:5, indRandom = 2:5 )
+  )
+  M2 <- update(M1, Formulas = forms)
+  saveRDS(M2, paste0("out/", "M2_MVJ_V2", ".rds"))
+  
+  
+  # M3
+  forms <- list(
+    "cum_perc_adh_ara2oieca" = list( fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
+                                     indFixed = 2:5, indRandom = 2:5),
+    "cum_perc_adh_bbloq"    = list( fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
+                                    indFixed = 2:5, indRandom = 2:5 )
+  )
+  M3 <- update(M1, Formulas = forms)
+  saveRDS(M3, paste0("out/", "M3_MVJ_V2", ".rds"))
+  
+  #PARA TRES VARIABLES LONGITUDINALES
   # Lista de ecuaciones con su respectivas familiasa
   ecuaciones <- list(
-    as.formula(paste(paste("cum_perc_adh_guia_arm" ,paste('ns(month, 4)', collapse = '+'),  sep = '~'), "(ns(month, 4) | id)", sep = '+')),
-    as.formula(paste(paste("cum_perc_adh_bbloq" ,paste('ns(month, 4)', collapse = '+'),  sep = '~'), "(ns(month, 4) | id)", sep = '+'))
-    # ,
-    # as.formula(paste(paste("cum_perc_adh_arm" ,paste('ns(month, 4)', collapse = '+'),  sep = '~'), "(ns(month, 4) | id)", sep = '+'))
+    as.formula(paste(paste("cum_perc_adh_ara2oieca" ,paste('ns(month, 4)', collapse = '+'),  sep = '~'), "(ns(month, 4) | id)", sep = '+')),
+    as.formula(paste(paste("cum_perc_adh_bbloq" ,paste('ns(month, 4)', collapse = '+'),  sep = '~'), "(ns(month, 4) | id)", sep = '+')),
+    as.formula(paste(paste("cum_perc_adh_arm" ,paste('ns(month, 4)', collapse = '+'),  sep = '~'), "(ns(month, 4) | id)", sep = '+'))
   )
-  family <- list(gaussian, gaussian)
+  family <- list(gaussian, gaussian,gaussian)
   
   # M1
   set.seed(1000)
@@ -84,65 +132,38 @@ apply_MVJM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESC
                         x = TRUE,
                         model = TRUE)
 
-  M1 <- mvJointModelBayes(MixedModelFit1, coxFit.df_jm, timeVar = "time_to_event")
+  M1 <- mvJointModelBayes(MixedModelFit1, coxFit.df_jm, timeVar = "month")
   summary(M1)
-  saveRDS(M1, paste0("out/", "_MVJM1_", ".rds"))
+  saveRDS(M1, paste0("out/", "M1_MVJ_V3", ".rds"))
   
   
   # M2
   forms <- list(
-    "cum_perc_adh_guia_arm" = list( fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
+    "cum_perc_adh_ara2oieca" = "value",
+    "cum_perc_adh_ara2oieca" = list( fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
                                     indFixed = 2:5, indRandom = 2:5 ),
-    "cum_perc_adh_bbloq"    = list( fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
+    "cum_perc_adh_bbloq"     = "value",
+    "cum_perc_adh_bbloq"     = list( fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
                                     indFixed = 2:5, indRandom = 2:5 ),
-    "cum_perc_adh_arm"      = list( fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
+    "cum_perc_adh_arm"       = "value",
+    "cum_perc_adh_arm"       = list( fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
                                     indFixed = 2:5, indRandom = 2:5 )
   )
-  M2 <- update(M1, param = "td-both", extraForm = forms)
-  saveRDS(M2, paste0("out/", "_MVJM2_", ".rds"))
+  M2 <- update(M1, Formulas = forms)
+  saveRDS(M2, paste0("out/", "M2_MVJ_V3", ".rds"))
   
   
   # M3
   forms <- list(
-    "cum_perc_adh_guia_arm" = list( fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
+    "cum_perc_adh_ara2oieca" = list( fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
                                     indFixed = 2:5, indRandom = 2:5),
     "cum_perc_adh_bbloq"    = list( fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
                                     indFixed = 2:5, indRandom = 2:5 ),
     "cum_perc_adh_arm"      = list( fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
                                     indFixed = 2:5, indRandom = 2:5 )
   )
-  M2 <- update(M1, param = "td-extra", extraForm = forms)
-  saveRDS(M3, paste0("out/", "_MVJM3_", ".rds"))
-  
-  
-  # Modelización del proceso del evento ---------------------------------------------------------------
-  # M1: Fit JM with longitudinal process (4) and event process (6)
-  # M1 <- JMbayes::jointModelBayes(
-  #   long_proc,
-  #   coxFit.df_jm,
-  #   timeVar = "month",
-  #   n.iter = 30000,
-  #   n.burnin = 3000)
-  # saveRDS(M1, paste0(OUTPATH, paste0(output, "_M1_", LONGVAR, ".rds")))
-  # 
-  # 
-  # # M2: Fit JM with longitudinal process (4) y componentes de tendencia y valor actuales
-  # dForm <- list(fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
-  #               indFixed = 2:5, indRandom = 2:5)
-  # M2 <- update(M1, param = "td-both", extraForm = dForm)
-  # saveRDS(M2, paste0(OUTPATH, output, "_M2_", LONGVAR, ".rds"))
-  # 
-  # 
-  # # M3: Fit JM with longitudinal process (4) y componente de tendencia
-  # dForm <- list(fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
-  #               indFixed = 2:5, indRandom = 2:5)
-  # M3 <- update(M1, param = "td-extra", extraForm = dForm)
-  # saveRDS(M3, paste0(OUTPATH, output, "_M3_", LONGVAR, ".rds"))
-  # 
-  # # Generar tabla resultados ----------------------------------------------------------------------------
-  # JM_table <- summary_table(M1, M2, M3)
-  # saveRDS(JM_table, paste0(OUTPATH, output, "JM_table_", LONGVAR, ".rds"))
-  # rm("M1", "M2", "M3")
+  M3 <- update(M1, Formulas = forms)
+  saveRDS(M3, paste0("out/", "M3_MVJ_V3", ".rds"))
 }
 
 # JM para adherencia guia (con arm) ---------------------------------------------------------------------
@@ -169,7 +190,7 @@ patients_conditions <- list(
   early_death_patient_30 = NULL,
   patient_with_prescription = TRUE
 )
-apply_JM(df_jm0 = df_jm, patients_conditions = patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM1')
+apply_JM(df_jm0 = df_jm, patients_conditions = patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, output = 'JM1')
 
 df_jm <- readr::read_csv("data/out/df_JM.csv")
 # Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días
@@ -180,10 +201,10 @@ patients_conditions <- list(
   early_death_patient_30 = FALSE,
   patient_with_prescription = NULL
 )
-apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM2')
+apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, output = 'JM2')
 
 # TODO Ejecutar joint model
-# Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días 
+# Subset: Muestra sin tener en cuenta pacientes que fallecen los primeros 30 días
 df_jm <- readr::read_csv("data/out/df_JM.csv")
 # y filtrando pacientes de novo en fecha ingreso
 patients_conditions <- list(
@@ -193,10 +214,10 @@ patients_conditions <- list(
   early_death_patient_30 = FALSE,
   patient_with_prescription = NULL
 )
-apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM3')
+apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, output = 'JM3')
 
 
-# Subset: Muestra filtrando pacientes con prescripciones, 
+# Subset: Muestra filtrando pacientes con prescripciones,
 df_jm <- readr::read_csv("data/out/df_JM.csv")
 # sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso
 patients_conditions <- list(
@@ -206,151 +227,151 @@ patients_conditions <- list(
   early_death_patient_30 = FALSE,
   patient_with_prescription = TRUE
 )
-apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM4')
+apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, output = 'JM4')
 
 
 
-# JM para data.frame completo ---------------------------------------------
-
-# JM para variable ara2:
-LONGVAR <- "cum_perc_adh_ara2"
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR)
-
-# JM para variable ieca:
-LONGVAR <- "cum_perc_adh_ieca"
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR)
-
-# JM para variable bbloq:
-LONGVAR <- "cum_perc_adh_bbloq"
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR)
-
-# JM para variable adh_doctor:
-LONGVAR <- "cum_perc_adh_doctor"
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR)
-
-# JM para variable adh_guia:
-LONGVAR <- "cum_perc_adh_guia"
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR)
-
-# jm_table1 <- get_table(OUTPATH, output, LONGVAR = "cum_perc_adh_ara2", save = FALSE)
-get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_ieca", save = TRUE)
-get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_bbloq", save = TRUE)
-get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_doctor", save = TRUE)
-get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_guia", save = TRUE)
-
-
-# JM para data.frame con prescripciones ---------------------------------------------
-# sin pacientes que no tienen prescripciones
-df_jm <- readr::read_csv("data/out/df_JM2.csv")
-patients_conditions <- list(
-  denovo_ic_paciente = NULL,
-  denovo_tt_paciente_fing = NULL,
-  denovo_tt_paciente_falta = NULL,
-  early_death_patient_30 = NULL,
-  patient_with_prescription = TRUE
-)
-
-# JM para variable ara2:
-LONGVAR <- "cum_perc_adh_ara2"
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido1')
-
-# JM para variable ieca:
-LONGVAR <- "cum_perc_adh_ieca"
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido1')
-
-# JM para variable bbloq:
-LONGVAR <- "cum_perc_adh_bbloq"
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido1')
-
-# JM para variable adh_doctor:
-LONGVAR <- "cum_perc_adh_doctor"
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido1')
-
-# JM para variable adh_guia:
-LONGVAR <- "cum_perc_adh_guia"
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido1')
-
-output <- 'JM_reducido1'
-
-get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_ara2", save = TRUE)
-get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_ieca", save = TRUE)
-get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_bbloq", save = TRUE)
-get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_doctor", save = TRUE)
-get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_guia", save = TRUE)
-
-
-# JM para data.frame con prescripciones y sin pacientes que fallecen los primeros 30 días JM_reducido2---------------------------------------------
-# sin pacientes que no tienen prescripciones
-df_jm <- readr::read_csv("data/out/df_JM2.csv")
-patients_conditions <- list(
-  denovo_ic_paciente = NULL,
-  denovo_tt_paciente_fing = NULL,
-  denovo_tt_paciente_falta = NULL,
-  early_death_patient_30 = FALSE,
-  patient_with_prescription = TRUE
-)
-
-# JM para variable ara2:
-LONGVAR <- "cum_perc_adh_ara2"
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido2')
-
-# JM para variable ieca:
-LONGVAR <- "cum_perc_adh_ieca"
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido2')
-
-# JM para variable bbloq:
-LONGVAR <- "cum_perc_adh_bbloq"
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido2')
-
-# JM para variable adh_doctor:
-LONGVAR <- "cum_perc_adh_doctor"
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido2')
-
-# JM para variable adh_guia:
-LONGVAR <- "cum_perc_adh_guia"
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido2')
-
-output <- 'JM_reducido2'
-get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_ara2", save = TRUE)
-get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_ieca", save = TRUE)
-get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_bbloq", save = TRUE)
-get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_doctor", save = TRUE)
-get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_guia", save = TRUE)
-
-# JM para data.frame con prescripciones, sin pacientes que fallecen los primeros 30 días JM_reducido3---------------------------------------------
-# sin pacientes que no tienen prescripciones
-df_jm <- readr::read_csv("data/out/df_JM2.csv")
-patients_conditions <- list(
-  denovo_ic_paciente = TRUE,
-  denovo_tt_paciente_fing = TRUE,
-  denovo_tt_paciente_falta = NULL,
-  early_death_patient_30 = FALSE,
-  patient_with_prescription = TRUE
-)
-
-# JM para variable ara2:
-LONGVAR <- "cum_perc_adh_ara2"
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido3')
-
-# JM para variable ieca:
-LONGVAR <- "cum_perc_adh_ieca"
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido3')
-
-# JM para variable bbloq:
-LONGVAR <- "cum_perc_adh_bbloq"
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido3')
-
-# JM para variable adh_doctor:
-LONGVAR <- "cum_perc_adh_doctor"
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido3')
-
-# JM para variable adh_guia:
-LONGVAR <- "cum_perc_adh_guia"
-apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducidotest2')
-
-output <- 'JM_reducido3'
-get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_ara2", save = TRUE)
-get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_ieca", save = TRUE)
-get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_bbloq", save = TRUE)
-get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_doctor", save = TRUE)
-get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_guia", save = TRUE)
+# # JM para data.frame completo ---------------------------------------------
+# 
+# # JM para variable ara2:
+# LONGVAR <- "cum_perc_adh_ara2"
+# apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH)
+# 
+# # JM para variable ieca:
+# LONGVAR <- "cum_perc_adh_ieca"
+# apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH)
+# 
+# # JM para variable bbloq:
+# LONGVAR <- "cum_perc_adh_bbloq"
+# apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH)
+# 
+# # JM para variable adh_doctor:
+# LONGVAR <- "cum_perc_adh_doctor"
+# apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH)
+# 
+# # JM para variable adh_guia:
+# LONGVAR <- "cum_perc_adh_guia"
+# apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH)
+# 
+# # jm_table1 <- get_table(OUTPATH, output, LONGVAR = "cum_perc_adh_ara2", save = FALSE)
+# get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_ieca", save = TRUE)
+# get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_bbloq", save = TRUE)
+# get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_doctor", save = TRUE)
+# get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_guia", save = TRUE)
+# 
+# 
+# # JM para data.frame con prescripciones ---------------------------------------------
+# # sin pacientes que no tienen prescripciones
+# df_jm <- readr::read_csv("data/out/df_JM2.csv")
+# patients_conditions <- list(
+#   denovo_ic_paciente = NULL,
+#   denovo_tt_paciente_fing = NULL,
+#   denovo_tt_paciente_falta = NULL,
+#   early_death_patient_30 = NULL,
+#   patient_with_prescription = TRUE
+# )
+# 
+# # JM para variable ara2:
+# LONGVAR <- "cum_perc_adh_ara2"
+# apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido1')
+# 
+# # JM para variable ieca:
+# LONGVAR <- "cum_perc_adh_ieca"
+# apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido1')
+# 
+# # JM para variable bbloq:
+# LONGVAR <- "cum_perc_adh_bbloq"
+# apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido1')
+# 
+# # JM para variable adh_doctor:
+# LONGVAR <- "cum_perc_adh_doctor"
+# apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido1')
+# 
+# # JM para variable adh_guia:
+# LONGVAR <- "cum_perc_adh_guia"
+# apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido1')
+# 
+# output <- 'JM_reducido1'
+# 
+# get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_ara2", save = TRUE)
+# get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_ieca", save = TRUE)
+# get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_bbloq", save = TRUE)
+# get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_doctor", save = TRUE)
+# get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_guia", save = TRUE)
+# 
+# 
+# # JM para data.frame con prescripciones y sin pacientes que fallecen los primeros 30 días JM_reducido2---------------------------------------------
+# # sin pacientes que no tienen prescripciones
+# df_jm <- readr::read_csv("data/out/df_JM2.csv")
+# patients_conditions <- list(
+#   denovo_ic_paciente = NULL,
+#   denovo_tt_paciente_fing = NULL,
+#   denovo_tt_paciente_falta = NULL,
+#   early_death_patient_30 = FALSE,
+#   patient_with_prescription = TRUE
+# )
+# 
+# # JM para variable ara2:
+# LONGVAR <- "cum_perc_adh_ara2"
+# apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido2')
+# 
+# # JM para variable ieca:
+# LONGVAR <- "cum_perc_adh_ieca"
+# apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido2')
+# 
+# # JM para variable bbloq:
+# LONGVAR <- "cum_perc_adh_bbloq"
+# apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido2')
+# 
+# # JM para variable adh_doctor:
+# LONGVAR <- "cum_perc_adh_doctor"
+# apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido2')
+# 
+# # JM para variable adh_guia:
+# LONGVAR <- "cum_perc_adh_guia"
+# apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido2')
+# 
+# output <- 'JM_reducido2'
+# get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_ara2", save = TRUE)
+# get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_ieca", save = TRUE)
+# get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_bbloq", save = TRUE)
+# get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_doctor", save = TRUE)
+# get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_guia", save = TRUE)
+# 
+# # JM para data.frame con prescripciones, sin pacientes que fallecen los primeros 30 días JM_reducido3---------------------------------------------
+# # sin pacientes que no tienen prescripciones
+# df_jm <- readr::read_csv("data/out/df_JM2.csv")
+# patients_conditions <- list(
+#   denovo_ic_paciente = TRUE,
+#   denovo_tt_paciente_fing = TRUE,
+#   denovo_tt_paciente_falta = NULL,
+#   early_death_patient_30 = FALSE,
+#   patient_with_prescription = TRUE
+# )
+# 
+# # JM para variable ara2:
+# LONGVAR <- "cum_perc_adh_ara2"
+# apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido3')
+# 
+# # JM para variable ieca:
+# LONGVAR <- "cum_perc_adh_ieca"
+# apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido3')
+# 
+# # JM para variable bbloq:
+# LONGVAR <- "cum_perc_adh_bbloq"
+# apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido3')
+# 
+# # JM para variable adh_doctor:
+# LONGVAR <- "cum_perc_adh_doctor"
+# apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducido3')
+# 
+# # JM para variable adh_guia:
+# LONGVAR <- "cum_perc_adh_guia"
+# apply_JM(df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_reducidotest2')
+# 
+# output <- 'JM_reducido3'
+# get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_ara2", save = TRUE)
+# get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_ieca", save = TRUE)
+# get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_bbloq", save = TRUE)
+# get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_doctor", save = TRUE)
+# get_table(OUTPATH, output = 'JM', LONGVAR = "cum_perc_adh_guia", save = TRUE)
