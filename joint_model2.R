@@ -65,7 +65,7 @@ apply_MVJM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESC
     as.formula(paste(paste("cum_perc_adh_ara2oieca" ,paste('ns(month, 4)', collapse = '+'),  sep = '~'), "(ns(month, 4) | id)", sep = '+')),
     as.formula(paste(paste("cum_perc_adh_bbloq" ,paste('ns(month, 4)', collapse = '+'),  sep = '~'), "(ns(month, 4) | id)", sep = '+'))
   )
-  family <- list(gaussian, gaussian,gaussian)
+  family <- list(gaussian, gaussian)
   
   # M1
   set.seed(1000)
@@ -109,14 +109,14 @@ apply_MVJM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESC
   M3 <- update(M1, Formulas = forms)
   saveRDS(M3, paste0("out/", "M3_MVJ_V2", ".rds"))
   
-  #PARA TRES VARIABLES LONGITUDINALES
+  #PARA TRES VARIABLES LONGITUDINALES***************************************************************
   # Lista de ecuaciones con su respectivas familiasa
   ecuaciones <- list(
     as.formula(paste(paste("cum_perc_adh_ara2oieca" ,paste('ns(month, 4)', collapse = '+'),  sep = '~'), "(ns(month, 4) | id)", sep = '+')),
     as.formula(paste(paste("cum_perc_adh_bbloq" ,paste('ns(month, 4)', collapse = '+'),  sep = '~'), "(ns(month, 4) | id)", sep = '+')),
     as.formula(paste(paste("cum_perc_adh_arm" ,paste('ns(month, 4)', collapse = '+'),  sep = '~'), "(ns(month, 4) | id)", sep = '+'))
   )
-  family <- list(gaussian, gaussian,gaussian)
+  family <- list(gaussian, gaussian, gaussian)
   
   # M1
   set.seed(1000)

@@ -22,7 +22,7 @@ generate_coxdf <- function(df_jm) {
 }
 
 preprocess_dfjm <- function(df) {
-  df <- df[c(VARIABLESTODOS, LONGVAR)]
+  df <- df[c(VARIABLESTODOS, VARIABLESLONGS)]
   df <- df %>% dplyr::arrange(id, month)
   return(df)
 }
