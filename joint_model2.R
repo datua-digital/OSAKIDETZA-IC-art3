@@ -83,7 +83,7 @@ apply_MVJM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESC
   
   M1 <- mvJointModelBayes(MixedModelFit1, coxFit.df_jm, timeVar = "month")
   summary(M1)
-  saveRDS(M1, paste0("out/", "M1_MVJ_V2", ".rds"))
+  saveRDS(M1, paste0("out/", output, "_M1_MVJM_V2", ".rds"))
   
   
   # M2
@@ -96,7 +96,7 @@ apply_MVJM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESC
                                      indFixed = 2:5, indRandom = 2:5 )
   )
   M2 <- update(M1, Formulas = forms)
-  saveRDS(M2, paste0("out/", "M2_MVJ_V2", ".rds"))
+  saveRDS(M2, paste0("out/", output, "_M2_MVJM_V2", ".rds"))
   
   
   # M3
@@ -107,9 +107,10 @@ apply_MVJM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESC
                                     indFixed = 2:5, indRandom = 2:5 )
   )
   M3 <- update(M1, Formulas = forms)
-  saveRDS(M3, paste0("out/", "M3_MVJ_V2", ".rds"))
+  saveRDS(M3, paste0("out/", output, "_M3_MVJM_V2", ".rds"))
   
   #PARA TRES VARIABLES LONGITUDINALES***************************************************************
+  rm("M1", "M2", "M3")
   # Lista de ecuaciones con su respectivas familiasa
   ecuaciones <- list(
     as.formula(paste(paste("cum_perc_adh_ara2oieca" ,paste('ns(month, 4)', collapse = '+'),  sep = '~'), "(ns(month, 4) | id)", sep = '+')),
@@ -134,7 +135,7 @@ apply_MVJM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESC
 
   M1 <- mvJointModelBayes(MixedModelFit1, coxFit.df_jm, timeVar = "month")
   summary(M1)
-  saveRDS(M1, paste0("out/", "M1_MVJ_V3", ".rds"))
+  saveRDS(M1, paste0("out/", output, "_M1_MVJM_V3", ".rds"))
   
   
   # M2
@@ -150,7 +151,7 @@ apply_MVJM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESC
                                     indFixed = 2:5, indRandom = 2:5 )
   )
   M2 <- update(M1, Formulas = forms)
-  saveRDS(M2, paste0("out/", "M2_MVJ_V3", ".rds"))
+  saveRDS(M2, paste0("out/", output, "_M2_MVJM_V3", ".rds"))
   
   
   # M3
@@ -163,7 +164,7 @@ apply_MVJM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESC
                                     indFixed = 2:5, indRandom = 2:5 )
   )
   M3 <- update(M1, Formulas = forms)
-  saveRDS(M3, paste0("out/", "M3_MVJ_V3", ".rds"))
+  saveRDS(M3, paste0("out/", output, "_M3_MVJM_V3", ".rds"))
 }
 
 # JM para adherencia guia (con arm) ---------------------------------------------------------------------
@@ -179,7 +180,7 @@ patients_conditions <- list(
   patient_with_prescription = NULL
 )
 
-apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM')
+apply_MVJM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, output = 'JM')
 
 df_jm <- readr::read_csv("data/out/df_JM.csv")
 # Subset: Muestra filtrando pacientes con prescripciones:
@@ -227,7 +228,7 @@ patients_conditions <- list(
   early_death_patient_30 = FALSE,
   patient_with_prescription = TRUE
 )
-apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, output = 'JM4')
+apply_MVJM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, output = 'JM4')
 
 
 
