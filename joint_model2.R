@@ -1,7 +1,6 @@
-#TODO: Replicar un modelo con la librería rstanarm
-
 # load libraries ----------------------------------------------------------
 # 
+
 library(rstanarm)
 library(JMbayes)
 library(readr)
@@ -17,8 +16,8 @@ source("utils/jm_utils.R")
 source("utils/table_utils.R")
 
 # Selección de variables ---------------------------------------------------------------
-VARIABLESCOX_IND <- c("sexo", "edad_ing1")
-VARIABLESCOX <- c("sexo", "edad_ing1", "cluster(id)")
+VARIABLESCOX_IND <- c("sexo", "edad_ing1", 'charlson', 'fe.reducida.severa')
+VARIABLESCOX <- c("sexo", "edad_ing1", "cluster(id)", 'charlson', 'fe.reducida.severa')
 VARIABLESLONGS <- c("cum_perc_adh_arm","cum_perc_adh_ara2oieca","cum_perc_adh_guia_arm","cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_ieca", "cum_perc_adh_doctor", "cum_perc_adh_guia")
 VARIABLESTODOS <- c("id", VARIABLESCOX_IND, "event","time_to_event", "month")
 
@@ -26,15 +25,7 @@ VARIABLESTODOS <- c("id", VARIABLESCOX_IND, "event","time_to_event", "month")
 # --------------------------------------------
 # PRUEBAS
 # sin tener en cuenta pacientes que fallecen los primeros 30 días, y filtrando pacientes de novo en fecha ingreso
-patients_conditions <- list(
-  denovo_ic_paciente = TRUE,
-  denovo_tt_paciente_fing = TRUE,
-  denovo_tt_paciente_falta = NULL,
-  early_death_patient_30 = FALSE,
-  patient_with_prescription = TRUE
-)
 
-df_jm0 <- readr::read_csv("data/out/df_JM.csv")
 # 
 # 
 # LONGVAR <- c("cum_perc_adh_guia_arm", "cum_perc_adh_bbloq")
@@ -82,9 +73,8 @@ apply_MVJM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESC
                         model = TRUE)
   
   M1 <- mvJointModelBayes(MixedModelFit1, coxFit.df_jm, timeVar = "month")
-  summary(M1)
-  saveRDS(M1, paste0("out/", output, "_M1_MVJM_V2", ".rds"))
-  
+  saveRDS(M1, paste0("out/", output, "_M1_MVJ_V2", ".rds"))
+
   
   # M2
   forms <- list(
@@ -96,6 +86,7 @@ apply_MVJM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESC
                                      indFixed = 2:5, indRandom = 2:5 )
   )
   M2 <- update(M1, Formulas = forms)
+
   saveRDS(M2, paste0("out/", output, "_M2_MVJM_V2", ".rds"))
   
   
@@ -109,6 +100,7 @@ apply_MVJM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESC
   M3 <- update(M1, Formulas = forms)
   saveRDS(M3, paste0("out/", output, "_M3_MVJM_V2", ".rds"))
   
+
   #PARA TRES VARIABLES LONGITUDINALES***************************************************************
   rm("M1", "M2", "M3")
   # Lista de ecuaciones con su respectivas familiasa
@@ -124,7 +116,6 @@ apply_MVJM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESC
   MixedModelFit1 <- mvglmer(ecuaciones,
                             data = df_jm,
                             families = family)
-  
   surv_object <- Surv(time = cox_df$time_to_event,
                       event = as.numeric(cox_df$event))
   
@@ -135,8 +126,9 @@ apply_MVJM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESC
 
   M1 <- mvJointModelBayes(MixedModelFit1, coxFit.df_jm, timeVar = "month")
   summary(M1)
+
   saveRDS(M1, paste0("out/", output, "_M1_MVJM_V3", ".rds"))
-  
+
   
   # M2
   forms <- list(
@@ -153,6 +145,7 @@ apply_MVJM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESC
   M2 <- update(M1, Formulas = forms)
   saveRDS(M2, paste0("out/", output, "_M2_MVJM_V3", ".rds"))
   
+  rm("M2")
   
   # M3
   forms <- list(
