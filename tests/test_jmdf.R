@@ -78,31 +78,8 @@ comprobar_valores_rango <- function(df_jm){
 }
 
 
-# Comprobar que los valores relacionados con el tiempo tienen los valores correspondientes********************
+# Comprobar que los valores relacionados con el tiempo son acumulativos********************
 comprobar_valores_tiempo <- function(df_jm){
-  variables <- list(
-    "month" = c(12, 0),
-    "edad_ing1" = c(1000, 0),
-    "sexo" = c("Hombre", "Mujer"),
-    "time_to_event" = c(12.001, 0.001),
-    "dura_in_months" = c(12, 0),
-    "last_month" = c(12.001, 0),
-    "perc_adh_ara2" = c(100, 0),
-    "perc_adh_bbloq" = c(100, 0),
-    "perc_adh_arm" = c(100, 0),
-    "perc_adh_ieca" = c(100, 0),
-    "perc_adh_guia" = c(100, 0),
-    "perc_adh_doctor" = c(100, 0),
-    "perc_adh_ara2ioeca" = c(100, 0),
-    "perc_adh_guia_arm" = c(100, 0),
-    "cum_perc_adh_ara2" = c(12, 0),
-    "cum_perc_adh_bbloq" = c(12, 0),
-    "cum_perc_adh_ieca" = c(12, 0),
-    "cum_perc_adh_doctor" = c(12, 0),
-    "cum_perc_adh_guia" = c(12, 0),
-    "cum_perc_adh_ara2ioeca" = c(12, 0),
-    "cum_perc_adh_guia_arm" = c(12, 0)
-  )
   v_tiempo <- 
     c("month",
       "cum_perc_adh_ara2",
@@ -112,8 +89,6 @@ comprobar_valores_tiempo <- function(df_jm){
       "cum_perc_adh_guia",
       "cum_perc_adh_ara2oieca",
       "cum_perc_adh_guia_arm")
-  
-  factor_ajuste <- 0.001
   
   #Comprobar tiempo
   for (j in unique(df_jm$id)) {
