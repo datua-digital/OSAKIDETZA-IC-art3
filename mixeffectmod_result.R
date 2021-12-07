@@ -12,17 +12,18 @@ source("utils/table_utils.R")
 source("utils/plot_utils.R")
 VARIABLESCOX_IND <- c("sexo", "edad_ing1")
 VARIABLESCOX <- c("sexo", "edad_ing1", "cluster(id)")
-VARIABLESLONGS <- c("cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_ieca", "cum_perc_adh_doctor", "cum_perc_adh_guia")
+VARIABLESLONGS <- c("cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_ieca",
+                    "cum_perc_adh_doctor", "cum_perc_adh_guia", "cum_perc_adh_guia_arm", "cum_perc_adh_ara2oieca")
 VARIABLESTODOS <- c("id", VARIABLESCOX_IND, "event","time_to_event", "month")
-LONGVAR <- "cum_perc_adh_guia_arm"
+LONGVAR <- "cum_perc_adh_bbloq"
 
 df_jm <- readr::read_csv("data/out/df_JM.csv")
 
 patients_conditions <- list(
-  denovo_ic_paciente = TRUE,
-  denovo_tt_paciente_fing = TRUE,
+  denovo_ic_paciente = NULL,
+  denovo_tt_paciente_fing = NULL,
   denovo_tt_paciente_falta = NULL,
-  early_death_patient_30 = FALSE,
+  early_death_patient_30 = NULL,
   patient_with_prescription = NULL
 )
 
@@ -52,11 +53,14 @@ result <- modelization_longproc(df_jm0 = df_jm,
 # standardized residuals versus fitted values by gender
 plot(result, resid(., type = "p") ~ fitted(.), abline = 0)
 # observed versus fitted values by Subject
-plot(result, cum_perc_adh_guia_arm ~ fitted(.))
+plot(result, cum_perc_adh_ara2oieca ~ fitted(.))
 
-obs_pred_plot(result$data, id_ = 14516937)
-obs_pred_plot(result$data, id_ = 764021079)
-obs_pred_plot(result$data, id_ = 844755579)
+obs_pred_plot(df = result$data, id_ = 14516937, longvar = LONGVAR)
+obs_pred_plot(df = result$data, id_ = 764021079, longvar = LONGVAR)
+obs_pred_plot(df = result$data, id_ = 844755579, longvar = LONGVAR)
+obs_pred_plot(df = result$data, id_ = 1184371008, longvar = LONGVAR)
+obs_pred_plot(df = result$data, id_ = 1185106353, longvar = LONGVAR)
 
+result$data[result$data$id == 844755579, 'cum_perc_adh_guia_arm']
 # TODO: Testear el shiny
 # runDynPred("lme")

@@ -1,8 +1,9 @@
 
 
-obs_pred_plot <- function(df, id_, new_data = FALSE){
+obs_pred_plot <- function(df, id_, new_data = FALSE, longvar){
   df$pred <- predict(result)
-  p <- ggplot(data = subset(df, id == id_) , aes(x = month, y = cum_perc_adh_guia_arm)) + 
+  df$yaxis <- df[[longvar]]
+  p <- ggplot(data = subset(df, id == id_) , aes(x = month, y = yaxis)) + 
     geom_point(size = 3) + 
     theme_bw() + 
     geom_line(aes(x = month, y = pred)) + 
