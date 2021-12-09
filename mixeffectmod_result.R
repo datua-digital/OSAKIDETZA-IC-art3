@@ -12,10 +12,10 @@ source("utils/table_utils.R")
 source("utils/plot_utils.R")
 VARIABLESCOX_IND <- c("sexo", "edad_ing1")
 VARIABLESCOX <- c("sexo", "edad_ing1", "cluster(id)")
-VARIABLESLONGS <- c("cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_ieca",
+VARIABLESLONGS <- c("cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_ieca", "cum_perc_adh_arm",
                     "cum_perc_adh_doctor", "cum_perc_adh_guia", "cum_perc_adh_guia_arm", "cum_perc_adh_ara2oieca")
 VARIABLESTODOS <- c("id", VARIABLESCOX_IND, "event","time_to_event", "month")
-LONGVAR <- "cum_perc_adh_bbloq"
+LONGVAR <- "cum_perc_adh_arm"
 
 df_jm <- readr::read_csv("data/out/df_JM.csv")
 
