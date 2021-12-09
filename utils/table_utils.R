@@ -94,9 +94,43 @@ summary_table <- function(m1, m2, m3, cox_vars) {
   # summary table #
   #---------------#
   summaryJM <- cbind(Tm1, Tm2, Tm3)
+  
+  
+  
+  # add DIC
   DIC <- c(m1$DIC, m2$DIC, m3$DIC)
   names(DIC) <- c("m1", "m2", "m3")
-  return(list("summaryJM" = summaryJM, "DIC" = DIC))
+  dic_table <- c(m1$DIC, NA, m2$DIC, NA, m3$DIC, NA)
+  summaryJM <- rbind(summaryJM, dic_table)
+  row.names(summaryJM)[nrow(summaryJM)] <- "DIC"
+  
+  
+  # add AUC
+  auc11 <- JMbayes::aucJM(m1, df_jm, Tstart = 6, Thoriz = 12)
+  auc12 <- JMbayes::aucJM(m1, df_jm, Tstart = 1, Thoriz = 6)
+  auc13 <- JMbayes::aucJM(m1, df_jm, Tstart = 1, Thoriz = 12)
+  auc21 <- JMbayes::aucJM(m2, df_jm, Tstart = 6, Thoriz = 12)
+  auc22 <- JMbayes::aucJM(m2, df_jm, Tstart = 1, Thoriz = 6)
+  auc23 <- JMbayes::aucJM(m2, df_jm, Tstart = 1, Thoriz = 12)
+  auc31 <- JMbayes::aucJM(m3, df_jm, Tstart = 6, Thoriz = 12)
+  auc32 <- JMbayes::aucJM(m3, df_jm, Tstart = 1, Thoriz = 6)
+  auc33 <- JMbayes::aucJM(m3, df_jm, Tstart = 1, Thoriz = 12)
+  
+  auc_6_12_table <- c(auc11$auc, NA, auc21$auc, NA, auc31$auc, NA)
+  auc_1_6_table <- c(auc12$auc, NA, auc22$auc, NA, auc32$auc, NA)
+  auc_1_12_table <- c(auc13$auc, NA, auc23$auc, NA, auc33$auc, NA)
+  names(auc_1_12_table) <- c("m1", "m2", "m3")
+  names(auc_1_6_table) <- c("m1", "m2", "m3")
+  names(auc_6_12_table) <- c("m1", "m2", "m3")
+  
+  summaryJM <- rbind(summaryJM, auc_1_12_table, auc_1_6_table, auc_6_12_table)
+  
+  row.names(summaryJM)[(nrow(summaryJM) - 2):nrow(summaryJM)] <- c("auc_1_12", "auc_1_6", "auc_6_12")
+  
+  return(list("summaryJM" = summaryJM, "DIC" = DIC,
+              "AUC1_12" = auc_1_12_table,
+              "AUC1_6" = auc_1_6_table,
+              "AUC6_12" = auc_6_12_table))
 }
 
 get_table <- function(OUTPATH, output, LONGVAR, save = FALSE) {
