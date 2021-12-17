@@ -10,7 +10,8 @@ DATAOUTPATH <- "data/out/"
 
 VARIABLESCOX_IND <- c("sexo", "edad_ing1", "charlson", "fe.reducida.severa")
 VARIABLESCOX <- c("sexo", "edad_ing1")
-VARIABLESLONGS <- c("cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_ieca", "cum_perc_adh_doctor", "cum_perc_adh_guia",
+VARIABLESLONGS <- c("cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_ieca",
+                    "cum_perc_adh_doctor", "cum_perc_adh_guia", "cum_perc_adh_ara2oieca",
                     "cum_perc_adh_guia_arm")
 VARIABLESTODOS <- c("id", VARIABLESCOX_IND, "event", "time_to_event", "month")
 ### all results and values for the report
