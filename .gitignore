@@ -3,7 +3,6 @@
 .Rapp.history
 
 # discard data directory files
-data/
 library/
 
 # Session Data files
@@ -41,4 +40,10 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
-out/
+
+# discard extension files
+*.csv
+*.rds
+*.rar
+*.rda
+*.RData
