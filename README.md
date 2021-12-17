@@ -7,5 +7,18 @@ To create the data frame used in Joint Models, you need to run builder.R. To do 
 - base_joinModel_artic3.rda.RData
 - library cohorteicc2_0.1.0.tar.gz
 - library constructedBases_0.1.1.tar.gz
+- library IndiceCharlson.rda
 
 please, ask them to the owner of the project.
+
+In the set up, the first script you should ejecute is builder.R, in order to create df_JM.csv file. This file is necessary to use other scripts.
+
+To ejecute builder.R:
+- Add base_joinModel_artic3.rda.RData and library IndiceCharlson.rda to path data/in
+- Install the libraries from constructedBases_0.1.1.tar.gz and cohorteicc2_0.1.0.tar.gz
+- Ejecute the entire script
+
+df_JM.csv will be create in the path data/out
+
+Enjoy it!
+
