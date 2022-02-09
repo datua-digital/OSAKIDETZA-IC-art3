@@ -312,3 +312,67 @@ rm("M1", "M2", "M3")
 
 
 
+
+
+# multivariate, 2 variables; cum_perc_adh_ara2oieca y cum_perc_adh_bbloqM; de Novo + no30dayscensured; sexo, edad, charlson, fe reducida   ------------------------------------------------------------
+
+df_jm <- readr::read_csv("data/out/df_JM.csv")
+
+# choose patients
+patients_conditions <- list(
+  denovo_ic_paciente = TRUE,
+  denovo_tt_paciente_fing = TRUE,
+  denovo_tt_paciente_falta = NULL,
+  early_death_patient_30 = FALSE,
+  patient_with_prescription = NULL
+)
+
+
+df_jm$sexo <- as.factor(df_jm$sexo)
+df_jm$id <- as.factor(df_jm$id)
+df_jm$event <- as.numeric(df_jm$event)
+
+df_jm <- filter_patients(df_jm, patients_conditions)
+df_jm <- preprocess_dfjm(df_jm)
+cox_df <- df_jm[!duplicated(df_jm$id), ]
+
+# M1
+set.seed(1000)
+lmeFit <- mvglmer(
+  formulas = list(
+    cum_perc_adh_ara2oieca ~ ns(month, 4) + (ns(month, 4) | id),
+    cum_perc_adh_bbloq ~ ns(month, 4) + (ns(month, 4) | id)
+  ),
+  data = df_jm,
+  families = list(gaussian, gaussian))
+
+
+survFit <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1 + charlson + fe.reducida.severa, data = cox_df, x = TRUE, model = TRUE)
+
+M1 <- mvJointModelBayes(lmeFit, survFit, timeVar = "month")
+saveRDS(JM_table, file = 'out/informe/mv2_2variables_sexoedadcharlsonfereducida.rds')
+
+
+# M2
+forms <- list(
+  "cum_perc_adh_ara2oieca" = "value",
+  "cum_perc_adh_ara2oieca" = list( fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
+                                   indFixed = 2:5, indRandom = 2:5 ),
+  "cum_perc_adh_bbloq"     = "value",
+  "cum_perc_adh_bbloq"     = list( fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
+                                   indFixed = 2:5, indRandom = 2:5 )
+)
+M2 <- update(M1, Formulas = forms)
+saveRDS(M2, paste0(OUTPATH, output, "_M2", ".rds"))
+
+
+# M3
+forms <- list(
+  "cum_perc_adh_ara2oieca" = list( fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
+                                   indFixed = 2:5, indRandom = 2:5),
+  "cum_perc_adh_bbloq"    = list( fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
+                                  indFixed = 2:5, indRandom = 2:5 )
+)
+M3 <- update(M1, Formulas = forms)
+saveRDS(M3, paste0(OUTPATH, output, "_M3", ".rds"))
+
