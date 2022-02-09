@@ -1,6 +1,5 @@
 # load libraries ----------------------------------------------------------
-# 
-library(rstanarm)
+#
 library(JMbayes)
 library(readr)
 library(nlme)
@@ -15,17 +14,19 @@ source("utils/jm_utils.R")
 source("utils/table_utils.R")
 
 # Selección de variables ---------------------------------------------------------------
-VARIABLESCOX_IND <- c("sexo", "edad_ing1")
-VARIABLESCOX <- c("sexo", "edad_ing1", "cluster(id)")
+VARIABLESCOX_IND <- c("sexo", "edad_ing1", "charlson", "fe.reducida.severa")
+VARIABLESCOX <- c("sexo", "edad_ing1", "charlson", "fe.reducida.severa", "cluster(id)")
 VARIABLESLONGS <- c("cum_perc_adh_arm","cum_perc_adh_ara2oieca","cum_perc_adh_guia_arm","cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_ieca", "cum_perc_adh_doctor", "cum_perc_adh_guia")
 VARIABLESTODOS <- c("id", VARIABLESCOX_IND, "event","time_to_event", "month")
 
 # functions ---------------------------------------------------------------
 apply_MV2JM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX,
                      VARIABLESTODOS, OUTPATH, output = 'MV2JM') {
-  
+  df_jm <- df_jm0
+  df_jm$sexo <- as.factor(df_jm$sexo)
+  df_jm$id <- as.factor(df_jm$id)
   # choose patients
-  df_jm <- filter_patients(df_jm0, patients_conditions)
+  df_jm <- filter_patients(df_jm, patients_conditions)
   # build data ---------------------------------------------------------------
   cox_df <- generate_coxdf(df_jm)
   df_jm <- preprocess_dfjm(df_jm)
@@ -35,7 +36,7 @@ apply_MV2JM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLES
     as.formula(paste(paste("cum_perc_adh_ara2oieca" ,paste('ns(month, 4)', collapse = '+'),  sep = '~'), "(ns(month, 4) | id)", sep = '+')),
     as.formula(paste(paste("cum_perc_adh_bbloq" ,paste('ns(month, 4)', collapse = '+'),  sep = '~'), "(ns(month, 4) | id)", sep = '+'))
   )
-  family <- list(gaussian, gaussian,gaussian)
+  family <- list(gaussian, gaussian)
   
   # M1
   set.seed(1000)
@@ -43,16 +44,13 @@ apply_MV2JM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLES
                             data = df_jm,
                             families = family)
   
-  surv_object <- Surv(time = cox_df$time_to_event,
-                      event = as.numeric(cox_df$event))
+  survFit <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1 + charlson + fe.reducida.severa, data = cox_df, x = TRUE, model = TRUE)
   
-  coxFit.df_jm <- coxph(as.formula(paste("surv_object", paste(VARIABLESCOX, collapse = "+"), sep = "~")), 
-                        data = cox_df,
-                        x = TRUE,
-                        model = TRUE)
-  
-  M1 <- mvJointModelBayes(MixedModelFit1, coxFit.df_jm, timeVar = "month")
+  # 
+  M1 <- mvJointModelBayes(MixedModelFit1, survFit, timeVar = "month")
   summary(M1)
+  
+
   saveRDS(M1, paste0(OUTPATH, output, "_M1", ".rds"))
   
   
