@@ -21,9 +21,9 @@ rm("M1", "M2", "M3")
 # Selección de variables ---------------------------------------------------------------
 VARIABLESCOX_IND <- c("sexo", "edad_ing1", "charlson", "fe.reducida.severa")
 VARIABLESCOX <- c("sexo", "edad_ing1", "charlson", "fe.reducida.severa", "cluster(id)")
-VARIABLESLONGS <- c("cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_ieca", "cum_perc_adh_doctor", "cum_perc_adh_guia")
+VARIABLESLONGS <- c("cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_ieca",
+                    "cum_perc_adh_doctor", "cum_perc_adh_guia", "cum_perc_adh_guia_arm")
 VARIABLESTODOS <- c("id", VARIABLESCOX_IND, "event","time_to_event", "month")
-
 
 # functions ---------------------------------------------------------------
 apply_JM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX,
@@ -38,7 +38,8 @@ apply_JM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX
   # Modelización de la variable longitudinal y el evento---------------------------------------------------------------
   long_proc <- longitudinal_process(LONGVAR = LONGVAR, data_ = df_jm, tipo = "splines_cubicas")
   
-  surv_object <- Surv(time = cox_df$time_to_event,
+  surv_object <- Surv(
+    time = cox_df$time_to_event,
                       event = as.numeric(cox_df$event))
   
   coxFit.df_jm <- coxph(as.formula(paste("surv_object", paste(VARIABLESCOX, collapse = "+"), sep = "~")), 
@@ -79,7 +80,7 @@ apply_JM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX
 # JM para adherencia guia (con arm) ---------------------------------------------------------------------
 LONGVAR <- "cum_perc_adh_guia_arm"
 
-df_jm <- readr::read_csv("data/out/df_JM.csv")
+df_jm <- readr::read_csv(paste0(DATAOUTPATH, "df_JM.csv"))
 # Subset: Muestra teniendo en cuenta todos los id-s
 patients_conditions <- list(
   denovo_ic_paciente = NULL,
@@ -89,7 +90,16 @@ patients_conditions <- list(
   patient_with_prescription = NULL
 )
 
-apply_JM(df_jm0 = df_jm, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX, VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM_charlson_fe')
+apply_JM(
+  df_jm0 = df_jm, 
+  patients_conditions, 
+  VARIABLESCOX_IND, 
+  VARIABLESCOX, 
+  VARIABLESTODOS, 
+  OUTPATH, 
+  LONGVAR, 
+  output = 'JM_charlson_fe'
+)
 
 df_jm <- readr::read_csv("data/out/df_JM.csv")
 # Subset: Muestra filtrando pacientes con prescripciones:

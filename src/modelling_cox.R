@@ -10,14 +10,14 @@ source(paste0(UTILSSCRIPTSPATH, "table_utils.R"))
 LONGVAR <- "cum_perc_adh_guia_arm"
 VARIABLESCOX_IND <- c("sexo", "edad_ing1", "charlson", "fe.reducida.severa")
 VARIABLESCOX <- c("sexo", "edad_ing1")
-VARIABLESLONGS <- c("cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_ieca", "cum_perc_adh_doctor", "cum_perc_adh_guia",
+VARIABLESLONGS <- c("cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_ieca",
+                    "cum_perc_adh_doctor", "cum_perc_adh_guia",
                     "cum_perc_adh_guia_arm")
 VARIABLESTODOS <- c("id", VARIABLESCOX_IND, "event", "time_to_event", "month")
 
-
+df_jm <- readr::read_csv(paste0(DATAOUTPATH, "df_JM.csv"))
 # Cox univariante: Subset de todos los pacientes -------------------------------------------
 
-df_jm <- readr::read_csv("src/data/out/df_JM.csv")
 # choose patients
 patients_conditions <- list(
   denovo_ic_paciente = NULL,
@@ -42,7 +42,6 @@ coxph(Surv(time_to_event, event) ~ charlson, cluster = id, cox_df)
 coxph(Surv(time_to_event, event) ~ fe.reducida.severa, cluster = id, cox_df)
 
 # Cox univariante: Subset de todos pacientes de novo y no cesurados en 30 días -------------------------------------------
-df_jm <- readr::read_csv("data/out/df_JM.csv")
 # choose patients
 patients_conditions <- list(
   denovo_ic_paciente = TRUE,
@@ -66,7 +65,6 @@ coxph(Surv(time_to_event, event) ~ charlson, cluster = id, cox_df)
 coxph(Surv(time_to_event, event) ~ fe.reducida.severa, cluster = id, cox_df)
 
 # Cox multivariante: Subset de todos los pacientes -------------------------------------------
-df_jm <- readr::read_csv("data/out/df_JM.csv")
 # choose patients
 patients_conditions <- list(
   denovo_ic_paciente = NULL,
@@ -94,7 +92,6 @@ coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.se
 
 
 # Cox multivariante: Subset de todos pacientes de novo y no cesurados en 30 días -------------------------------------------
-df_jm <- readr::read_csv("data/out/df_JM.csv")
 # choose patients
 patients_conditions <- list(
   denovo_ic_paciente = TRUE,
