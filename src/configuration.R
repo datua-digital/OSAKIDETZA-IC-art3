@@ -1,0 +1,5 @@
+DATAINPATH <- "src/data/in/"
+DATAOUTPATH <- "src/data/out/"
+BUILDINGSCRIPTSPATH <- "src/building/"
+UTILSSCRIPTSPATH <- "src/utils/"
+OUTPATH <- "out/"

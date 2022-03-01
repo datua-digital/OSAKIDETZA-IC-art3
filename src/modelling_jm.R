@@ -9,12 +9,14 @@ library(nlme)
 library(tidyverse)
 library(splines)
 # global environment variables --------------------------------------------
-OUTPATH <- "out/"
-rm("M1", "M2", "M3")
+
 
 # load sources ------------------------------------------------------------
-source("utils/jm_utils.R")
-source("utils/table_utils.R")
+source(paste("src", "configuration.R", sep = "/"), encoding = "UTF-8")
+source(paste0(UTILSSCRIPTSPATH, "jm_utils.R"))
+source(paste0(UTILSSCRIPTSPATH, "table_utils.R"))
+
+rm("M1", "M2", "M3")
 
 # Selección de variables ---------------------------------------------------------------
 VARIABLESCOX_IND <- c("sexo", "edad_ing1", "charlson", "fe.reducida.severa")

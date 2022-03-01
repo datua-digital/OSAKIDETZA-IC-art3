@@ -1,3 +1,4 @@
+# load libraries and sources----------------------------------------------------------
 library(data.table)
 library(ggplot2)
 library(JMbayes)
@@ -5,12 +6,10 @@ library(splines)
 library(tidyverse)
 library(gridExtra)
 
-# sources
-source("utils/table_utils.R")
+source(paste("src", "configuration.R", sep = "/"), encoding = "UTF-8")
+source(paste0(UTILSSCRIPTSPATH, "table_utils.R"))
 
-# global variables
-OUTPATH <- "out/"
-DATAINPATH <- "data/in/"
+# Logic----------------------------------------------------------
 
 M1 <- readRDS(paste(OUTPATH, 'JM3_M1_cum_perc_adh_guia_arm.rds', sep = '/'))
 M2 <- readRDS(paste(OUTPATH, 'JM3_M2_cum_perc_adh_guia_arm.rds', sep = '/'))

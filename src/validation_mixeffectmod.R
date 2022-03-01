@@ -1,15 +1,15 @@
-# load libraries ----------------------------------------------------------
+# load libraries and sources----------------------------------------------------------
 library(nlme)
 library(tidyverse)
 library(splines)
 library(lattice)
-# global environment variables --------------------------------------------
-OUTPATH <- "out/"
 
-# load sources ------------------------------------------------------------
-source("utils/jm_utils.R")
-source("utils/table_utils.R")
-source("utils/plot_utils.R")
+source(paste("src", "configuration.R", sep = "/"), encoding = "UTF-8")
+source(paste0(UTILSSCRIPTSPATH, "jm_utils.R"))
+source(paste0(UTILSSCRIPTSPATH, "table_utils.R"))
+
+
+# Script variables ---------------------------------------------------------------
 VARIABLESCOX_IND <- c("sexo", "edad_ing1")
 VARIABLESCOX <- c("sexo", "edad_ing1", "cluster(id)")
 VARIABLESLONGS <- c("cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_ieca", "cum_perc_adh_arm",
@@ -17,7 +17,8 @@ VARIABLESLONGS <- c("cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_iec
 VARIABLESTODOS <- c("id", VARIABLESCOX_IND, "event","time_to_event", "month")
 LONGVAR <- "cum_perc_adh_arm"
 
-df_jm <- readr::read_csv("data/out/df_JM.csv")
+# Script ---------------------------------------------------------------
+df_jm <- readr::read_csv(paste0(DATAOUTPATH, "df_JM.csv"))
 
 patients_conditions <- list(
   denovo_ic_paciente = NULL,
@@ -27,8 +28,10 @@ patients_conditions <- list(
   patient_with_prescription = NULL
 )
 
-modelization_longproc <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX,
-                     VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM') {
+modelization_longproc <- function(
+  df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX,
+  VARIABLESTODOS, OUTPATH, LONGVAR, output = 'JM'
+) {
   
   # choose patients
   df_jm <- filter_patients(df_jm0, patients_conditions)
@@ -41,13 +44,15 @@ modelization_longproc <- function(df_jm0, patients_conditions, VARIABLESCOX_IND,
   return(long_proc)
 }
 
-result <- modelization_longproc(df_jm0 = df_jm,
-                                patients_conditions,
-                                VARIABLESCOX_IND,
-                                VARIABLESCOX,
-                                VARIABLESTODOS,
-                                OUTPATH,
-                                LONGVAR)
+result <- modelization_longproc(
+  df_jm0 = df_jm,
+  patients_conditions,
+  VARIABLESCOX_IND,
+  VARIABLESCOX,
+  VARIABLESTODOS,
+  OUTPATH,
+  LONGVAR
+)
 
 
 # standardized residuals versus fitted values by gender

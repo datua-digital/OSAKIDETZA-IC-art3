@@ -1,7 +1,7 @@
 print("montly_arrangement OK")
 
 # load sources ------------------------------------------------------------
-source("utils/df_utils.R")
+source("src/utils/df_utils.R")
 
 #' Rearrange prescription data in months
 #'

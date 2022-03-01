@@ -1,3 +1,5 @@
+# TODO: No está en funcionamiento
+source(paste("src", "configuration.R", sep = "/"), encoding = "UTF-8")
 
 # functions ---------------------------------------------------------------
 apply_JM <- function(df_jm0, patients_conditions, VARIABLESCOX_IND, VARIABLESCOX,

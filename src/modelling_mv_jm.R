@@ -1,22 +1,20 @@
-# load libraries ----------------------------------------------------------
-#
+# load libraries and sources----------------------------------------------------------
 library(JMbayes)
 library(readr)
 library(nlme)
 library(tidyverse)
 library(splines)
-# global environment variables --------------------------------------------
-OUTPATH <- "out/"
-# rm("M1", "M2", "M3")
 
-# load sources ------------------------------------------------------------
-source("utils/jm_utils.R")
-source("utils/table_utils.R")
+source(paste("src", "configuration.R", sep = "/"), encoding = "UTF-8")
+source(paste0(UTILSSCRIPTSPATH, "jm_utils.R"))
+source(paste0(UTILSSCRIPTSPATH, "table_utils.R"))
 
-# Selección de variables ---------------------------------------------------------------
+# Script variables ---------------------------------------------------------------
 VARIABLESCOX_IND <- c("sexo", "edad_ing1", "charlson", "fe.reducida.severa")
 VARIABLESCOX <- c("sexo", "edad_ing1", "charlson", "fe.reducida.severa", "cluster(id)")
-VARIABLESLONGS <- c("cum_perc_adh_arm","cum_perc_adh_ara2oieca","cum_perc_adh_guia_arm","cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_ieca", "cum_perc_adh_doctor", "cum_perc_adh_guia")
+VARIABLESLONGS <- c("cum_perc_adh_arm", "cum_perc_adh_ara2oieca", "cum_perc_adh_guia_arm", 
+                    "cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_ieca", 
+                    "cum_perc_adh_doctor", "cum_perc_adh_guia")
 VARIABLESTODOS <- c("id", VARIABLESCOX_IND, "event","time_to_event", "month")
 
 # functions ---------------------------------------------------------------

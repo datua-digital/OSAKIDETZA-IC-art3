@@ -12,12 +12,9 @@ rm(list = ls())
 library(constructedBases) # it needs to be installed constructedBases_0.1.1.tar.gz
 library(lintr)
 
-# global environment variables --------------------------------------------
+# builder variables --------------------------------------------
 
 # path and files parameters
-DATAINPATH <- "data/in/"
-DATAOUTPATH <- "data/out/"
-BUILDINGSCRIPTSPATH <- "building/"
 PROJECTRDATA <- "base_joinModel_artic3.rda.RData"
 CHARLSONDATA <- "IndiceCharlson.rda"
 
@@ -28,7 +25,7 @@ EARLYDEATHPATIENTDAYS <- 30
 
 
 # load sources ------------------------------------------------------------
-
+source(paste("src", "configuration.R", sep = "/"), encoding = "UTF-8")
 source(paste0(BUILDINGSCRIPTSPATH, "preprocessing.R"), encoding = "UTF-8")
 source(paste0(BUILDINGSCRIPTSPATH, "case_identification.R"), encoding = "UTF-8")
 source(paste0(BUILDINGSCRIPTSPATH, "baseJoinModel_farmaco_fusion.R"), encoding = "UTF-8")
@@ -75,11 +72,13 @@ base_join_model2_1 <- adherencia_farmacos_guia(base_join_model1_0)
 base_join_model2_2 <- adherencia_farmacos_medico(base_join_model1_0)
 base_join_model2_3 <- adherencia_farmacos_ara2ieca(base_join_model1_0)
 base_join_model2_4 <- adherencia_farmacos_guia_arm(base_join_model1_0)
-base_join_model2_5 <- merge_timevarying_vars(base_join_model2_0,
-                                             base_join_model2_1, 
-                                             base_join_model2_2,
-                                             base_join_model2_3,
-                                             base_join_model2_4)
+base_join_model2_5 <- merge_timevarying_vars(
+  base_join_model2_0,
+  base_join_model2_1,
+  base_join_model2_2,
+  base_join_model2_3,
+  base_join_model2_4
+)
 # saveRDS(base_join_model2_5, paste0(DATAOUTPATH, "baseJoinModel_afterTimevarying_vars.rds"))
 
 # Input final df ------------------------------------

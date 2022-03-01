@@ -3,8 +3,8 @@ library(tidyverse)
 library(nlme)
 library(splines)
 
-source("utils/jm_utils.R")
-source("utils/table_utils.R")
+source("src/utils/jm_utils.R")
+source("src/utils/table_utils.R")
 
 DATAOUTPATH <- "data/out/"
 

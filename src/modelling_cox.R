@@ -1,12 +1,12 @@
-# explorando Cox
+# load libraries and sources----------------------------------------------------------
 library(JMbayes)
 library(survival)
 library(tidyverse)
-source("utils/jm_utils.R")
-source("utils/table_utils.R")
+source(paste("src", "configuration.R", sep = "/"), encoding = "UTF-8")
+source(paste0(UTILSSCRIPTSPATH, "jm_utils.R"))
+source(paste0(UTILSSCRIPTSPATH, "table_utils.R"))
 
-
-DATAOUTPATH <- "data/out/"
+# script variables----------------------------------------------------------
 LONGVAR <- "cum_perc_adh_guia_arm"
 VARIABLESCOX_IND <- c("sexo", "edad_ing1", "charlson", "fe.reducida.severa")
 VARIABLESCOX <- c("sexo", "edad_ing1")
@@ -17,7 +17,7 @@ VARIABLESTODOS <- c("id", VARIABLESCOX_IND, "event", "time_to_event", "month")
 
 # Cox univariante: Subset de todos los pacientes -------------------------------------------
 
-df_jm <- readr::read_csv("data/out/df_JM.csv")
+df_jm <- readr::read_csv("src/data/out/df_JM.csv")
 # choose patients
 patients_conditions <- list(
   denovo_ic_paciente = NULL,
