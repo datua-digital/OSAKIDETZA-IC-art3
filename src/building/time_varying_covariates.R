@@ -1,6 +1,7 @@
 # load sources ------------------------------------------------------------
 source(paste("src", "configuration.R", sep = "/"), encoding = "UTF-8")
 source(paste0(UTILSSCRIPTSPATH, "table_utils.R"))
+source(paste0(UTILSSCRIPTSPATH, "df_utils.R"))
 
 #' merge_timevarying_vars
 #'
