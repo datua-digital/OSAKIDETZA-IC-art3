@@ -91,6 +91,9 @@ apply_JM <- function(df, patients_conditions, covariables, variable_longitudinal
   }
   
   # Generar tabla resultados ----------------------------------------------------------------------------
+  M1 <- readRDS(paste0(OUTPATH, model_name_prefix, "_M1_", variable_longitudinal, ".rds"))
+  M2 <- readRDS(paste0(OUTPATH, model_name_prefix, "_M2_", variable_longitudinal, ".rds"))
+  M3 <- readRDS(paste0(OUTPATH, model_name_prefix, "_M3_", variable_longitudinal, ".rds"))
   JM_table <- summary_table(
     m1 = M1,
     m2 = M2,
