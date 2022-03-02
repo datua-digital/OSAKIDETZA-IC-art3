@@ -17,6 +17,7 @@ rm("M1", "M2", "M3")  # delete models
 apply_JM <- function(df, patients_conditions, covariables, variable_longitudinal, model_name_prefix = 'JM', save_model = FALSE) {
   # fixed variables: 
   variables_ids_eventos <- c("id", "event", "time_to_event", "month")
+  variable_longitudinal <<- variable_longitudinal  # es necesario para que no de un error en jointModelBayes
   
   # build data
   df_jm <- filter_patients(df, patients_conditions)
@@ -91,12 +92,12 @@ apply_JM <- function(df, patients_conditions, covariables, variable_longitudinal
   
   # Generar tabla resultados ----------------------------------------------------------------------------
   JM_table <- summary_table(
-    m1 = M1, 
-    m2 = M2, 
-    m3 = M3, 
+    m1 = M1,
+    m2 = M2,
+    m3 = M3,
     cox_vars = covariables
   )
-  saveRDS(JM_table, paste0(OUTPATH, model_name_prefix, "JM_table_", LONGVAR, ".rds"))
+  saveRDS(JM_table, paste0(OUTPATH, model_name_prefix, "JM_table_", variable_longitudinal, ".rds"))
   rm("M1", "M2", "M3")
 }
 
@@ -132,5 +133,5 @@ apply_JM(
   covariables = c("sexo", "edad_ing1", "charlson", "fe.reducida.severa"), 
   variable_longitudinal = "cum_perc_adh_guia_arm", 
   model_name_prefix = 'JM_1', 
-  save_model = FALSE
+  save_model = TRUE
 )
