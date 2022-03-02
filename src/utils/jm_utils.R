@@ -1,10 +1,10 @@
 library(nlme)
 
-longitudinal_process <- function(LONGVAR, data_, tipo = 'splines_cubicas') {
+longitudinal_process <- function(variable_longitudinal, data_, tipo = 'splines_cubicas') {
   if (tipo == 'splines_cubicas') {
     long_process <- nlme::lme(
       as.formula(paste(
-        eval(LONGVAR), paste('ns(month, 4)', collapse = '+'), sep = '~')
+        eval(variable_longitudinal), paste('ns(month, 4)', collapse = '+'), sep = '~')
       ),
       random = ~ ns(month, 4) | id,
       data = data_,
@@ -14,15 +14,15 @@ longitudinal_process <- function(LONGVAR, data_, tipo = 'splines_cubicas') {
   return(long_process)
 }
 
-generate_coxdf <- function(df_jm) {
+generate_coxdf <- function(df_jm, variables_cox) {
   cox_df <- df_jm[!duplicated(df_jm$id), ]
-  cox_df <- cox_df[VARIABLESTODOS]
+  cox_df <- cox_df[variables_cox]
   cox_df <- cox_df %>% dplyr::arrange(id, month)
   return(cox_df)
 }
 
-preprocess_dfjm <- function(df) {
-  df <- df[c(VARIABLESTODOS, VARIABLESLONGS)]
+preprocess_dfjm <- function(df, variables_jm) {
+  df <- df[variables_jm]
   df <- df %>% dplyr::arrange(id, month)
   return(df)
 }
