@@ -24,6 +24,8 @@ generate_coxdf <- function(df_jm, variables_cox) {
 preprocess_dfjm <- function(df, variables_jm) {
   df <- df[variables_jm]
   df <- df %>% dplyr::arrange(id, month)
+  df$time_to_event <- round(df$time_to_event, 6)
+  df$month <- round(df$month, 6)
   return(df)
 }
 

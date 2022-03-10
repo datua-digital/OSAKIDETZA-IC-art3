@@ -94,4 +94,4 @@ base_join_model3 <- acum_month(base_join_model2_11)
 # recalcular evento y tiempo hasta evento para los últimos:
 
 # TODO: Mejor que sea un .rds, seguramente evitará problemas y guardará mejor el tipo de datos
-write.csv(base_join_model3, paste0(DATAOUTPATH, "df_JM.csv"))
+saveRDS(base_join_model3, paste0(DATAOUTPATH, "df_JM.rds"))

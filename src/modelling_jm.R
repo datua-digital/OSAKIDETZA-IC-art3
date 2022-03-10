@@ -19,6 +19,7 @@ apply_JM <- function(df, patients_conditions, covariables, variable_longitudinal
   variables_ids_eventos <- c("id", "event", "time_to_event", "month")
   variable_longitudinal <<- variable_longitudinal  # es necesario para que no de un error en jointModelBayes
   
+  
   # build data
   df_jm <- filter_patients(df, patients_conditions)
   cox_df <- generate_coxdf(
@@ -107,7 +108,7 @@ apply_JM <- function(df, patients_conditions, covariables, variable_longitudinal
 # JM para adherencia guia (con arm) ---------------------------------------------------------------------
 
 apply_JM(
-  df = readr::read_csv(paste0(DATAOUTPATH, "df_JM.csv")), 
+  df = readRDS(paste0(DATAOUTPATH, "df_JM.rds")), 
   patients_conditions = list(
     denovo_ic_paciente = NULL,
     denovo_tt_paciente_fing = NULL,
@@ -125,7 +126,7 @@ apply_JM(
 # y filtrando pacientes de novo en fecha ingreso
 
 apply_JM(
-  df = readr::read_csv(paste0(DATAOUTPATH, "df_JM.csv")), 
+  df = readRDS(paste0(DATAOUTPATH, "df_JM.rds")), 
   patients_conditions = list(
     denovo_ic_paciente = TRUE,
     denovo_tt_paciente_fing = TRUE,
