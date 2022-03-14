@@ -26,6 +26,14 @@ preprocess_dfjm <- function(df, variables_jm) {
   df <- df %>% dplyr::arrange(id, month)
   df$time_to_event <- round(df$time_to_event, 6)
   df$month <- round(df$month, 6)
+  
+  df$id <- as.factor(df$id)
+  df$event <- as.numeric(df$event)
+  
+  if (c('sexo') %in% colnames(df)) {
+    df$sexo <- as.factor(df$sexo)
+  }
+  
   return(df)
 }
 

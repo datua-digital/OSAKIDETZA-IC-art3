@@ -1,7 +1,7 @@
 
 
 #TODO: Refactoring pendiente
-summary_table <- function(m1, m2, m3, cox_vars) {
+summary_table <- function(m1, m2, m3, df_jm, cox_vars) {
   # Function for the generation of Table 3 of the manuscript.
   #-------------#
   # Left column #
@@ -28,7 +28,7 @@ summary_table <- function(m1, m2, m3, cox_vars) {
     CI <- c(CI, paste0("(", round(lower[i], 4), ";", round(upper[i], 4), ")"))
   }
   Tm1 <- data.frame("Mean" = round(value, 4), CI)
-  colnames(Tm1) <- c("Mean", "95% CI")
+  Tm1['M1_mean_95ci'] <- paste(Tm1$Mean, Tm1$CI)
   rownames(Tm1) <- c("Intercept", "$B_n(t,lambda_1)$", "$B_n(t,lambda_2)$",
                      "$B_n(t,lambda_3)$", "$B_n(t,lambda_4)$", "sigma_eps",
                      cox_vars, "Current Value", "Slope")
@@ -57,7 +57,7 @@ summary_table <- function(m1, m2, m3, cox_vars) {
     CI <- c(CI, paste0("(", round(lower[i], 4), ";", round(upper[i], 4), ")"))
   }
   Tm2 <- data.frame("Mean" = round(value, 4), CI)
-  colnames(Tm2) <- c("Mean", "95% CI")
+  Tm2['M2_mean_95ci'] <- paste(Tm2$Mean, Tm2$CI)
   rownames(Tm2) <- c("Intercept", "$B_n(t,lambda_1)$", "$B_n(t,lambda_2)$",
                      "$B_n(t,lambda_3)$", "$B_n(t,lambda_4)$", "sigma_eps",
                      cox_vars, "Current Value", "Slope")
@@ -86,46 +86,31 @@ summary_table <- function(m1, m2, m3, cox_vars) {
     CI <- c(CI, paste0("(", round(lower[i], 4), ";", round(upper[i], 4), ")"))
   }
   Tm3 <- data.frame("Mean" = round(value, 4), CI)
-  colnames(Tm3) <- c("Mean", "95% CI")
+  Tm3['M3_mean_95ci'] <- paste(Tm3$Mean, Tm3$CI)
   rownames(Tm3) <- c("Intercept", "$B_n(t,lambda_1)$", "$B_n(t,lambda_2)$",
                      "$B_n(t,lambda_3)$", "$B_n(t,lambda_4)$", "sigma_eps",
                      cox_vars, "Current Value", "Slope")
   #---------------#
   # summary table #
   #---------------#
-  summaryJM <- cbind(Tm1, Tm2, Tm3)
-  
-  
+  summaryJM <- cbind(Tm1['M1_mean_95ci'], Tm2['M2_mean_95ci'], Tm3['M3_mean_95ci'])
   
   # add DIC
   DIC <- c(m1$DIC, m2$DIC, m3$DIC)
-  names(DIC) <- c("m1", "m2", "m3")
-  dic_table <- c(m1$DIC, NA, m2$DIC, NA, m3$DIC, NA)
+  names(DIC) <- c("M1", "M2", "M3")
+  dic_table <- c(m1$DIC, m2$DIC, m3$DIC)
   summaryJM <- rbind(summaryJM, dic_table)
   row.names(summaryJM)[nrow(summaryJM)] <- "DIC"
   
   
   # # add AUC
-  # auc11 <- JMbayes::aucJM(m1, df_jm, Tstart = 6, Thoriz = 12)
-  # auc12 <- JMbayes::aucJM(m1, df_jm, Tstart = 1, Thoriz = 6)
-  # auc13 <- JMbayes::aucJM(m1, df_jm, Tstart = 1, Thoriz = 12)
-  # auc21 <- JMbayes::aucJM(m2, df_jm, Tstart = 6, Thoriz = 12)
-  # auc22 <- JMbayes::aucJM(m2, df_jm, Tstart = 1, Thoriz = 6)
-  # auc23 <- JMbayes::aucJM(m2, df_jm, Tstart = 1, Thoriz = 12)
-  # auc31 <- JMbayes::aucJM(m3, df_jm, Tstart = 6, Thoriz = 12)
-  # auc32 <- JMbayes::aucJM(m3, df_jm, Tstart = 1, Thoriz = 6)
-  # auc33 <- JMbayes::aucJM(m3, df_jm, Tstart = 1, Thoriz = 12)
-  # 
-  # auc_6_12_table <- c(auc11$auc, NA, auc21$auc, NA, auc31$auc, NA)
-  # auc_1_6_table <- c(auc12$auc, NA, auc22$auc, NA, auc32$auc, NA)
-  # auc_1_12_table <- c(auc13$auc, NA, auc23$auc, NA, auc33$auc, NA)
-  # names(auc_1_12_table) <- c("m1", "m2", "m3")
-  # names(auc_1_6_table) <- c("m1", "m2", "m3")
-  # names(auc_6_12_table) <- c("m1", "m2", "m3")
-  # 
-  # summaryJM <- rbind(summaryJM, auc_1_12_table, auc_1_6_table, auc_6_12_table)
-  # 
-  # row.names(summaryJM)[(nrow(summaryJM) - 2):nrow(summaryJM)] <- c("auc_1_12", "auc_1_6", "auc_6_12")
+  auc1 <- JMbayes::aucJM(m1, df_jm, Tstart = 1, Thoriz = 12)
+  auc2 <- JMbayes::aucJM(m2, df_jm, Tstart = 1, Thoriz = 12)
+  auc3 <- JMbayes::aucJM(m3, df_jm, Tstart = 1, Thoriz = 12)
+  auc_1_12_table <- c(auc1$auc, auc2$auc, auc3$auc)
+  names(auc_1_12_table) <- c("M1", "M2", "M3")
+  summaryJM <- rbind(summaryJM, auc_1_12_table)
+  row.names(summaryJM)[nrow(summaryJM)] <- c("auc_1_12")
   
   return(
     list(
