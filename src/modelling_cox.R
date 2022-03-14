@@ -15,7 +15,7 @@ VARIABLESLONGS <- c("cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_iec
                     "cum_perc_adh_guia_arm")
 VARIABLESTODOS <- c("id", VARIABLESCOX_IND, "event", "time_to_event", "month")
 
-df_jm <- readr::read_csv(paste0(DATAOUTPATH, "df_JM.csv"))
+df_jm <- readRDS(paste0(DATAOUTPATH, "df_JM.rds"))
 # Cox univariante: Subset de todos los pacientes -------------------------------------------
 
 # choose patients
@@ -36,10 +36,11 @@ df_jm <- preprocess_dfjm(df_jm)
 cox_df <- df_jm[!duplicated(df_jm$id), ]
 
 
-coxph(Surv(time_to_event, event) ~ sexo, cluster = id, cox_df)
-coxph(Surv(time_to_event, event) ~ edad_ing1, cluster = id, cox_df)
-coxph(Surv(time_to_event, event) ~ charlson, cluster = id, cox_df)
-coxph(Surv(time_to_event, event) ~ fe.reducida.severa, cluster = id, cox_df)
+t1 <- coxph(Surv(time_to_event, event) ~ sexo, cluster = id, cox_df)
+t2 <- coxph(Surv(time_to_event, event) ~ edad_ing1, cluster = id, cox_df)
+t3 <- coxph(Surv(time_to_event, event) ~ charlson, cluster = id, cox_df)
+t4 <- coxph(Surv(time_to_event, event) ~ fe.reducida.severa, cluster = id, cox_df)
+
 
 # Cox univariante: Subset de todos pacientes de novo y no cesurados en 30 días -------------------------------------------
 # choose patients
@@ -82,14 +83,20 @@ df_jm <- filter_patients(df_jm, patients_conditions)
 df_jm <- preprocess_dfjm(df_jm)
 cox_df <- df_jm[!duplicated(df_jm$id), ]
 
+library(dynpred)
+dynpred::cindex(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa, cox_df)
+test <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa, cox_df)
+test$concordance
 
-coxph(Surv(time_to_event, event) ~ sexo + edad_ing1, cluster = id, cox_df)
-coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson, cluster = id, cox_df)
-coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + fe.reducida.severa, cluster = id, cox_df)
-coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa, cluster = id, cox_df)
-coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + fe.reducida.severa*edad_ing1, cluster = id, cox_df)
-coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + fe.reducida.severa*charlson, cluster = id, cox_df)
 
+t1 <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1, cluster = id, cox_df)
+t2 <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson, cluster = id, cox_df)
+t3 <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + fe.reducida.severa, cluster = id, cox_df)
+t4 <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa, cluster = id, cox_df)
+t5 <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + fe.reducida.severa*edad_ing1, cluster = id, cox_df)
+t6 <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + fe.reducida.severa*charlson, cluster = id, cox_df)
+
+tprescribed <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + prescribedtoguia, cluster = id, cox_df)
 
 # Cox multivariante: Subset de todos pacientes de novo y no cesurados en 30 días -------------------------------------------
 # choose patients

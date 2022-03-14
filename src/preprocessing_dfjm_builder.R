@@ -10,7 +10,7 @@
 rm(list = ls())
 library(constructedBases) # it needs to be installed constructedBases_0.1.1.tar.gz
 library(lintr)
-
+constructedBases::basal
 # builder variables --------------------------------------------
 
 # path and files parameters
@@ -27,6 +27,7 @@ EARLYDEATHPATIENTDAYS <- 30
 source(paste("src", "configuration.R", sep = "/"), encoding = "UTF-8")
 source(paste0(BUILDINGSCRIPTSPATH, "preprocessing.R"), encoding = "UTF-8")
 source(paste0(BUILDINGSCRIPTSPATH, "case_identification.R"), encoding = "UTF-8")
+source(paste0(BUILDINGSCRIPTSPATH, "prescribed_adherence_drugs_in_fechaalta.R"), encoding = "UTF-8")
 source(paste0(BUILDINGSCRIPTSPATH, "baseJoinModel_farmaco_fusion.R"), encoding = "UTF-8")
 source(paste0(BUILDINGSCRIPTSPATH, "monthly_arrangement.R"), encoding = "UTF-8")
 source(paste0(BUILDINGSCRIPTSPATH, "time_varying_covariates.R"), encoding = "UTF-8")
@@ -42,7 +43,7 @@ df_farmacos <- constructedBases::farmacos_traye
 
 # preprocess baseJoinModel
 base_join_model_0 <- preprocess_base_join_model(baseJoinModel)
-
+base_join_model_01 <- get_guia_prescribed_infechaalta(df = base_join_model_0, drugs = PROJECTDRUGS)
 # preprocess farmacos
 df_farmacos <- preprocess_farmacos(df_farmacos, PROJECTDRUGS)
 
@@ -50,7 +51,7 @@ df_farmacos <- preprocess_farmacos(df_farmacos, PROJECTDRUGS)
 basal_ch <- preprocess_basal_ch(basal_ch)
 
 # Case identification -----------------------------------------------------
-base_join_model_1 <- case_identification(base_join_model_0, EARLYDEATHPATIENTDAYS, PROJECTDRUGS)
+base_join_model_1 <- case_identification(base_join_model_01, EARLYDEATHPATIENTDAYS, PROJECTDRUGS)
 saveRDS(base_join_model_1, paste0(DATAOUTPATH, "data_after_case_identification.rds"))
 
 # df_farmacos, base_join_model and Charlson index fusion ------------------------------------

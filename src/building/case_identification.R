@@ -2,6 +2,9 @@ library(plyr)
 library(dplyr)
 library(cohorteicc2)
 
+source(paste("src", "configuration.R", sep = "/"), encoding = "UTF-8")
+source(paste0(UTILSSCRIPTSPATH, "drug_utils.R"))
+
 print("case identification OK")
 
 #' case_identification
@@ -60,22 +63,6 @@ identify_ic_denovopatients <- function(df_, ap, ing) {
   df_ <- df_ %>%
     dplyr::mutate(denovo_ic_paciente = dplyr::if_else((!id %in% ap$id) & (!id %in% ing$id), TRUE, FALSE))
   return(df_)
-}
-
-#' get_principio_activo: get active principle of some families
-#'
-#' @param drugs: (character) Global variable DRUGS
-#'
-#' @return ppa active principles of dlobal variable DRUGS
-get_principio_activo <- function(drugs) {
-  ppa <- c()
-  if (c("arm") %in% drugs) {
-    ppa <- c(ppa, c("espironolactona", "eplerenona"))
-  }
-  if (c("arm") %in% drugs) {
-    ppa <- c(ppa, c("dapagliflozina", "empagliflozina"))
-  }
-  return(ppa)
 }
 
 
