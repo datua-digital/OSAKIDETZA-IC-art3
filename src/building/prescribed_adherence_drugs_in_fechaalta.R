@@ -13,20 +13,9 @@ get_guia_prescribed_infechaalta <- function(df, drugs){
       drugs = drugs
   )
 
-  df <- assign_drugs_prescibed_infechaalta(df, df_fechaalta_prescribed, drugs)
+  df <- assign_drugs_infechaalta(df, df_fechaalta_prescribed, drugs, mode='prescibed')
   
-  df <- assign_prescribedtoguia(df)
-  return(df)
-}
-
-assign_drugs_prescibed_infechaalta <- function(df, df_fechaalta_prescribed, drugs){
-  for (drug in drugs) {
-    drug_prescribed_ids <- unique(
-      df_fechaalta_prescribed[(df_fechaalta_prescribed$familia %in% drug), 'id']
-    )
-    df[paste0(drug, '_prescribed')] <- df$id %in% drug_prescribed_ids
-  }
-  
+  df <- assign_prescribedtoguia(df, mode = 'prescribed')
   return(df)
 }
 
@@ -55,17 +44,80 @@ get_prescribed_drugs_infechaalta <- function(ids, drugs) {
   return(df_fechaalta_prescribed)
 }
 
-assign_prescribedtoguia <- function(df) {
-  df$prescribedtoguia <- 
-    ((df$ara2_prescribed) | (df$ieca_prescribed)) & 
-    (df$bbloq_prescribed) & 
-    (df$arm_prescribed)
+assign_drugs_infechaalta <- function(df, df_fechaalta_prescribed, drugs, mode){
+  for (drug in drugs) {
+    drug_prescribed_ids <- unique(
+      df_fechaalta_prescribed[(df_fechaalta_prescribed$familia %in% drug), 'id']
+    )
+    df[paste0(drug, '_', mode)] <- df$id %in% drug_prescribed_ids
+  }
+  
+  return(df)
+}
+
+assign_prescribedtoguia <- function(df, mode) {
+  if (mode == 'prescribed') {
+    df$prescribedtoguia <- 
+      ((df$ara2_prescribed) | (df$ieca_prescribed)) & 
+      (df$bbloq_prescribed) & 
+      (df$arm_prescribed)
+  } else {
+    df$adherencedtoguia <- 
+      ((df$ara2_adherenced) | (df$ieca_adherenced)) & 
+      (df$bbloq_adherenced) & 
+      (df$arm_adherenced)
+  }
+  
   return(df)
 }
 
 
-
-
 # adherenced_to_guia ------------------------------------------------------
+df <- base_join_model_0
+get_guia_adherenced_infechaalta <- function(df, drugs){
+  df_fechaalta_adherenced <- 
+    get_adherenced_drugs_infechaalta(
+      ids = df$id,
+      drugs = drugs
+    )
+  
+  df <- assign_drugs_infechaalta(
+    df,
+    df_fechaalta_adherenced,
+    drugs,
+    mode = 'adherenced'
+  )
 
+  df <- assign_prescribedtoguia(df, mode = 'adherenced')
+  return(df)
+}
+
+
+get_adherenced_drugs_infechaalta <- function(ids, drugs) {
+  # Ver cuántos no tenían los fármacos con los que trabajamos al ingreso
+  # añado la fecha de ingreso y alta
+  
+  ing_pri <- cohorteicc2::ingresos_pri %>%
+    dplyr::distinct(id, .keep_all = TRUE) %>%
+    dplyr::filter(id %in% ids) %>%
+    dplyr::select(id, falta_ing1)
+  ing_pri$id <- factor(ing_pri$id)
+  farmacos <- constructedBases::farmacos_traye %>% 
+    dplyr::select(id, familia, tip, start, end) %>%
+    dplyr::filter(id %in% ids) %>%
+    dplyr::filter(tip == "2a") %>%
+    dplyr::filter((familia %in% drugs)) %>%
+    dplyr::left_join(ing_pri, by = "id")
+  # prescripcion con inicio antes del alta y finalización después del ingreso
+  df_fechaalta_adherenced <- farmacos %>% 
+    filter(
+      (start < falta_ing1) 
+      & (end > falta_ing1)
+    )
+  
+  df_fechaalta_adherenced <- df_fechaalta_adherenced %>% 
+    rename(fecha_inicio = start, fecha_fin = end)
+  
+  return(df_fechaalta_adherenced)
+}
 
