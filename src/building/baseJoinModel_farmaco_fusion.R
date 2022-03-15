@@ -37,10 +37,12 @@ process_base_join_model <- function(df, duration) {
     dplyr::mutate(end = if_else(end > MortOingIcc, MortOingIcc, end, missing = end))
   # set time to event and set event
   df <- df %>%
-    dplyr::mutate(event = if_else((MortOingIcc - falta_ing1) <= 360,
-                           TRUE,
-                           FALSE,
-                           missing = FALSE)) %>%
+    dplyr::mutate(event = as.numeric(
+      if_else((MortOingIcc - falta_ing1) <= 360,
+              TRUE,
+              FALSE,
+              missing = FALSE))
+      ) %>%
     dplyr::mutate(time_to_event = if_else(as.numeric(MortOingIcc - falta_ing1) <= 360,
                                    as.numeric(MortOingIcc - falta_ing1) / 30 + adjusted_factor,
                                    12 + adjusted_factor))
@@ -54,10 +56,13 @@ process_base_join_model <- function(df, duration) {
 reset_timeevent_vars <- function(df) {
   adjusted_factor <- 0.001
   df <- df %>%
-    dplyr::mutate(event = if_else((MortOingIcc - falta_ing1) <= 360,
-                           TRUE,
-                           FALSE,
-                           missing = FALSE)) %>%
+    dplyr::mutate(event = as.numeric(if_else(
+      (MortOingIcc - falta_ing1) <= 360,
+      TRUE,
+      FALSE,
+      missing = FALSE)
+    )
+    ) %>%
     dplyr::mutate(time_to_event = if_else(as.numeric(MortOingIcc - falta_ing1) <= 360,
                                    as.numeric(MortOingIcc - falta_ing1) / 30 + adjusted_factor,
                                    12 + adjusted_factor)) %>%
