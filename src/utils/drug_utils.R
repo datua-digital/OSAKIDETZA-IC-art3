@@ -10,8 +10,8 @@ get_principio_activo <- function(drugs) {
   if (c("arm") %in% drugs) {
     ppa <- c(ppa, c("espironolactona", "eplerenona"))
   }
-  if (c("arm") %in% drugs) {
-    ppa <- c(ppa, c("dapagliflozina", "empagliflozina"))
-  }
+  # if (c("arm") %in% drugs) {
+  #   ppa <- c(ppa, c("dapagliflozina", "empagliflozina"))
+  # }
   return(ppa)
 }

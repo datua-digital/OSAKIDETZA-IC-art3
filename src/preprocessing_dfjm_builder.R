@@ -10,7 +10,7 @@
 rm(list = ls())
 library(constructedBases) # it needs to be installed constructedBases_0.1.1.tar.gz
 library(lintr)
-constructedBases::basal
+
 # builder variables --------------------------------------------
 
 # path and files parameters
@@ -26,6 +26,7 @@ EARLYDEATHPATIENTDAYS <- 30
 # load sources ------------------------------------------------------------
 source(paste("src", "configuration.R", sep = "/"), encoding = "UTF-8")
 source(paste0(BUILDINGSCRIPTSPATH, "preprocessing.R"), encoding = "UTF-8")
+source(paste0(BUILDINGSCRIPTSPATH, "postprocessing.R"), encoding = "UTF-8")
 source(paste0(BUILDINGSCRIPTSPATH, "case_identification.R"), encoding = "UTF-8")
 source(paste0(BUILDINGSCRIPTSPATH, "prescribed_adherence_drugs_in_fechaalta.R"), encoding = "UTF-8")
 source(paste0(BUILDINGSCRIPTSPATH, "baseJoinModel_farmaco_fusion.R"), encoding = "UTF-8")
@@ -44,6 +45,8 @@ df_farmacos <- constructedBases::farmacos_traye
 # preprocess baseJoinModel
 base_join_model_0 <- preprocess_base_join_model(baseJoinModel)
 base_join_model_01 <- get_guia_prescribed_infechaalta(df = base_join_model_0, drugs = PROJECTDRUGS)
+base_join_model_02 <- get_guia_adherenced_infechaalta(df = base_join_model_01, drugs = PROJECTDRUGS)
+
 # preprocess farmacos
 df_farmacos <- preprocess_farmacos(df_farmacos, PROJECTDRUGS)
 
@@ -51,7 +54,7 @@ df_farmacos <- preprocess_farmacos(df_farmacos, PROJECTDRUGS)
 basal_ch <- preprocess_basal_ch(basal_ch)
 
 # Case identification -----------------------------------------------------
-base_join_model_1 <- case_identification(base_join_model_01, EARLYDEATHPATIENTDAYS, PROJECTDRUGS)
+base_join_model_1 <- case_identification(base_join_model_02, EARLYDEATHPATIENTDAYS, PROJECTDRUGS)
 saveRDS(base_join_model_1, paste0(DATAOUTPATH, "data_after_case_identification.rds"))
 
 # df_farmacos, base_join_model and Charlson index fusion ------------------------------------
@@ -92,7 +95,8 @@ base_join_model2_11 <- reset_timeevent_vars(base_join_model2_10)
 # calcular adherencias acumuladas en meses ------------------------------------
 base_join_model3 <- acum_month(base_join_model2_11)
 
-# recalcular evento y tiempo hasta evento para los últimos:
+# postprocessing:
+base_join_model3 <- postprocessing(base_join_model3)
 
 # TODO: Mejor que sea un .rds, seguramente evitará problemas y guardará mejor el tipo de datos
 saveRDS(base_join_model3, paste0(DATAOUTPATH, "df_JM.rds"))

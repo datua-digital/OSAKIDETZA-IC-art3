@@ -7,15 +7,8 @@ source(paste0(UTILSSCRIPTSPATH, "jm_utils.R"))
 source(paste0(UTILSSCRIPTSPATH, "table_utils.R"))
 
 # script variables----------------------------------------------------------
-LONGVAR <- "cum_perc_adh_guia_arm"
-VARIABLESCOX_IND <- c("sexo", "edad_ing1", "charlson", "fe.reducida.severa")
-VARIABLESCOX <- c("sexo", "edad_ing1")
-VARIABLESLONGS <- c("cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_ieca",
-                    "cum_perc_adh_doctor", "cum_perc_adh_guia",
-                    "cum_perc_adh_guia_arm")
-VARIABLESTODOS <- c("id", VARIABLESCOX_IND, "event", "time_to_event", "month")
-
 df_jm <- readRDS(paste0(DATAOUTPATH, "df_JM.rds"))
+
 # Cox univariante: Subset de todos los pacientes -------------------------------------------
 
 # choose patients
@@ -26,10 +19,6 @@ patients_conditions <- list(
   early_death_patient_30 = NULL,
   patient_with_prescription = NULL
 )
-
-df_jm$sexo <- as.factor(df_jm$sexo)
-df_jm$id <- as.factor(df_jm$id)
-df_jm$event <- as.numeric(df_jm$event)
 
 df_jm <- filter_patients(df_jm, patients_conditions)
 df_jm <- preprocess_dfjm(df_jm)
@@ -52,10 +41,6 @@ patients_conditions <- list(
   patient_with_prescription = NULL
 )
 
-df_jm$sexo <- as.factor(df_jm$sexo)
-df_jm$id <- as.factor(df_jm$id)
-df_jm$event <- as.numeric(df_jm$event)
-
 df_jm <- filter_patients(df_jm, patients_conditions)
 df_jm <- preprocess_dfjm(df_jm)
 cox_df <- df_jm[!duplicated(df_jm$id), ]
@@ -75,10 +60,6 @@ patients_conditions <- list(
   patient_with_prescription = NULL
 )
 
-df_jm$sexo <- as.factor(df_jm$sexo)
-df_jm$id <- as.factor(df_jm$id)
-df_jm$event <- as.numeric(df_jm$event)
-
 df_jm <- filter_patients(df_jm, patients_conditions)
 df_jm <- preprocess_dfjm(df_jm)
 cox_df <- df_jm[!duplicated(df_jm$id), ]
@@ -89,14 +70,20 @@ test <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.red
 test$concordance
 
 
-t1 <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1, cluster = id, cox_df)
-t2 <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson, cluster = id, cox_df)
-t3 <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + fe.reducida.severa, cluster = id, cox_df)
-t4 <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa, cluster = id, cox_df)
-t5 <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + fe.reducida.severa*edad_ing1, cluster = id, cox_df)
-t6 <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + fe.reducida.severa*charlson, cluster = id, cox_df)
+t1 <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1, cox_df)
+t2 <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson, cox_df)
+t3 <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + fe.reducida.severa, cox_df)
+t4 <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa, cox_df)
+t5 <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + fe.reducida.severa*edad_ing1, cox_df)
+t6 <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + fe.reducida.severa*charlson, cox_df)
 
-tprescribed <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + prescribedtoguia, cluster = id, cox_df)
+tprescribed_guia <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + prescribedtoguia_fechaalta, cox_df)
+tadherenced <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + adherencedtoguia_fechaalta, cox_df)
+tprescribed_drugs <- coxph(
+  Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + arm_prescribed_fechaalta + prescribediecaara2_fechaalta + bbloq_prescribed_fechaalta,
+  cox_df
+)
+# comparar caracteristicas paciente + adherencia total (fija) o (longitudinal)
 
 # Cox multivariante: Subset de todos pacientes de novo y no cesurados en 30 días -------------------------------------------
 # choose patients

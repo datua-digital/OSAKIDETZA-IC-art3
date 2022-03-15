@@ -13,15 +13,16 @@ get_guia_prescribed_infechaalta <- function(df, drugs){
       drugs = drugs
   )
 
-  df <- assign_drugs_infechaalta(df, df_fechaalta_prescribed, drugs, mode='prescibed')
+  df <- assign_drugs_infechaalta(df, df_fechaalta_prescribed, drugs, mode = 'prescribed')
   
   df <- assign_prescribedtoguia(df, mode = 'prescribed')
+  
+  df <- assign_prescribediecaoara2(df, mode = 'prescribed')
   return(df)
 }
 
 get_prescribed_drugs_infechaalta <- function(ids, drugs) {
-  # Ver cuántos no tenían los fármacos con los que trabajamos al ingreso
-  # añado la fecha de ingreso y alta
+  
   ppa <- get_principio_activo(drugs)
   
   ing_pri <- cohorteicc2::ingresos_pri %>%
@@ -35,21 +36,33 @@ get_prescribed_drugs_infechaalta <- function(ids, drugs) {
     dplyr::filter((familia %in% drugs) | (principio %in% ppa)) %>%
     dplyr::left_join(ing_pri, by = "id")
   presc_ing[presc_ing$principio %in% ppa, 'familia'] <- 'arm'
-  # prescripcion con inicio antes del alta y finalización después del ingreso
+  
+  # prescripción con inicio antes del alta y finalización después del ingreso
   df_fechaalta_prescribed <- presc_ing %>% 
     filter(
-      (fecha_inicio < falta_ing1) 
+      (fecha_inicio <= falta_ing1) 
       & (fecha_fin > falta_ing1)
     )
   return(df_fechaalta_prescribed)
 }
 
 assign_drugs_infechaalta <- function(df, df_fechaalta_prescribed, drugs, mode){
+  drug <- drugs[4]
   for (drug in drugs) {
     drug_prescribed_ids <- unique(
       df_fechaalta_prescribed[(df_fechaalta_prescribed$familia %in% drug), 'id']
     )
-    df[paste0(drug, '_', mode)] <- df$id %in% drug_prescribed_ids
+    df[paste0(drug, '_', mode, '_fechaalta')] <- df$id %in% drug_prescribed_ids
+  }
+  
+  return(df)
+}
+
+assign_prescribediecaoara2 <- function(df, mode) {
+  if (mode == 'prescribed') {
+    df$prescribediecaara2_fechaalta <- (df$ara2_prescribed_fechaalta) | (df$ieca_prescribed_fechaalta)
+  } else {
+    df$adherencediecaara2_fechaalta <- (df$ara2_adherenced_fechaalta) | (df$ieca_adherenced_fechaalta)
   }
   
   return(df)
@@ -57,15 +70,15 @@ assign_drugs_infechaalta <- function(df, df_fechaalta_prescribed, drugs, mode){
 
 assign_prescribedtoguia <- function(df, mode) {
   if (mode == 'prescribed') {
-    df$prescribedtoguia <- 
-      ((df$ara2_prescribed) | (df$ieca_prescribed)) & 
-      (df$bbloq_prescribed) & 
-      (df$arm_prescribed)
+    df$prescribedtoguia_fechaalta <- 
+      ((df$ara2_prescribed_fechaalta) | (df$ieca_prescribed_fechaalta)) & 
+      (df$bbloq_prescribed_fechaalta) & 
+      (df$arm_prescribed_fechaalta)
   } else {
-    df$adherencedtoguia <- 
-      ((df$ara2_adherenced) | (df$ieca_adherenced)) & 
-      (df$bbloq_adherenced) & 
-      (df$arm_adherenced)
+    df$adherencedtoguia_fechaalta <- 
+      ((df$ara2_adherenced_fechaalta) | (df$ieca_adherenced_fechaalta)) & 
+      (df$bbloq_adherenced_fechaalta) & 
+      (df$arm_adherenced_fechaalta)
   }
   
   return(df)
@@ -73,7 +86,7 @@ assign_prescribedtoguia <- function(df, mode) {
 
 
 # adherenced_to_guia ------------------------------------------------------
-df <- base_join_model_0
+
 get_guia_adherenced_infechaalta <- function(df, drugs){
   df_fechaalta_adherenced <- 
     get_adherenced_drugs_infechaalta(
@@ -89,14 +102,14 @@ get_guia_adherenced_infechaalta <- function(df, drugs){
   )
 
   df <- assign_prescribedtoguia(df, mode = 'adherenced')
+  
+  df <- assign_prescribediecaoara2(df, mode = 'adherenced')
+  
   return(df)
 }
 
-
 get_adherenced_drugs_infechaalta <- function(ids, drugs) {
-  # Ver cuántos no tenían los fármacos con los que trabajamos al ingreso
-  # añado la fecha de ingreso y alta
-  
+
   ing_pri <- cohorteicc2::ingresos_pri %>%
     dplyr::distinct(id, .keep_all = TRUE) %>%
     dplyr::filter(id %in% ids) %>%
@@ -108,10 +121,10 @@ get_adherenced_drugs_infechaalta <- function(ids, drugs) {
     dplyr::filter(tip == "2a") %>%
     dplyr::filter((familia %in% drugs)) %>%
     dplyr::left_join(ing_pri, by = "id")
-  # prescripcion con inicio antes del alta y finalización después del ingreso
+  # adherencia con inicio antes del alta y finalización después del ingreso
   df_fechaalta_adherenced <- farmacos %>% 
     filter(
-      (start < falta_ing1) 
+      (start <= falta_ing1) 
       & (end > falta_ing1)
     )
   
@@ -120,4 +133,3 @@ get_adherenced_drugs_infechaalta <- function(ids, drugs) {
   
   return(df_fechaalta_adherenced)
 }
-

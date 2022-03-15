@@ -6,6 +6,7 @@
 preprocess_base_join_model <- function(df) {
   # Establecer tipo de datos
   df$id <- as.character(df$id)
+  df$sexo <- factor(df$sexo)
   return(df)
 }
 
@@ -19,6 +20,7 @@ preprocess_base_join_model <- function(df) {
 preprocess_farmacos <- function(df, drugs) {
   # seleccionar fármacos
   df <- df[df$familia %in% drugs, ]
+  df$id <- as.character(df$id)
   return(df)
 }
 
