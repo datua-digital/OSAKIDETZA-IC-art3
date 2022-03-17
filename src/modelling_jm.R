@@ -53,7 +53,7 @@ apply_JM <- function(df_jm, patients_conditions, covariables, variable_longitudi
     n.iter = 30000,
     n.burnin = 3000
   )
-
+  model_name_prefix <- 'congreso'
   if (save_model) {
     saveRDS(M1, paste0(OUTPATH, paste0(model_name_prefix, "_M1_", variable_longitudinal, ".rds")))
   }
@@ -107,7 +107,8 @@ apply_JM(
     early_death_patient_30 = NULL,
     patient_with_prescription = NULL
   ), 
-  covariables = c("sexo", "edad_ing1", "charlson", "fe.reducida.severa"), 
+  covariables = c("sexo", "edad_ing1", "charlson", "fe.reducida.severa", 
+                  "arm_prescribed_fechaalta", "prescribediecaara2_fechaalta", "bbloq_prescribed_fechaalta"), 
   variable_longitudinal = "cum_perc_adh_guia_arm", 
   model_name_prefix = 'JM_0', 
   save_model = FALSE
