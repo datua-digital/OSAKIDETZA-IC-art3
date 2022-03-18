@@ -53,7 +53,7 @@ apply_JM <- function(df_jm, patients_conditions, covariables, variable_longitudi
     n.iter = 30000,
     n.burnin = 3000
   )
-  model_name_prefix <- 'congreso'
+  
   if (save_model) {
     saveRDS(M1, paste0(OUTPATH, paste0(model_name_prefix, "_M1_", variable_longitudinal, ".rds")))
   }
