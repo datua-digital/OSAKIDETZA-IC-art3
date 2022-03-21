@@ -23,7 +23,7 @@ merge_byid <- function(df1, df2) {
 
 #TODO: Creo que la duración habría que cambiarlo a 360, aunque es posible que tenerlo
 # en 365 no afecte en nada al código.
-process_base_join_model <- function(df, duration) {
+process_base_join_model <- function(df, duration, event) {
   # filter patients with drug prescriptions
   cols <- c("familia", "end", "dura", "tip", "estado_obje")
   df <- df[!rowSums(is.na(df[cols])), ]
@@ -40,10 +40,7 @@ process_base_join_model <- function(df, duration) {
   
   
   # set time to event and event for MortOingIcc
-  df <- set_event_time_to_event(df, 'MortOingIcc')
-
-  # set time to event and event for fmort2
-  df <- set_event_time_to_event(df, 'Mort')
+  df <- set_event_time_to_event(df, event)
   
   # filter prescription periods where end > start. end == start is also discarded.
   df <- df[(df["end"] > df["start"]) | is.na(df["end"]), ]
@@ -52,12 +49,10 @@ process_base_join_model <- function(df, duration) {
   return(df)
 }
 
-reset_timeevent_vars <- function(df) {
+reset_timeevent_vars <- function(df, event) {
+  adjusted_factor <- 0.001
   # set time to event and event for MortOingIcc
-  df <- set_event_time_to_event(df, 'MortOingIcc')
-  
-  # set time to event and event for fmort2
-  df <- set_event_time_to_event(df, 'Mort')
+  df <- set_event_time_to_event(df, event)
   
   df <- df %>%
     dplyr::mutate(
@@ -71,9 +66,9 @@ reset_timeevent_vars <- function(df) {
   return(df)
 }
 
-set_event_time_to_event <- function(df, target='MortOingIcc') {
+set_event_time_to_event <- function(df, event='MortOingIcc') {
   adjusted_factor <- 0.001
-  if (target == 'MortOingIcc') {
+  if (event == 'MortOingIcc') {
     df <- df %>%
       dplyr::mutate(
         event = as.numeric(
@@ -92,10 +87,10 @@ set_event_time_to_event <- function(df, target='MortOingIcc') {
           12 + adjusted_factor
         )
       )
-  } else if (target == 'Mort') {
+  } else if (event == 'fmort2') {
     df <- df %>%
       dplyr::mutate(
-        event_mort = as.numeric(
+        event = as.numeric(
           if_else(
             (fmort2 - falta_ing1) <= 360,
             TRUE,
@@ -105,7 +100,7 @@ set_event_time_to_event <- function(df, target='MortOingIcc') {
         )
       ) %>%
       dplyr::mutate(
-        time_to_event_mort = if_else(
+        time_to_event = if_else(
           as.numeric(fmort2 - falta_ing1) <= 360,
           as.numeric(fmort2 - falta_ing1) / 30 + adjusted_factor,
           12 + adjusted_factor

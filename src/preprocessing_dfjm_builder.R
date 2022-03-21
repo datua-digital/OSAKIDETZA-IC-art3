@@ -21,7 +21,7 @@ CHARLSONDATA <- "IndiceCharlson.rda"
 PROJECTDRUGS <- c("ara2", "ieca", "bbloq", "arm")# , "ado")
 FOLLOWUP <- 365
 EARLYDEATHPATIENTDAYS <- 30
-
+EVENT <- "MortOingIcc"
 
 # load sources ------------------------------------------------------------
 source(paste("src", "configuration.R", sep = "/"), encoding = "UTF-8")
@@ -60,7 +60,7 @@ saveRDS(base_join_model_1, paste0(DATAOUTPATH, "data_after_case_identification.r
 # df_farmacos, base_join_model and Charlson index fusion ------------------------------------
 base_join_model_merged_0 <- merge_byid(base_join_model_1, df_farmacos)
 base_join_model_merged_1 <- merge_byid(base_join_model_merged_0, basal_ch)
-base_join_model_2 <- process_base_join_model(base_join_model_merged_1, duration = FOLLOWUP)
+base_join_model_2 <- process_base_join_model(base_join_model_merged_1, duration = FOLLOWUP, event = EVENT)
 saveRDS(base_join_model_2,  paste0(DATAOUTPATH, "baseJoinModel_and_farmacos.rds"))
 
 
@@ -90,7 +90,7 @@ base_join_model2_7 <- input_patients_noiniprescriptions(base_join_model2_6)
 base_join_model2_8 <- input_patients_nofinprescriptions(base_join_model2_7, FOLLOWUP)
 base_join_model2_9 <- input_patients_nointerprescriptions(base_join_model2_8)
 base_join_model2_10 <- input_adhvars(base_join_model2_9)
-base_join_model2_11 <- reset_timeevent_vars(base_join_model2_10)
+base_join_model2_11 <- reset_timeevent_vars(base_join_model2_10, EVENT)
 
 # calcular adherencias acumuladas en meses ------------------------------------
 base_join_model3 <- acum_month(base_join_model2_11)
@@ -99,4 +99,4 @@ base_join_model3 <- acum_month(base_join_model2_11)
 base_join_model3 <- postprocessing(base_join_model3)
 
 # TODO: Mejor que sea un .rds, seguramente evitará problemas y guardará mejor el tipo de datos
-saveRDS(base_join_model3, paste0(DATAOUTPATH, "df_JM.rds"))
+saveRDS(base_join_model3, paste0(DATAOUTPATH, "df_JM", "_", EVENT, ".rds"))
