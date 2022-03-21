@@ -18,6 +18,7 @@ apply_JM <- function(df_jm, patients_conditions, covariables, variable_longitudi
   # fixed variables: 
   variables_ids_eventos <- c("id", "event", "time_to_event", "month")
   variable_longitudinal <<- variable_longitudinal  # es necesario para que no de un error en jointModelBayes
+  variable_longitudinal_name <- get_variable_longitudinal_name(variable_longitudinal)
   
   # build and preprocess data
   df_jm <- filter_patients(df_jm, patients_conditions)
@@ -55,7 +56,7 @@ apply_JM <- function(df_jm, patients_conditions, covariables, variable_longitudi
   )
   
   if (save_model) {
-    saveRDS(M1, paste0(OUTPATH, paste0(model_name_prefix, "_M1_", variable_longitudinal, ".rds")))
+    saveRDS(M1, paste0(OUTPATH_UNIV, paste0(model_name_prefix, "_M1_", variable_longitudinal_name, ".rds")))
   }
 
   # M2: Fit JM with longitudinal process (4) y componentes de tendencia y valor actuales
@@ -71,7 +72,7 @@ apply_JM <- function(df_jm, patients_conditions, covariables, variable_longitudi
     extraForm = dForm
   )
   if (save_model) {
-    saveRDS(M2, paste0(OUTPATH, model_name_prefix, "_M2_", variable_longitudinal, ".rds"))
+    saveRDS(M2, paste0(OUTPATH_UNIV, model_name_prefix, "_M2_", variable_longitudinal_name, ".rds"))
   }
   
   # M3: Fit JM with longitudinal process (4) y componente de tendencia
@@ -81,7 +82,7 @@ apply_JM <- function(df_jm, patients_conditions, covariables, variable_longitudi
     extraForm = dForm
   )
   if (save_model) {
-    saveRDS(M3, paste0(OUTPATH, model_name_prefix, "_M3_", variable_longitudinal, ".rds"))
+    saveRDS(M3, paste0(OUTPATH_UNIV, model_name_prefix, "_M3_", variable_longitudinal_name, ".rds"))
   }
   
   # Generar tabla resultados ----------------------------------------------------------------------------
@@ -93,7 +94,7 @@ apply_JM <- function(df_jm, patients_conditions, covariables, variable_longitudi
     df_jm = df_jm,
     cox_vars = covariables
   )
-  saveRDS(JM_table, paste0(OUTPATH, model_name_prefix, "JM_table_", variable_longitudinal, ".rds"))
+  saveRDS(JM_table, paste0(OUTPATH_UNIV, model_name_prefix, "JM_table_", variable_longitudinal_name, ".rds"))
   rm("M1", "M2", "M3")
 }
 
