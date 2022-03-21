@@ -128,8 +128,5 @@ get_adherenced_drugs_infechaalta <- function(ids, drugs) {
       & (end > falta_ing1)
     )
   
-  df_fechaalta_adherenced <- df_fechaalta_adherenced %>% 
-    rename(fecha_inicio = start, fecha_fin = end)
-  
   return(df_fechaalta_adherenced)
 }
