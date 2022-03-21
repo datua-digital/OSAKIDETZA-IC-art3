@@ -244,6 +244,6 @@ apply_MV3JM(
     patient_with_prescription = NULL
   ), 
   covariables = c("sexo", "edad_ing1", "charlson", "fe.reducida.severa"),
-  model_name_prefix = 'JMMV2', 
+  model_name_prefix = 'JMMV3', 
   save_model = TRUE
 )
