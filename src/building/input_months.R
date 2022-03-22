@@ -84,9 +84,9 @@ input_patients_noiniprescriptions <- function(df) {
 #' @param x subset of df. One of the patient of the cohort.
 #' @param FOLLOWUP (numeric) global param FOLLOWUP
 input_final_months <- function(x, FOLLOWUP, months_toadd=c()) {
-  if (!any(is.na(x$MortOingIcc))) {
-    if (unique(x$MortOingIcc) < unique(x$falta_ing1 + FOLLOWUP)) {
-      max_month <- min(ceiling(as.numeric(unique(x$MortOingIcc - x$falta_ing1 + 1), units = "days") / 30), 12)
+  if (!any(is.na(x$fecha_evento))) {
+    if (unique(x$fecha_evento) < unique(x$falta_ing1 + FOLLOWUP)) {
+      max_month <- min(ceiling(as.numeric(unique(x$fecha_evento - x$falta_ing1 + 1), units = "days") / 30), 12)
     } else {
       max_month <- 12
     }

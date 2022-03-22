@@ -23,10 +23,10 @@ scale_startend <- function(df) {
   df <- df %>%
     dplyr::mutate(start_time = (start - falta_ing1) / 30) %>%
     dplyr::mutate(end_time = (end - falta_ing1) / 30) %>%
-    dplyr::mutate(dura_in_months = if_else((MortOingIcc - falta_ing1) / 30 < 12,
-                                    (MortOingIcc - falta_ing1) / 30, 12)) %>%
-    dplyr::mutate(last_month = if_else((MortOingIcc - falta_ing1) / 30 < 12,
-                                ceiling((MortOingIcc - falta_ing1) / 30),
+    dplyr::mutate(dura_in_months = if_else((fecha_evento - falta_ing1) / 30 < 12,
+                                    (fecha_evento - falta_ing1) / 30, 12)) %>%
+    dplyr::mutate(last_month = if_else((fecha_evento - falta_ing1) / 30 < 12,
+                                ceiling((fecha_evento - falta_ing1) / 30),
                                 12))
   df$start_time <- as.numeric(df$start_time, units = "days") # real scale is month, which is not covered by the library
   df$end_time <- as.numeric(df$end_time, units = "days")
