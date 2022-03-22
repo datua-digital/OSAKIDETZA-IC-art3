@@ -25,7 +25,6 @@ apply_MV2JM <- function(
   
   # build and preprocess data
   df_jm <- filter_patients(df_jm, patients_conditions)
-  # df_jm <- df_jm[df_jm$id %in% unique(df_jm$id)[1:300], ]
   df_jm <- preprocess_dfjm(
     df_jm, 
     variables_jm = c(covariables, variables_longitudinales, variables_ids_eventos)
@@ -109,7 +108,7 @@ apply_MV2JM <- function(
 
 
 apply_MV2JM(
-  df_jm = readRDS(paste0(DATAOUTPATH, "df_JM.rds")), 
+  df_jm = readRDS(paste0(DATAOUTPATH, "df_JM_MortOingIcc.rds")), 
   patients_conditions = list(
     denovo_ic_paciente = NULL,
     denovo_tt_paciente_fing = NULL,
@@ -237,7 +236,7 @@ apply_MV3JM <- function(
 
 
 apply_MV3JM(
-  df_jm = readRDS(paste0(DATAOUTPATH, "df_JM.rds")), 
+  df_jm = readRDS(paste0(DATAOUTPATH, "df_JM_MortOingIcc.rds")), 
   patients_conditions = list(
     denovo_ic_paciente = NULL,
     denovo_tt_paciente_fing = NULL,

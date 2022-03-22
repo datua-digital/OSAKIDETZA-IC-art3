@@ -7,7 +7,7 @@ source(paste0(UTILSSCRIPTSPATH, "jm_utils.R"))
 source(paste0(UTILSSCRIPTSPATH, "table_utils.R"))
 
 # script variables----------------------------------------------------------
-df_jm <- readRDS(paste0(DATAOUTPATH, "df_JM.rds"))
+df_jm <- readRDS(paste0(DATAOUTPATH, "df_JM_MortOingIcc.rds"))
 
 # funciones
 

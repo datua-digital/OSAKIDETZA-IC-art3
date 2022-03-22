@@ -100,7 +100,7 @@ apply_JM <- function(df_jm, patients_conditions, covariables, variable_longitudi
 
 # JM para adherencia guia (con arm) ---------------------------------------------------------------------
 apply_JM(
-  df_jm = readRDS(paste0(DATAOUTPATH, "df_JM.rds")), 
+  df_jm = readRDS(paste0(DATAOUTPATH, "df_JM_MortOingIcc.rds")), 
   patients_conditions = list(
     denovo_ic_paciente = NULL,
     denovo_tt_paciente_fing = NULL,
@@ -119,7 +119,7 @@ apply_JM(
 # y filtrando pacientes de novo en fecha ingreso
 
 apply_JM(
-  df_jm = readRDS(paste0(DATAOUTPATH, "df_JM.rds")), 
+  df_jm = readRDS(paste0(DATAOUTPATH, "df_JM_MortOingIcc.rds")), 
   patients_conditions = list(
     denovo_ic_paciente = TRUE,
     denovo_tt_paciente_fing = TRUE,
