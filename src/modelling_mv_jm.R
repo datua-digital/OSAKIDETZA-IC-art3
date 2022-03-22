@@ -25,7 +25,6 @@ apply_MV2JM <- function(
   
   # build and preprocess data
   df_jm <- filter_patients(df_jm, patients_conditions)
-  # df_jm <- df_jm[df_jm$id %in% unique(df_jm$id)[1:300], ]
   df_jm <- preprocess_dfjm(
     df_jm, 
     variables_jm = c(covariables, variables_longitudinales, variables_ids_eventos)
@@ -72,15 +71,10 @@ apply_MV2JM <- function(
   
 
   M1 <- mvJointModelBayes(MixedModelFit1, survFit, timeVar = "month")
-  summary(M1)
   
   if (save_model) {
-    saveRDS(M1, paste0(OUTPATH, paste0(model_name_prefix, "_M1_", ".rds")))
+    saveRDS(M1, paste0(OUTPATH_MULTIV, paste0(model_name_prefix, "_M1_", ".rds")))
   }
-  
-
-  saveRDS(M1, paste0(OUTPATH, output, "_M1", ".rds"))
-  
   
   # M2
   forms <- list(
@@ -92,11 +86,10 @@ apply_MV2JM <- function(
                                      indFixed = 2:5, indRandom = 2:5 )
   )
   M2 <- update(M1, Formulas = forms)
+  
   if (save_model) {
-    saveRDS(M2, paste0(OUTPATH, paste0(model_name_prefix, "_M1_", ".rds")))
+    saveRDS(M2, paste0(OUTPATH_MULTIV, paste0(model_name_prefix, "_M2_", ".rds")))
   }
-  
-  
   
   # M3
   forms <- list(
@@ -106,15 +99,16 @@ apply_MV2JM <- function(
                                     indFixed = 2:5, indRandom = 2:5 )
   )
   M3 <- update(M1, Formulas = forms)
+  
   if (save_model) {
-    saveRDS(M3, paste0(OUTPATH, paste0(model_name_prefix, "_M1_", ".rds")))
+    saveRDS(M3, paste0(OUTPATH_MULTIV, paste0(model_name_prefix, "_M3_", ".rds")))
   }
   
 }
 
 
 apply_MV2JM(
-  df_jm = readRDS(paste0(DATAOUTPATH, "df_JM.rds")), 
+  df_jm = readRDS(paste0(DATAOUTPATH, "df_JM_MortOingIcc.rds")), 
   patients_conditions = list(
     denovo_ic_paciente = NULL,
     denovo_tt_paciente_fing = NULL,
@@ -199,9 +193,10 @@ apply_MV3JM <- function(
   
   
   M1 <- mvJointModelBayes(MixedModelFit1, survFit, timeVar = "month")
-  summary(M1)
   
-  saveRDS(M1, paste0(OUTPATH, output, "_M1", ".rds"))
+  if (save_model) {
+    saveRDS(M1, paste0(OUTPATH_MULTIV, paste0(model_name_prefix, "_M1_", ".rds")))
+  }
   
   
   # M2
@@ -217,8 +212,10 @@ apply_MV3JM <- function(
                                     indFixed = 2:5, indRandom = 2:5 )
   )
   M2 <- update(M1, Formulas = forms)
-  saveRDS(M2, paste0(OUTPATH, output, "_M2", ".rds"))
   
+  if (save_model) {
+    saveRDS(M2, paste0(OUTPATH_MULTIV, paste0(model_name_prefix, "_M2_", ".rds")))
+  }
   
   # M3
   forms <- list(
@@ -229,13 +226,17 @@ apply_MV3JM <- function(
     "cum_perc_adh_arm"      = list( fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
                                     indFixed = 2:5, indRandom = 2:5 )
   )
+  
   M3 <- update(M1, Formulas = forms)
-  saveRDS(M3, paste0(OUTPATH, output, "_M3", ".rds"))
+  
+  if (save_model) {
+    saveRDS(M3, paste0(OUTPATH_MULTIV, paste0(model_name_prefix, "_M3_", ".rds")))
+  }
 }
 
 
 apply_MV3JM(
-  df_jm = readRDS(paste0(DATAOUTPATH, "df_JM.rds")), 
+  df_jm = readRDS(paste0(DATAOUTPATH, "df_JM_MortOingIcc.rds")), 
   patients_conditions = list(
     denovo_ic_paciente = NULL,
     denovo_tt_paciente_fing = NULL,
@@ -244,6 +245,6 @@ apply_MV3JM(
     patient_with_prescription = NULL
   ), 
   covariables = c("sexo", "edad_ing1", "charlson", "fe.reducida.severa"),
-  model_name_prefix = 'JMMV2', 
+  model_name_prefix = 'JMMV3', 
   save_model = TRUE
 )

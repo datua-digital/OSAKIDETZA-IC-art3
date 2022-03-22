@@ -24,15 +24,9 @@ generate_coxdf <- function(df_jm, variables_cox) {
 preprocess_dfjm <- function(df, variables_jm) {
   df <- df[variables_jm]
   df <- df %>% dplyr::arrange(id, month)
+  
   df$time_to_event <- round(df$time_to_event, 6)
   df$month <- round(df$month, 6)
-  
-  df$id <- as.factor(df$id)
-  df$event <- as.numeric(df$event)
-  
-  if (c('sexo') %in% colnames(df)) {
-    df$sexo <- as.factor(df$sexo)
-  }
   
   return(df)
 }
@@ -57,10 +51,11 @@ filter_patients <- function(df, patients_conditions) {
   return(df)
 }
 
-# plot_longitudinal_process <- function(data_, id, variable )
-# long_ids <- names(which(table(df_td$id) > 6))
-# ids <- sample(long_ids, 16)
-# xyplot(as.formula(paste(variable_longitudinal, paste('dura_acumulada | id', collapse = '+'), sep='~')),
-#        data = df_td, 
-#        subset = id %in% ids, type = c("p", "smooth"), 
-#        lwd = 2, layout = c(4, 4))
+get_variable_longitudinal_name <- function(variable_longitudinal) {
+  if (variable_longitudinal == "cum_perc_adh_guia_arm") {
+    return("guia")
+  } else {
+    return(variable_longitudinal)
+  }
+  return(df)
+}

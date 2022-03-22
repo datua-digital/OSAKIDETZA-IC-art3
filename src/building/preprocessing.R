@@ -3,10 +3,11 @@
 #' @param df (data.frame)
 #'
 #' @return df (data.frame) with columns types set
-preprocess_base_join_model <- function(df) {
+preprocess_base_join_model <- function(df, event) {
   # Establecer tipo de datos
   df$id <- as.character(df$id)
   df$sexo <- factor(df$sexo)
+  df$fecha_evento <- df[[event]]
   return(df)
 }
 
