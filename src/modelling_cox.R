@@ -100,3 +100,25 @@ coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.se
 coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + fe.reducida.severa*edad_ing1, cluster = id, cox_df)
 coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + fe.reducida.severa*charlson, cluster = id, cox_df)
 
+
+# test different AUC calculations -----------------------------------------
+# Se tiene que ejecutar primero tprescribed_drugs
+library(survAUC)
+library(dynpred)
+Surv
+tp <- predict(tprescribed_drugs)
+tp2 <- predict(tprescribed_drugs)
+
+cindex(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + arm_prescribed_fechaalta + prescribediecaara2_fechaalta + bbloq_prescribed_fechaalta,
+       cox_df)
+AUCt <- dynpred::AUC(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + arm_prescribed_fechaalta + prescribediecaara2_fechaalta + bbloq_prescribed_fechaalta,
+                     cox_df)
+
+AUC_CD <- AUC.cd(
+  Surv(cox_df$time_to_event, cox_df$event),
+  Surv(cox_df$time_to_event, cox_df$event),
+  tp,
+  tp2,
+  seq(5, 365, 5)
+)
+AUC_CD
