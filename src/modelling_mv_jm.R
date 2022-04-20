@@ -186,13 +186,15 @@ apply_MV3JM <- function(
   )
   
   survFit <- coxph(
-    Surv(time_to_event, event) ~ sexo + edad_ing1 + charlson + fe.reducida.severa, 
+    Surv(time_to_event, event) ~ sexo + edad_ing1 + charlson + fe.reducida.severa
+    + arm_prescribed_fechaalta + prescribediecaara2_fechaalta + bbloq_prescribed_fechaalta, 
     data = cox_df, 
     model = TRUE
   )
   
   
   M1 <- mvJointModelBayes(MixedModelFit1, survFit, timeVar = "month")
+  # auc1 <- JMbayes::aucJM(M1, df_jm, Tstart = 1, Thoriz = 12)
   
   if (save_model) {
     saveRDS(M1, paste0(OUTPATH_MULTIV, paste0(model_name_prefix, "_M1_", ".rds")))
@@ -212,6 +214,7 @@ apply_MV3JM <- function(
                                     indFixed = 2:5, indRandom = 2:5 )
   )
   M2 <- update(M1, Formulas = forms)
+  # auc2 <- JMbayes::aucJM(M2, df_jm, Tstart = 1, Thoriz = 12)
   
   if (save_model) {
     saveRDS(M2, paste0(OUTPATH_MULTIV, paste0(model_name_prefix, "_M2_", ".rds")))
@@ -228,6 +231,7 @@ apply_MV3JM <- function(
   )
   
   M3 <- update(M1, Formulas = forms)
+  # auc3 <- JMbayes::aucJM(M3, df_jm, Tstart = 1, Thoriz = 12)
   
   if (save_model) {
     saveRDS(M3, paste0(OUTPATH_MULTIV, paste0(model_name_prefix, "_M3_", ".rds")))
@@ -244,7 +248,9 @@ apply_MV3JM(
     early_death_patient_30 = NULL,
     patient_with_prescription = NULL
   ), 
-  covariables = c("sexo", "edad_ing1", "charlson", "fe.reducida.severa"),
-  model_name_prefix = 'JMMV3', 
+  covariables = c("sexo", "edad_ing1", "charlson", "fe.reducida.severa", 
+                  "arm_prescribed_fechaalta", "prescribediecaara2_fechaalta", 
+                  "bbloq_prescribed_fechaalta"),
+  model_name_prefix = 'JMMV32', 
   save_model = TRUE
 )
