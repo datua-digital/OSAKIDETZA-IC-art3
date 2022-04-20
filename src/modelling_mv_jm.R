@@ -139,7 +139,6 @@ apply_MV3JM <- function(
   
   # build and preprocess data
   df_jm <- filter_patients(df_jm, patients_conditions)
-  # df_jm <- df_jm[df_jm$id %in% unique(df_jm$id)[1:300], ]
   df_jm <- preprocess_dfjm(
     df_jm, 
     variables_jm = c(covariables, variables_longitudinales, variables_ids_eventos)
