@@ -21,7 +21,7 @@ CHARLSONDATA <- "IndiceCharlson.rda"
 PROJECTDRUGS <- c("ara2", "ieca", "bbloq", "arm")# , "ado")
 FOLLOWUP <- 365
 EARLYDEATHPATIENTDAYS <- 30
-EVENT <- "MortOingIcc"
+EVENT <- "MortOingIcc" # "fmort2"
 
 # load sources ------------------------------------------------------------
 source(paste("src", "configuration.R", sep = "/"), encoding = "UTF-8")

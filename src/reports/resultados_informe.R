@@ -5,19 +5,13 @@ library(splines)
 
 source("src/utils/jm_utils.R")
 source("src/utils/table_utils.R")
+source(paste("src", "configuration.R", sep = "/"), encoding = "UTF-8")
 
-DATAOUTPATH <- "data/out/"
-
-VARIABLESCOX_IND <- c("sexo", "edad_ing1", "charlson", "fe.reducida.severa")
-VARIABLESCOX <- c("sexo", "edad_ing1")
-VARIABLESLONGS <- c("cum_perc_adh_ara2", "cum_perc_adh_bbloq", "cum_perc_adh_ieca",
-                    "cum_perc_adh_doctor", "cum_perc_adh_guia", "cum_perc_adh_ara2oieca",
-                    "cum_perc_adh_guia_arm")
-VARIABLESTODOS <- c("id", VARIABLESCOX_IND, "event", "time_to_event", "month")
-### all results and values for the report
-LONGVAR <- "cum_perc_adh_guia_arm"
+covariables <- c("sexo", "edad_ing1") 
+variable_longitudinal <- "cum_perc_adh_guia_arm"
+variables_ids_eventos <- c("id", "event", "time_to_event", "month")
 # Univariante; cum_perc_adh_guia_arm; all patient; sexo, edad; value; slope-value; slope -------------------------------------------------
-df_jm <- readr::read_csv("data/out/df_JM.csv")
+df_jm <- readRDS(paste0(DATAOUTPATH, "df_JM.rds"))
 
 # choose patients
 patients_conditions <- list(
@@ -28,13 +22,16 @@ patients_conditions <- list(
   patient_with_prescription = NULL
 )
 
-
-df_jm$sexo <- as.factor(df_jm$sexo)
-df_jm$id <- as.factor(df_jm$id)
-df_jm$event <- as.numeric(df_jm$event)
+# df_jm$sexo <- as.factor(df_jm$sexo)
+# df_jm$id <- as.factor(df_jm$id)
+# df_jm$event <- as.numeric(df_jm$event)
 
 df_jm <- filter_patients(df_jm, patients_conditions)
-df_jm <- preprocess_dfjm(df_jm)
+df_jm <- preprocess_dfjm(
+  df_jm,
+  variables_jm = c(covariables, variable_longitudinal, variables_ids_eventos)
+)
+df_jm <- df_jm[df_jm$id %in% unique(df_jm$id)[1:100], ]
 cox_df <- df_jm[!duplicated(df_jm$id), ]
 
 lmeFit <- lme(cum_perc_adh_guia_arm ~ ns(month, 4), 
@@ -42,9 +39,18 @@ lmeFit <- lme(cum_perc_adh_guia_arm ~ ns(month, 4),
               data = df_jm,
               control = lmeControl(opt = 'optim'))
 
-survFit <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1, data = cox_df, x = TRUE, model = TRUE)
+survFit <- coxph(
+  as.formula(paste("Surv(time_to_event, event)", paste(covariables, collapse = "+"), sep = "~")),
+  data = cox_df,
+  x = TRUE,
+  model = TRUE
+)
+
+
 M1 <- jointModelBayes(lmeFit, survFit, timeVar = "month")
-auc1 <- JMbayes::aucJM(M1, df_jm, Tstart = 6, Thoriz = 12)
+auc1 <- JMbayes::aucJM(M1, df_jm, Tstart = 1, Thoriz = 12)
+
+
 
 # M2: Fit JM with longitudinal process (4) y componentes de tendencia y valor actuales
 dForm <- list(fixed = ~ 0 + dns(month, 4), random = ~ 0 + dns(month, 4),
