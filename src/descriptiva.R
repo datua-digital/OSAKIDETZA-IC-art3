@@ -232,7 +232,7 @@ plot_td_behaviour(
   plot_type = 'line_mean'
 )
 
-# Distribución de la mortalidad
+# Distribución del evento
 event_distribution(event_var = "MortOingIcc", plot_type = "histograma")
 event_distribution(event_var = "MortOingIcc", plot_type = "densidad")
 event_distribution(event_var = "fmort2", plot_type = "histograma")
@@ -250,5 +250,8 @@ binarizar_variables <- function(variables_abinarizar, threshold) {
 event_var <- "MortOingIcc"
 threshold <- 80
 data <- readRDS(paste0(DATAOUTPATH, data_for_event(event_var), ".rds"))
-data <- binarizar_variables(variables_abinarizar, threshold)
+data <- binarizar_variables(
+  variables_abinarizar = c("perc_adh_ara2oieca", "perc_adh_arm", "perc_adh_bbloq", "perc_adh_guia_arm"),
+  threshold
+  )
 
