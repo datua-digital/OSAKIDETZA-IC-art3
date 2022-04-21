@@ -238,3 +238,17 @@ event_distribution(event_var = "MortOingIcc", plot_type = "densidad")
 event_distribution(event_var = "fmort2", plot_type = "histograma")
 event_distribution(event_var = "fmort2", plot_type = "densidad")
 
+
+# Latent classes ----------------------------------------------------------
+binarizar_variables <- function(variables_abinarizar, threshold) {
+  for (variable_abinarizar in variables_abinarizar) {
+    data[[paste0(variable_abinarizar, '_binarized')]] <- as.numeric(data[[variable_abinarizar]] >= threshold)
+  }
+  return(data)
+}
+
+event_var <- "MortOingIcc"
+threshold <- 80
+data <- readRDS(paste0(DATAOUTPATH, data_for_event(event_var), ".rds"))
+data <- binarizar_variables(variables_abinarizar, threshold)
+
