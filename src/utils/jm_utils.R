@@ -59,3 +59,11 @@ get_variable_longitudinal_name <- function(variable_longitudinal) {
   }
   return(df)
 }
+
+data_for_event <- function(event_var) {
+  if (event_var == "MortOingIcc") {
+    return("df_JM_MortOingIcc")
+  } else if (event_var == "fmort2") {
+    return("df_JM_fmort2")
+  }
+}

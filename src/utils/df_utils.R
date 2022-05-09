@@ -53,3 +53,13 @@ deletemultiplecolumns <- function(df, columns){
   return(df)
 }
 
+
+renamecolumn_base <- function(old_name, new_name, data){
+  names(data)[names(data) == old_name] <- new_name
+  return(data)
+}
+
+
+f_group_by <- function(data, x){
+  group_by(data, !!!syms(x))
+}

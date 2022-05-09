@@ -109,7 +109,9 @@ apply_JM(
     patient_with_prescription = NULL
   ), 
   covariables = c("sexo", "edad_ing1", "charlson", "fe.reducida.severa", 
-                  "arm_prescribed_fechaalta", "prescribediecaara2_fechaalta", "bbloq_prescribed_fechaalta"), 
+                  "arm_prescribed_fechaalta", "prescribediecaara2_fechaalta",
+                  "bbloq_prescribed_fechaalta", "denovo_ic_paciente"
+                  ), 
   variable_longitudinal = "cum_perc_adh_guia_arm", 
   model_name_prefix = 'JM_0', 
   save_model = FALSE
