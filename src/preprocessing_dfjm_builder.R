@@ -54,13 +54,13 @@ df_farmacos <- preprocess_farmacos(df_farmacos, PROJECTDRUGS)
 basal_ch <- preprocess_basal_ch(basal_ch)
 
 # Case identification -----------------------------------------------------
-base_join_model_1 <- case_identification(base_join_model_02, EARLYDEATHPATIENTDAYS, PROJECTDRUGS)
+base_join_model_0 <- merge_byid(base_join_model_02, basal_ch)
+base_join_model_1 <- case_identification(base_join_model_0, EARLYDEATHPATIENTDAYS, PROJECTDRUGS)
 saveRDS(base_join_model_1, paste0(DATAOUTPATH, "data_after_case_identification_", EVENT ,".rds"))
 
-# df_farmacos, base_join_model and Charlson index fusion ------------------------------------
-base_join_model_merged_0 <- merge_byid(base_join_model_1, df_farmacos)
-base_join_model_merged_1 <- merge_byid(base_join_model_merged_0, basal_ch)
-base_join_model_2 <- process_base_join_model(base_join_model_merged_1, duration = FOLLOWUP)
+# df_farmacos and base_join_model fusion ------------------------------------
+base_join_model_merged <- merge_byid(base_join_model_1, df_farmacos)
+base_join_model_2 <- process_base_join_model(base_join_model_merged, duration = FOLLOWUP)
 saveRDS(base_join_model_2,  paste0(DATAOUTPATH, "baseJoinModel_and_farmacos_", EVENT ,".rds"))
 
 
