@@ -80,7 +80,13 @@ tprescribed_drugs <- coxph(
   Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + arm_prescribed_fechaalta + prescribediecaara2_fechaalta + bbloq_prescribed_fechaalta,
   cox_df
 )
+tprescribed_drugs_novoic <- coxph(
+  Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + arm_prescribed_fechaalta + prescribediecaara2_fechaalta + bbloq_prescribed_fechaalta + denovo_ic_paciente,
+  cox_df
+)
 
+saveRDS(tprescribed_drugs, 'Cox_0td_4bs_3rx_mortoicc.rds')
+saveRDS(tprescribed_drugs_novoic, 'Cox_0td_5bs_3rx_mortoicc.rds')
 # Cox multivariante: Subset de todos pacientes de novo y no cesurados en 30 días -------------------------------------------
 # choose patients
 cox_df <- get_cox_data(
