@@ -264,8 +264,9 @@ cox_autoselected_deviance <- coxph(
 summary(cox_autoselected_deviance)
 
 # Tras la selección con Harrel's C-index:
-cox_autoselected <- coxph(
-  Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + prescribediecaara2_fechaalta + bbloq_prescribed_fechaalta + denovo_ic_paciente + InsufRenal.C + Valvulopatia,
+cox_autoselected_harrelsc <- coxph(
+  Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + prescribediecaara2_fechaalta + bbloq_prescribed_fechaalta + denovo_ic_paciente + InsufRenal.C + Valvulopatia
+  + Coronariopatia,
   cox_df
 )
-summary(cox_autoselected)
+summary(cox_autoselected_harrelsc)
