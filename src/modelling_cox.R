@@ -107,7 +107,6 @@ tprescribed_drugs_novoic <- coxph(
   Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + arm_prescribed_fechaalta + prescribediecaara2_fechaalta + bbloq_prescribed_fechaalta + denovo_ic_paciente,
   cox_df
 )
-cox_df$
 cox_df$pieca <- as.numeric(cox_df$prescribediecaara2_fechaalta)
 cox_df$pbb <- as.numeric(cox_df$bbloq_prescribed_fechaalta)
 cox_df$parm <- as.numeric(cox_df$arm_prescribed_fechaalta)
@@ -126,7 +125,7 @@ cox_df <- get_cox_data(
     patient_with_prescription = NULL
   )
 )
-df_jm$
+
 coxph(Surv(time_to_event, event) ~ sexo + edad_ing1, cluster = id, cox_df)
 coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson, cluster = id, cox_df)
 coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + fe.reducida.severa, cluster = id, cox_df)
@@ -139,7 +138,6 @@ coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.se
 # Se tiene que ejecutar primero tprescribed_drugs
 library(survAUC)
 library(dynpred)
-Surv
 tp <- predict(tprescribed_drugs)
 tp2 <- predict(tprescribed_drugs)
 
@@ -147,7 +145,7 @@ cindex(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.s
        cox_df)
 AUCt <- dynpred::AUC(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + arm_prescribed_fechaalta + prescribediecaara2_fechaalta + bbloq_prescribed_fechaalta,
                      cox_df)
-
+AUCt
 AUC_CD <- AUC.cd(
   Surv(cox_df$time_to_event, cox_df$event),
   Surv(cox_df$time_to_event, cox_df$event),
@@ -155,7 +153,7 @@ AUC_CD <- AUC.cd(
   tp2,
   seq(5, 365, 5)
 )
-AUC_CD
+
 
 # Variables continuas Vs categóricas --------------------------------------
 cox_df <- get_cox_data(
@@ -216,6 +214,17 @@ cox_df <- get_cox_data(
   )
 )
 surv_object_variables <- c("time_to_event", "event")
+
+# En caso de que entren en los modelos LASSO, valorar incluir estos calculos en JM.csv.
+# hipertension
+cox_df$hta <- "Sin diagnostico"
+cox_df$hta[cox_df$HTN == "HTN" | cox_df$HtnComplicn == "Htn-Complicn"] <- "hta"
+# diabetes
+cox_df$dm <- "Sin diagnostico"
+cox_df$dm[cox_df$DiabeteSin == "Diabete-Sin" | cox_df$DiabetesCon == "Diabetes-Con"] <- "dm"
+
+
+
 initial_variables <- c(
   "sexo", "fe.reducida.severa", "arm_prescribed_fechaalta", "charlson", "edad_ing1",
   "prescribediecaara2_fechaalta", "bbloq_prescribed_fechaalta", "denovo_ic_paciente", 
@@ -223,7 +232,7 @@ initial_variables <- c(
   "Arritmia", "all_cerebrovasc", "Arterosclerosis", "all_neoplasia",
   "EPOC", "Asma", "InsufRenal.C", "Tiroides", "DeficNutri", "Hyperlipidem",
   "all_anemia", "MoodDisorders", "Valvulopatia", "DiabetesCon",
-  "HtnComplicn", "digital", "estat", "diu", "ivab"
+  "HtnComplicn", "digital", "estat", "diu", "ivab", "hta", "dm"
 )
 cox_df$event <- as.numeric(cox_df$event)
 y <- as.matrix(cox_df[, surv_object_variables])
@@ -265,8 +274,8 @@ summary(cox_autoselected_deviance)
 
 # Tras la selección con Harrel's C-index:
 cox_autoselected_harrelsc <- coxph(
-  Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + prescribediecaara2_fechaalta + bbloq_prescribed_fechaalta + denovo_ic_paciente + InsufRenal.C + Valvulopatia
-  + Coronariopatia,
+  Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + prescribediecaara2_fechaalta + bbloq_prescribed_fechaalta + denovo_ic_paciente + InsufRenal.C + Valvulopatia,
   cox_df
 )
 summary(cox_autoselected_harrelsc)
+# saveRDS(cox_autoselected_harrelsc, 'Cox_0td_6bs_2rx_mortoicc.rds')
