@@ -17,7 +17,7 @@ plot_kaplanmeier <- function(event_var, strata_var) {
   data <- readRDS(paste0(DATAOUTPATH, data_for_event(event_var), ".rds"))
   strata_var_ <<- strata_var
   if (is.numeric(data[[strata_var_]])) {
-    data <- categorize_var(strata_var_, data)
+    data <- categorize_numeric_var(strata_var_, data)
     strata_var_ <<- paste0(strata_var_, '_2')
   }
   # fit and plot KM
@@ -35,9 +35,35 @@ plot_kaplanmeier <- function(event_var, strata_var) {
   )
 }
 
-categorize_var <- function(strata_var, data) {
-  data[[paste0(strata_var, '_2')]] <- as.numeric(Hmisc::cut2(data[[strata_var]], g = 4))
+categorize_numeric_var <- function(strata_var, data) {
+  if (strata_var == 'edad_ing1') {
+    data[[paste0(strata_var, '_2')]] <- anyadir_edad_categorizada(data)
+  } else if (strata_var == 'charlson') {
+    data[[paste0(strata_var, '_2')]] <- anyadir_charlson_categorizado(data)
+  } else{
+    data[[paste0(strata_var, '_2')]] <- as.numeric(Hmisc::cut2(data[[strata_var]], g = 4))
+  }
   return(data)
+}
+
+anyadir_edad_categorizada <- function(df) {
+  df$edadcat <- NA
+  df$edadcat[df$edad_ing1 < 55] <- "40-54"
+  df$edadcat[df$edad_ing1 >= 55 & df$edad_ing1 < 65] <- "55-64"
+  df$edadcat[df$edad_ing1 >= 65 & df$edad_ing1 < 75] <- "65-74"
+  df$edadcat[df$edad_ing1 >= 75 & df$edad_ing1 < 85] <- "75-84"
+  df$edadcat[df$edad_ing1 >= 85] <- "85+"
+  return(df$edadcat)
+}
+
+anyadir_charlson_categorizado <- function(df) {
+  df$charlsoncat <- NA
+  df$charlsoncat[df$charlson == 1] <- "1"
+  df$charlsoncat[df$charlson == 2] <- "2"
+  df$charlsoncat[df$charlson == 3] <- "3"
+  df$charlsoncat[df$charlson == 4] <- "4"
+  df$charlsoncat[df$charlson >= 5] <- "5+"
+  return(df$charlsoncat)
 }
 
 # comportamiento de la variable tiempodependiente
@@ -141,7 +167,7 @@ get_strata_var_accepted_vals <- function(filtering, data) {
 }
 
 preprocess_strata_var <- function(strata_var, data) {
-  data <- categorize_var(strata_var, data)
+  data <- categorize_numeric_var(strata_var, data)
   strata_var <- paste0(strata_var, '_2')
   data[[strata_var]] <- factor(data[[strata_var]])
   return(data)
@@ -253,5 +279,5 @@ data <- readRDS(paste0(DATAOUTPATH, data_for_event(event_var), ".rds"))
 data <- binarizar_variables(
   variables_abinarizar = c("perc_adh_ara2oieca", "perc_adh_arm", "perc_adh_bbloq", "perc_adh_guia_arm"),
   threshold
-  )
+)
 
