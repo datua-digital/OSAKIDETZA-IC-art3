@@ -18,6 +18,9 @@ get_guia_prescribed_infechaalta <- function(df, drugs){
   df <- assign_prescribedtoguia(df, mode = 'prescribed')
   
   df <- assign_prescribediecaoara2(df, mode = 'prescribed')
+  
+  df <- assign_precribedptot(df, mode = 'prescribed')
+  
   return(df)
 }
 
@@ -53,6 +56,17 @@ assign_drugs_infechaalta <- function(df, df_fechaalta_prescribed, drugs, mode){
       df_fechaalta_prescribed[(df_fechaalta_prescribed$familia %in% drug), 'id']
     )
     df[paste0(drug, '_', mode, '_fechaalta')] <- df$id %in% drug_prescribed_ids
+  }
+  
+  return(df)
+}
+
+assign_precribedptot <- function(df, mode) {
+  if (mode == 'prescribed') {
+    df$pieca <- as.numeric(df$prescribediecaara2_fechaalta)
+    df$pbb <- as.numeric(df$bbloq_prescribed_fechaalta)
+    df$parm <- as.numeric(df$arm_prescribed_fechaalta)
+    df$ptot <- paste0(df$pbb, df$pieca, df$parm)
   }
   
   return(df)
