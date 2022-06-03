@@ -208,6 +208,7 @@ preprocess <- function(data) {
 
 
 # Get results -------------------------------------------------------------
+filtering_ <- list(event = c(0), strata_var = NULL)
 
 # Kaplan Meier plots
 plot_kaplanmeier(event_var = "MortOingIcc", strata_var = "sexo")
@@ -233,7 +234,6 @@ plot_td_behaviour(td_var = "perc_adh_guia_arm", strata_var = "edad_ing1", plot_t
 plot_td_behaviour(td_var = "perc_adh_guia_arm", strata_var = "charlson", plot_type = 'line_mean')
 
 ## comportamiento de los covariables entre los que sobreviven:
-filtering_ <- list(event = c(0), strata_var = NULL)
 plot_td_behaviour(td_var = "perc_adh_guia_arm", strata_var = NULL, filtering = filtering_)
 plot_td_behaviour(td_var = "perc_adh_guia_arm", strata_var = "sexo", filtering = filtering_)
 plot_td_behaviour(td_var = "perc_adh_guia_arm", strata_var = "fe.reducida.severa", filtering = filtering_)
