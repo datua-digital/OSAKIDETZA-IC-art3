@@ -113,6 +113,8 @@ cox_df$parm <- as.numeric(cox_df$arm_prescribed_fechaalta)
 cox_df$ptot <- paste0(cox_df$pbb, cox_df$pieca, cox_df$parm)
 tprescribed_drugs_denovo_interac <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + denovo_ic_paciente + ptot, cox_df)
 summary(tprescribed_drugs_denovo_interac)
+
+saveRDS(tprescribed_drugs_denovo_interac, 'Cox_0td_5bs_1rx_mortoicc.rds')
 # Cox multivariante: Subset de todos pacientes de novo y no cesurados en 30 días -------------------------------------------
 # choose patients
 cox_df <- get_cox_data(
@@ -278,4 +280,88 @@ cox_autoselected_harrelsc <- coxph(
   cox_df
 )
 summary(cox_autoselected_harrelsc)
-# saveRDS(cox_autoselected_harrelsc, 'Cox_0td_6bs_2rx_mortoicc.rds')
+
+
+# Selección de variables en Cox añadiendo la variable ptot-------------------------------------------
+# TODO: Errepasatu pusheatu aurretik
+library(glmnet)
+library(survival)
+
+cox_df <- get_cox_data(
+  df_jm,
+  patients_conditions = list(
+    denovo_ic_paciente = NULL,
+    denovo_tt_paciente_fing = NULL,
+    denovo_tt_paciente_falta = NULL,
+    early_death_patient_30 = NULL,
+    patient_with_prescription = NULL
+  )
+)
+surv_object_variables <- c("time_to_event", "event")
+
+# En caso de que entren en los modelos LASSO, valorar incluir estos calculos en JM.csv.
+# hipertension
+cox_df$hta <- "Sin diagnostico"
+cox_df$hta[cox_df$HTN == "HTN" | cox_df$HtnComplicn == "Htn-Complicn"] <- "hta"
+# diabetes
+cox_df$dm <- "Sin diagnostico"
+cox_df$dm[cox_df$DiabeteSin == "Diabete-Sin" | cox_df$DiabetesCon == "Diabetes-Con"] <- "dm"
+
+cox_df$pieca <- as.numeric(cox_df$prescribediecaara2_fechaalta)
+cox_df$pbb <- as.numeric(cox_df$bbloq_prescribed_fechaalta)
+cox_df$parm <- as.numeric(cox_df$arm_prescribed_fechaalta)
+cox_df$ptot <- paste0(cox_df$pbb, cox_df$pieca, cox_df$parm)
+
+initial_variables <- c(
+  "sexo", "fe.reducida.severa", "charlson", "edad_ing1", "denovo_ic_paciente", 
+  "obesidad", "Infarto", "Coronariopatia", "ConduccCardiaco",
+  "Arritmia", "all_cerebrovasc", "Arterosclerosis", "all_neoplasia",
+  "EPOC", "Asma", "InsufRenal.C", "Tiroides", "DeficNutri", "Hyperlipidem",
+  "all_anemia", "MoodDisorders", "Valvulopatia", "DiabetesCon",
+  "HtnComplicn", "digital", "estat", "diu", "ivab", "hta", "dm", "ptot"
+)
+cox_df$event <- as.numeric(cox_df$event)
+y <- as.matrix(cox_df[, surv_object_variables])
+colnames(y) <- c('time', 'status')
+
+x <- cox_df[, initial_variables]
+
+fit <- glmnet(x, y, family = "cox", alpha = 1)
+
+plot(fit)
+plot(fit, xvar = "lambda", label = TRUE)
+
+# selección de variables en función de lambda. A medida que lambda aumenta, las variables que van a 0 decrecen.
+coef(fit, s = 0.01)
+coef(fit, s = 0.025)
+coef(fit, s = 0.05)
+
+# Validación cruzada con Harrels C-index y 
+model_matrix <- model.matrix(y~., data = cbind(x, y))
+x <- model_matrix[, c(-1, -(ncol(model_matrix) - 1), -ncol(model_matrix))]
+cvfit <- cv.glmnet(x, y, family = "cox", type.measure = "C", alpha = 1)
+
+plot(cvfit)
+C_coefs <- coef(fit, s = cvfit$lambda.1se)
+
+cvfit <- cv.glmnet(x, y, family = "cox", type.measure = "deviance", alpha = 1)
+cvfit
+plot(cvfit)
+pld_coefs <- coef(fit, s = cvfit$lambda.1se)
+
+
+# vamos a analizar el resultado con coxph, se mantiene la variable sexo:
+# Tras la selección con partial-likelihood (deviance)
+cox_autoselected_deviance <- coxph(
+  Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + denovo_ic_paciente + InsufRenal.C + Valvulopatia + ptot + Coronariopatia,
+  cox_df
+)
+summary(cox_autoselected_deviance)
+
+# Tras la selección con Harrel's C-index:
+cox_autoselected_harrelsc <- coxph(
+  Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + denovo_ic_paciente + InsufRenal.C + Valvulopatia + ptot,
+  cox_df
+)
+summary(cox_autoselected_harrelsc)
+
