@@ -12,10 +12,10 @@ source(paste0(UTILSSCRIPTSPATH, "jm_utils.R"))
 source(paste0(UTILSSCRIPTSPATH, "table_utils.R"))
 
 
-# AUC ---------------------------------------------------------------------
-
 M1 <- readRDS(paste(OUTPATH, 'JM_1td_5bs_3rx_mortoicc.rds', sep = '/'))
 summary(M1)
+# AUC ---------------------------------------------------------------------
+
 
 JMbayes::aucJM(M1, M1$Data$data, Tstart = 1, Thoriz = 12)
 JMbayes::aucJM(M1, M1$Data$data, Tstart = 2, Thoriz = 12)
@@ -291,4 +291,55 @@ ggplot(data = data_cv, mapping = aes(x = cv_sample, y = PE, group = 1)) +
   geom_line() +
   geom_hline(yintercept = pe_alldata, linetype = "dashed", color = "red", show.legend = TRUE) +
   theme_bw()
+
+# AUC casero --------------------------------------------------------------
+
+auc_casero <- function(model = readRDS(paste(OUTPATH, 'JM_1td_5bs_3rx_mortoicc.rds', sep = '/')), Tstart = 3, Thorizon = 12) {
+  
+  df_predictions <- get_df_prediciones_(model, Tstart)
+  
+  id_scores_actuals <- get_id_scores_actuals_(model, Thorizon)
+
+  auc <- calcular_auc_(id_scores_actuals$scores, id_scores_actuals$actuals)
+  
+  return(auc)
+}
+
+
+get_df_prediciones_ <- function(model, Tstart) {
+  df_model <- M1$Data$data
+  ids_cumplen_condicion_Tstart <- unique(df_model[(df_model$month > Tstart), 'id'])$id
+  df_predictions <- df_model[(df_model$id %in% ids_cumplen_condicion) & (df_model$month <= Tstart), ]
+  return(df_predictions)
+}
+
+
+get_id_scores_actuals_ <- function(model, Thorizon) {
+  scores <- c()
+  actuals <- c()
+  ids <- as.character(unique(df_predictions$id))
+  
+  for (id in ids) {
+    df_predictions_i <- df_predictions[df_predictions$id == id, ]
+    score_array_i <- survfitJM(M1, newdata = df_predictions_i, idVar = 'id', survTimes = c(Thorizon))
+    scores <- c(scores, score_array_i$summaries[[1]][2])
+    actuals <- c(actuals, unique(df_predictions_i$time_to_event) > Thorizon)
+  }
+  return(list(scores = scores, actuals = actuals))
+}
+
+calcular_auc_ <- function(scores, actuals, plot_roc = TRUE) {
+  actuals <- actuals[order(scores)]
+  sens <- (sum(actuals) - cumsum(actuals))/sum(actuals)
+  spec <- cumsum(!actuals)/sum(!actuals)
+  auc <- sum(spec*diff(c(0, 1 - sens)))
+  
+  if (plot_roc) {
+    plot(1 - spec, sens, type = "l", col = "red", 
+         ylab = "Sensitivity", xlab = "1 - Specificity")
+    abline(c(0,0),c(1,1))
+  }
+  
+  return(auc)
+}
 
