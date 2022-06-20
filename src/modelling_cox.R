@@ -2,6 +2,7 @@
 library(JMbayes)
 library(survival)
 library(tidyverse)
+library(rms)
 source(paste("src", "configuration.R", sep = "/"), encoding = "UTF-8")
 source(paste0(UTILSSCRIPTSPATH, "jm_utils.R"))
 source(paste0(UTILSSCRIPTSPATH, "table_utils.R"))
@@ -107,14 +108,9 @@ tprescribed_drugs_novoic <- coxph(
   Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + arm_prescribed_fechaalta + prescribediecaara2_fechaalta + bbloq_prescribed_fechaalta + denovo_ic_paciente,
   cox_df
 )
-cox_df$pieca <- as.numeric(cox_df$prescribediecaara2_fechaalta)
-cox_df$pbb <- as.numeric(cox_df$bbloq_prescribed_fechaalta)
-cox_df$parm <- as.numeric(cox_df$arm_prescribed_fechaalta)
-cox_df$ptot <- paste0(cox_df$pbb, cox_df$pieca, cox_df$parm)
-tprescribed_drugs_denovo_interac <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + denovo_ic_paciente + ptot, cox_df)
-summary(tprescribed_drugs_denovo_interac)
 
-saveRDS(tprescribed_drugs_denovo_interac, 'Cox_0td_5bs_1rx_mortoicc.rds')
+tprescribed_drugs_denovo_interac <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + denovo_ic_paciente + ptot, cox_df)
+
 # Cox multivariante: Subset de todos pacientes de novo y no cesurados en 30 días -------------------------------------------
 # choose patients
 cox_df <- get_cox_data(
@@ -365,3 +361,37 @@ cox_autoselected_harrelsc <- coxph(
 )
 summary(cox_autoselected_harrelsc)
 
+
+# Cox cross validation ----------------------------------------------------
+
+
+cox_df <- get_cox_data(
+  df_jm,
+  patients_conditions = list(
+    denovo_ic_paciente = NULL,
+    denovo_tt_paciente_fing = NULL,
+    denovo_tt_paciente_falta = NULL,
+    early_death_patient_30 = NULL,
+    patient_with_prescription = NULL
+  )
+)
+
+# se tiene que utilizar la función cph del paquete rms. Se ha comprobado que es equivalente a coxph.
+
+tprescribed_drugs_denovo_interac <- rms::cph(
+  Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + denovo_ic_paciente + ptot, 
+  cox_df, 
+  x = TRUE, 
+  y = TRUE
+)
+
+# cross validation
+validation_matrix <- rms::validate(tprescribed_drugs_denovo_interac, method = 'crossvalidation', B = 10, dxy = TRUE)
+validation_matrix
+cindex_train <- validation_matrix[1,2] / 2 + 0.5
+cindex_test <- validation_matrix[1, 3] / 2 + 0.5
+# bootstrap
+validation_matrix <- rms::validate(tprescribed_drugs_denovo_interac, B = 150, dxy = TRUE)
+validation_matrix
+cindex_train <- validation_matrix[1,2] / 2 + 0.5
+cindex_test <- validation_matrix[1, 3] / 2 + 0.5
