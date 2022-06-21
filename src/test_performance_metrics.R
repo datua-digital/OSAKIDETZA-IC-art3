@@ -85,6 +85,7 @@ ggplotly(
 roc <- JMbayes::rocJM(M1, M1$Data$data, Tstart = 1, Thoriz = 12)
 
 # saveRDS(roc, 'roc.rds')  # guardado para enseñar a Eduardo en la demo.
+
 roc <- readRDS('roc.rds')
 plot(roc)
 
@@ -296,9 +297,9 @@ ggplot(data = data_cv, mapping = aes(x = cv_sample, y = PE, group = 1)) +
 
 auc_casero <- function(model = readRDS(paste(OUTPATH, 'JM_1td_5bs_3rx_mortoicc.rds', sep = '/')), Tstart = 3, Thorizon = 12) {
   
-  df_predictions <- get_df_prediciones_(model, Tstart)
+  df_predictions <- get_df_prediciones_(model$Data$data, Tstart)
   
-  id_scores_actuals <- get_id_scores_actuals_(model, Thorizon)
+  id_scores_actuals <- get_id_scores_actuals_(df_predictions, model, Thorizon)
 
   auc <- calcular_auc_(id_scores_actuals$scores, id_scores_actuals$actuals)
   
@@ -306,22 +307,21 @@ auc_casero <- function(model = readRDS(paste(OUTPATH, 'JM_1td_5bs_3rx_mortoicc.r
 }
 
 
-get_df_prediciones_ <- function(model, Tstart) {
-  df_model <- M1$Data$data
+get_df_prediciones_ <- function(df_model, Tstart) {
   ids_cumplen_condicion_Tstart <- unique(df_model[(df_model$month > Tstart), 'id'])$id
-  df_predictions <- df_model[(df_model$id %in% ids_cumplen_condicion) & (df_model$month <= Tstart), ]
+  df_predictions <- df_model[(df_model$id %in% ids_cumplen_condicion_Tstart) & (df_model$month <= Tstart), ]
   return(df_predictions)
 }
 
 
-get_id_scores_actuals_ <- function(model, Thorizon) {
+get_id_scores_actuals_ <- function(df, model, Thorizon) {
   scores <- c()
   actuals <- c()
-  ids <- as.character(unique(df_predictions$id))
+  ids <- as.character(unique(df$id))
   
   for (id in ids) {
-    df_predictions_i <- df_predictions[df_predictions$id == id, ]
-    score_array_i <- survfitJM(M1, newdata = df_predictions_i, idVar = 'id', survTimes = c(Thorizon))
+    df_predictions_i <- df[df$id == id, ]
+    score_array_i <- survfitJM(model, newdata = df_predictions_i, idVar = 'id', survTimes = c(Thorizon))
     scores <- c(scores, score_array_i$summaries[[1]][2])
     actuals <- c(actuals, unique(df_predictions_i$time_to_event) > Thorizon)
   }
@@ -331,8 +331,8 @@ get_id_scores_actuals_ <- function(model, Thorizon) {
 calcular_auc_ <- function(scores, actuals, plot_roc = TRUE) {
   actuals <- actuals[order(scores)]
   sens <- (sum(actuals) - cumsum(actuals))/sum(actuals)
-  spec <- cumsum(!actuals)/sum(!actuals)
-  auc <- sum(spec*diff(c(0, 1 - sens)))
+  spec <- cumsum(!actuals) / sum(!actuals)
+  auc <- sum(spec * diff(c(0, 1 - sens)))
   
   if (plot_roc) {
     plot(1 - spec, sens, type = "l", col = "red", 
@@ -342,4 +342,101 @@ calcular_auc_ <- function(scores, actuals, plot_roc = TRUE) {
   
   return(auc)
 }
+
+auc0 <- auc_casero(model = readRDS(paste(OUTPATH, 'JM_1td_5bs_3rx_mortoicc.rds', sep = '/')), Tstart = 0, Thorizon = 12)
+auc1 <- auc_casero(model = readRDS(paste(OUTPATH, 'JM_1td_5bs_3rx_mortoicc.rds', sep = '/')), Tstart = 1, Thorizon = 12)
+auc2 <- auc_casero(model = readRDS(paste(OUTPATH, 'JM_1td_5bs_3rx_mortoicc.rds', sep = '/')), Tstart = 2, Thorizon = 12)
+auc3 <- auc_casero(model = readRDS(paste(OUTPATH, 'JM_1td_5bs_3rx_mortoicc.rds', sep = '/')), Tstart = 3, Thorizon = 12)
+auc4 <- auc_casero(model = readRDS(paste(OUTPATH, 'JM_1td_5bs_3rx_mortoicc.rds', sep = '/')), Tstart = 4, Thorizon = 12)
+auc5 <- auc_casero(model = readRDS(paste(OUTPATH, 'JM_1td_5bs_3rx_mortoicc.rds', sep = '/')), Tstart = 5, Thorizon = 12)
+auc6 <- auc_casero(model = readRDS(paste(OUTPATH, 'JM_1td_5bs_3rx_mortoicc.rds', sep = '/')), Tstart = 6, Thorizon = 12)
+auc7 <- auc_casero(model = readRDS(paste(OUTPATH, 'JM_1td_5bs_3rx_mortoicc.rds', sep = '/')), Tstart = 7, Thorizon = 12)
+auc8 <- auc_casero(model = readRDS(paste(OUTPATH, 'JM_1td_5bs_3rx_mortoicc.rds', sep = '/')), Tstart = 8, Thorizon = 12)
+auc9 <- auc_casero(model = readRDS(paste(OUTPATH, 'JM_1td_5bs_3rx_mortoicc.rds', sep = '/')), Tstart = 9, Thorizon = 12)
+auc10 <- auc_casero(model = readRDS(paste(OUTPATH, 'JM_1td_5bs_3rx_mortoicc.rds', sep = '/')), Tstart = 10, Thorizon = 12)
+auc11 <- auc_casero(model = readRDS(paste(OUTPATH, 'JM_1td_5bs_3rx_mortoicc.rds', sep = '/')), Tstart = 11, Thorizon = 12)
+
+c(auc1, auc2, auc3, auc4, auc5, auc6, auc7, auc8, auc9, auc10, auc11)
+auc_jm <- c(0.7028645, 0.6990075, 0.6961159, 0.6916279, 0.6845271, 0.6906954, 0.6901310, 0.6778196, 0.6576343, 0.6808355, 0.6405302)
+# for cox
+
+df_jm <- readRDS(paste0(DATAOUTPATH, "df_JM_MortOingIcc.rds"))
+
+
+# auc casero for cox
+get_cox_data <- function(df_jm, patients_conditions) {
+  df_jm <- filter_patients(df_jm, patients_conditions)
+  df_jm <- preprocess_dfjm(df_jm, variables_jm = colnames(df_jm))
+  cox_df <- df_jm[!duplicated(df_jm$id), ]
+  return(cox_df)
+}
+
+cox_df <- get_cox_data(
+  df_jm = readRDS(paste0(DATAOUTPATH, "df_JM_MortOingIcc.rds")),
+  patients_conditions = list(
+    denovo_ic_paciente = NULL,
+    denovo_tt_paciente_fing = NULL,
+    denovo_tt_paciente_falta = NULL,
+    early_death_patient_30 = NULL,
+    patient_with_prescription = NULL
+  )
+)
+tprescribed_drugs_denovo_interac <- coxph(
+  Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + denovo_ic_paciente + ptot, 
+  cox_df, 
+  x = TRUE, 
+  y = TRUE
+)
+cox_df[c('time_to_event', 'time_to_event', 'sexo', 'edad_ing1', 'charlson', 'fe.reducida.severa', 'denovo_ic_paciente', 'ptot')]
+auc_casero_cox <- function(df_model, model, Tstart = 1, Thorizon = 12) {
+  
+  df_predictions <- get_df_prediciones_cox_(df_model, Tstart)
+  
+  id_scores_actuals <- get_id_scores_actuals_cox_(df_predictions, model, Thorizon)
+  # print(id_scores_actuals)
+  auc <- calcular_auc_(id_scores_actuals$scores, id_scores_actuals$actuals)
+  
+  return(auc)
+}
+
+
+get_df_prediciones_cox_ <- function(df_model, Tstart) {
+  return(df_model[(df_model$time_to_event > Tstart), ])
+}
+
+
+get_id_scores_actuals_cox_ <- function(df, model, Thorizon) {
+  # scores <- predict(model, newdata = df, type = 'survival', times = Thorizon)
+  scores <- -predict(model, newdata = df, type = 'risk', times = Thorizon)
+  actuals <- c(df$time_to_event > Thorizon)
+  return(list(scores = scores, actuals = actuals))
+}
+
+auc_cox <- c()
+for (i in c(1:11)) {
+  auc_cox <- c(auc_cox, 
+               auc_casero_cox(
+                 cox_df[c('event', 'time_to_event', 'sexo', 'edad_ing1', 'charlson', 'fe.reducida.severa', 'denovo_ic_paciente', 'ptot')], 
+                 tprescribed_drugs_denovo_interac, 
+                 Tstart = i, 
+                 Thorizon = 12
+               )
+  )
+}
+
+auc_casero_data <- data.frame(
+  auc_value = c(round(auc_cox, 3), round(auc_jm, 3)), 
+  auc_type = factor(c(rep('auc_cox', 11), rep('auc_jm', 11))), 
+  auc_range = c('1-12', '2-12', '3-12', '4-12', '5-12', '6-12', '7-12', '8-12', '9-12', '10-12', '11-12'),
+  auc_range2 = c(c(1:11), c(1:11))
+)
+
+ggplotly(
+  ggplot(auc_casero_data, mapping = aes(x = auc_range2, y = auc_value, color = auc_type)) + 
+    geom_line() + 
+    geom_point() + scale_x_continuous(limits = c(1, 12)) +
+    theme_bw() +
+    ylim(0.5, 1) + 
+    xlab('Comparación enre AUCs comparativos')
+)
 
