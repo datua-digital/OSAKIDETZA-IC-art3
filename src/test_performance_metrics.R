@@ -423,7 +423,7 @@ for (i in c(1:11)) {
                )
   )
 }
-
+auc_jm <- c(0.7033, 0.6999, 0.6943, 0.6929, 0.6836, 0.6917, 0.6899, 0.6758, 0.6579, 0.6784, 0.6349)
 auc_casero_data <- data.frame(
   auc_value = c(round(auc_cox, 3), round(auc_jm, 3)), 
   auc_type = factor(c(rep('auc_cox', 11), rep('auc_jm', 11))), 
