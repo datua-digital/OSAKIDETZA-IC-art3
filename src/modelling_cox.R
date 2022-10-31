@@ -60,24 +60,6 @@ t3 <- coxph(Surv(time_to_event, event) ~ charlson, cluster = id, cox_df)
 t4 <- coxph(Surv(time_to_event, event) ~ fe.reducida.severa, cluster = id, cox_df)
 
 
-# Cox univariante: Subset de todos pacientes de novo y no cesurados en 30 días -------------------------------------------
-
-cox_df <- get_cox_data(
-  df_jm,
-  patients_conditions = list(
-    denovo_ic_paciente = TRUE,
-    denovo_tt_paciente_fing = TRUE,
-    denovo_tt_paciente_falta = NULL,
-    early_death_patient_30 = FALSE,
-    patient_with_prescription = NULL
-  )
-)
-
-coxph(Surv(time_to_event, event) ~ sexo, cluster = id, cox_df)
-coxph(Surv(time_to_event, event) ~ edad_ing1, cluster = id, cox_df)
-coxph(Surv(time_to_event, event) ~ charlson, cluster = id, cox_df)
-coxph(Surv(time_to_event, event) ~ fe.reducida.severa, cluster = id, cox_df)
-
 # Cox multivariante: Subset de todos los pacientes -------------------------------------------
 # choose patients
 cox_df <- get_cox_data(
@@ -111,46 +93,6 @@ tprescribed_drugs_novoic <- coxph(
 
 tprescribed_drugs_denovo_interac <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + denovo_ic_paciente + ptot, cox_df)
 summary(tprescribed_drugs_denovo_interac)
-# Cox multivariante: Subset de todos pacientes de novo y no cesurados en 30 días -------------------------------------------
-# choose patients
-cox_df <- get_cox_data(
-  df_jm,
-  patients_conditions = list(
-    denovo_ic_paciente = TRUE,
-    denovo_tt_paciente_fing = TRUE,
-    denovo_tt_paciente_falta = NULL,
-    early_death_patient_30 = FALSE,
-    patient_with_prescription = NULL
-  )
-)
-
-coxph(Surv(time_to_event, event) ~ sexo + edad_ing1, cluster = id, cox_df)
-coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson, cluster = id, cox_df)
-coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + fe.reducida.severa, cluster = id, cox_df)
-coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa, cluster = id, cox_df)
-coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + fe.reducida.severa*edad_ing1, cluster = id, cox_df)
-coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + fe.reducida.severa*charlson, cluster = id, cox_df)
-
-
-# test different AUC calculations -----------------------------------------
-# Se tiene que ejecutar primero tprescribed_drugs
-library(survAUC)
-library(dynpred)
-tp <- predict(tprescribed_drugs)
-tp2 <- predict(tprescribed_drugs)
-
-cindex(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + arm_prescribed_fechaalta + prescribediecaara2_fechaalta + bbloq_prescribed_fechaalta,
-       cox_df)
-AUCt <- dynpred::AUC(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + arm_prescribed_fechaalta + prescribediecaara2_fechaalta + bbloq_prescribed_fechaalta,
-                     cox_df)
-AUCt
-AUC_CD <- AUC.cd(
-  Surv(cox_df$time_to_event, cox_df$event),
-  Surv(cox_df$time_to_event, cox_df$event),
-  tp,
-  tp2,
-  seq(5, 365, 5)
-)
 
 
 # Variables continuas Vs categóricas --------------------------------------
@@ -197,88 +139,6 @@ summary(tprescribed_drugs_novoic_charlsoedadcat)
 
 # Selección de variables en Cox -------------------------------------------
 
-library(glmnet)
-library(survival)
-
-cox_df <- get_cox_data(
-  df_jm,
-  patients_conditions = list(
-    denovo_ic_paciente = NULL,
-    denovo_tt_paciente_fing = NULL,
-    denovo_tt_paciente_falta = NULL,
-    early_death_patient_30 = NULL,
-    patient_with_prescription = NULL
-  )
-)
-surv_object_variables <- c("time_to_event", "event")
-
-# En caso de que entren en los modelos LASSO, valorar incluir estos calculos en JM.csv.
-# hipertension
-cox_df$hta <- "Sin diagnostico"
-cox_df$hta[cox_df$HTN == "HTN" | cox_df$HtnComplicn == "Htn-Complicn"] <- "hta"
-# diabetes
-cox_df$dm <- "Sin diagnostico"
-cox_df$dm[cox_df$DiabeteSin == "Diabete-Sin" | cox_df$DiabetesCon == "Diabetes-Con"] <- "dm"
-
-
-
-initial_variables <- c(
-  "sexo", "fe.reducida.severa", "arm_prescribed_fechaalta", "charlson", "edad_ing1",
-  "prescribediecaara2_fechaalta", "bbloq_prescribed_fechaalta", "denovo_ic_paciente", 
-  "obesidad", "Infarto", "Coronariopatia", "ConduccCardiaco",
-  "Arritmia", "all_cerebrovasc", "Arterosclerosis", "all_neoplasia",
-  "EPOC", "Asma", "InsufRenal.C", "Tiroides", "DeficNutri", "Hyperlipidem",
-  "all_anemia", "MoodDisorders", "Valvulopatia", "DiabetesCon",
-  "HtnComplicn", "digital", "estat", "diu", "ivab", "hta", "dm"
-)
-cox_df$event <- as.numeric(cox_df$event)
-y <- as.matrix(cox_df[, surv_object_variables])
-colnames(y) <- c('time', 'status')
-
-x <- cox_df[, initial_variables]
-
-fit <- glmnet(x, y, family = "cox", alpha = 1)
-
-plot(fit)
-plot(fit, xvar = "lambda", label = TRUE)
-
-# selección de variables en función de lambda. A medida que lambda aumenta, las variables que van a 0 decrecen.
-coef(fit, s = 0.01)
-coef(fit, s = 0.025)
-coef(fit, s = 0.05)
-
-# Validación cruzada con Harrels C-index y 
-model_matrix <- model.matrix(y~., data = cbind(x, y))
-x <- model_matrix[, c(-1, -(ncol(model_matrix) - 1), -ncol(model_matrix))]
-cvfit <- cv.glmnet(x, y, family = "cox", type.measure = "C", alpha = 1)
-cvfit
-plot(cvfit)
-coef(fit, s = cvfit$lambda.1se)
-
-cvfit <- cv.glmnet(x, y, family = "cox", type.measure = "deviance", alpha = 1)
-cvfit
-plot(cvfit)
-coef(fit, s = cvfit$lambda.1se)
-
-
-# vamos a analizar el resultado con coxph, se mantiene la variable sexo:
-# Tras la selección con partial-likelihood (deviance)
-cox_autoselected_deviance <- coxph(
-  Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + prescribediecaara2_fechaalta + bbloq_prescribed_fechaalta + denovo_ic_paciente + InsufRenal.C + Valvulopatia,
-  cox_df
-)
-summary(cox_autoselected_deviance)
-
-# Tras la selección con Harrel's C-index:
-cox_autoselected_harrelsc <- coxph(
-  Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + prescribediecaara2_fechaalta + bbloq_prescribed_fechaalta + denovo_ic_paciente + InsufRenal.C + Valvulopatia,
-  cox_df
-)
-summary(cox_autoselected_harrelsc)
-
-
-# Selección de variables en Cox añadiendo la variable ptot-------------------------------------------
-# TODO: Errepasatu pusheatu aurretik
 library(glmnet)
 library(survival)
 
