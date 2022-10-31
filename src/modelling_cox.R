@@ -110,7 +110,7 @@ tprescribed_drugs_novoic <- coxph(
 )
 
 tprescribed_drugs_denovo_interac <- coxph(Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + denovo_ic_paciente + ptot, cox_df)
-
+summary(tprescribed_drugs_denovo_interac)
 # Cox multivariante: Subset de todos pacientes de novo y no cesurados en 30 días -------------------------------------------
 # choose patients
 cox_df <- get_cox_data(
@@ -171,7 +171,6 @@ tprescribed_drugs_novoic_continua <- coxph(
 )
 summary(tprescribed_drugs_novoic_continua)
 
-coxph()
 
 table(cox_df$edadcat)
 hist(cox_df$edad_ing1)

@@ -244,6 +244,7 @@ plot_td_behaviour(td_var = "perc_adh_guia_arm", strata_var = "denovo_ic_paciente
 plot_td_behaviour(td_var = "perc_adh_guia_arm", strata_var = "edad_ing1", filtering = filtering_)
 plot_td_behaviour(td_var = "perc_adh_guia_arm", strata_var = "charlson", filtering = filtering_)
 
+
 ## Plots del acta 01042022
 plot_td_behaviour(td_var = "perc_adh_bbloq", strata_var = "bbloq_prescribed_fechaalta")
 plot_td_behaviour(td_var = "perc_adh_ieca", strata_var = "prescribediecaara2_fechaalta")

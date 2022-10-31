@@ -74,7 +74,7 @@ apply_JM <- function(df_jm, patients_conditions, covariables, variable_longitudi
   if (save_model) {
     saveRDS(M2, paste0(OUTPATH_UNIV, model_name_prefix, "_M2_", variable_longitudinal_name, ".rds"))
   }
-  
+  auc3 <- JMbayes::aucJM(M3, df_jm, Tstart = 1, Thoriz = 12)
   # M3: Fit JM with longitudinal process (4) y componente de tendencia
   M3 <- update(
     M1, 
@@ -109,11 +109,10 @@ apply_JM(
     patient_with_prescription = NULL
   ), 
   covariables = c("sexo", "edad_ing1", "charlson", "fe.reducida.severa", 
-                  "arm_prescribed_fechaalta", "prescribediecaara2_fechaalta",
-                  "bbloq_prescribed_fechaalta", "denovo_ic_paciente"
+                  "denovo_ic_paciente", "ptot"
                   ), 
   variable_longitudinal = "cum_perc_adh_guia_arm", 
-  model_name_prefix = 'JM_0', 
+  model_name_prefix = 'JM_ptot0', 
   save_model = FALSE
 )
 
