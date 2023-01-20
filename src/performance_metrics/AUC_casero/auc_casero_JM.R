@@ -14,7 +14,7 @@ auc_casero <- function(model = readRDS(paste(OUTPATH, 'JM_1td_5bs_3rx_mortoicc.r
 
 
 get_df_prediciones_ <- function(df_model, Tstart) {
-  ids_cumplen_condicion_Tstart <- unique(df_model[(df_model$month > Tstart), 'id'])$id
+  ids_cumplen_condicion_Tstart <- unique(df_model[(df_model$month > Tstart), 'id']) # $id erabili det momentu batzutan
   df_predictions <- df_model[(df_model$id %in% ids_cumplen_condicion_Tstart) & (df_model$month <= Tstart), ]
   return(df_predictions)
 }

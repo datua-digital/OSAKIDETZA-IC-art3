@@ -1,5 +1,33 @@
-# for cox
 source(paste("src", "configuration.R", sep = "/"), encoding = "UTF-8")
+
+
+# Function calculation ----------------------------------------------------
+
+auc_casero_cox <- function(df_model, model, Tstart = 3, Thorizon = 12) {
+  
+  df_predictions <- get_df_prediciones_cox_(df_model, Tstart)
+  
+  id_scores_actuals <- get_id_scores_actuals_cox_(df_predictions, model, Thorizon)
+  # print(id_scores_actuals)
+  auc <- calcular_auc_(id_scores_actuals$scores, id_scores_actuals$actuals)
+  
+  return(auc)
+}
+
+
+get_df_prediciones_cox_ <- function(df_model, Tstart) {
+  return(df_model[(df_model$time_to_event > Tstart), ])
+}
+
+
+get_id_scores_actuals_cox_ <- function(df, model, Thorizon) {
+  scores <- -predict(model, newdata = df, type = 'risk', times = Thorizon)
+  actuals <- c(df$time_to_event > Thorizon)
+  return(list(scores = scores, actuals = actuals))
+}
+
+
+# tests -------------------------------------------------------------------
 
 df_jm <- readRDS(paste0(DATAOUTPATH, "df_JM_MortOingIcc.rds"))
 
@@ -22,6 +50,7 @@ cox_df <- get_cox_data(
     patient_with_prescription = NULL
   )
 )
+
 tprescribed_drugs_denovo_interac <- coxph(
   Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + denovo_ic_paciente + ptot, 
   cox_df, 
@@ -29,29 +58,6 @@ tprescribed_drugs_denovo_interac <- coxph(
   y = TRUE
 )
 
-auc_casero_cox <- function(df_model, model, Tstart = 3, Thorizon = 12) {
-  
-  df_predictions <- get_df_prediciones_cox_(df_model, Tstart)
-  
-  id_scores_actuals <- get_id_scores_actuals_cox_(df_predictions, model, Thorizon)
-  # print(id_scores_actuals)
-  auc <- calcular_auc_(id_scores_actuals$scores, id_scores_actuals$actuals)
-  
-  return(auc)
-}
-
-
-get_df_prediciones_cox_ <- function(df_model, Tstart) {
-  return(df_model[(df_model$time_to_event > Tstart), ])
-}
-
-
-get_id_scores_actuals_cox_ <- function(df, model, Thorizon) {
-  # scores <- predict(model, newdata = df, type = 'survival', times = Thorizon)
-  scores <- -predict(model, newdata = df, type = 'risk', times = Thorizon)
-  actuals <- c(df$time_to_event > Thorizon)
-  return(list(scores = scores, actuals = actuals))
-}
 
 auc_cox <- c()
 for (i in c(1:11)) {
