@@ -1,3 +1,7 @@
+# Copyright 2022: Datua IA SL. All Rights Reserved
+# Propietary and Confidential information of Datua IA
+# Disclosure, Use or Reproduction without the written authorization of Datua IA is prohibited
+
 # load libraries and sources----------------------------------------------------------
 library(data.table)
 library(ggplot2)

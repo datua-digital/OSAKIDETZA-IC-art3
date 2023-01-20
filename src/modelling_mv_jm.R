@@ -1,3 +1,7 @@
+# Copyright 2022: Datua IA SL. All Rights Reserved
+# Propietary and Confidential information of Datua IA
+# Disclosure, Use or Reproduction without the written authorization of Datua IA is prohibited
+
 # load libraries and sources----------------------------------------------------------
 library(JMbayes)
 library(readr)
@@ -234,7 +238,7 @@ apply_MV3JM <- function(
   # auc3 <- JMbayes::aucJM(M3, df_jm, Tstart = 1, Thoriz = 12)
   
   if (save_model) {
-    saveRDS(M3, paste0(OUTPATH_MULTIV, paste0(model_name_prefix, "_M3_", ".rds")))
+    saveRDS(M3, paste0(OUTPATH_MULTIV, paste0(model_name_prefix, "_M1_", ".rds")))
   }
 }
 
@@ -250,6 +254,6 @@ apply_MV3JM(
   ), 
   covariables = c("sexo", "edad_ing1", "charlson", "fe.reducida.severa", 
                   "denovo_ic_paciente", "ptot"),
-  model_name_prefix = 'JMMV32', 
+  model_name_prefix = 'JM_3td_5bs_1rx_mortoicc', 
   save_model = TRUE
 )
