@@ -18,6 +18,13 @@ longitudinal_process <- function(variable_longitudinal, data_, tipo = 'splines_c
   return(long_process)
 }
 
+get_cox_data <- function(df_jm, patients_conditions) {
+  df_jm <- filter_patients(df_jm, patients_conditions)
+  df_jm <- preprocess_dfjm(df_jm, variables_jm = colnames(df_jm))
+  cox_df <- df_jm[!duplicated(df_jm$id), ]
+  return(cox_df)
+}
+
 generate_coxdf <- function(df_jm, variables_cox) {
   cox_df <- df_jm[!duplicated(df_jm$id), ]
   cox_df <- cox_df[variables_cox]
