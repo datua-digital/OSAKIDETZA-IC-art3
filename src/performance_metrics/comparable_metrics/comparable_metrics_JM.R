@@ -2,12 +2,12 @@ library(DescTools)
 
 # Calculation functions ---------------------------------------------------
 
-auc_casero <- function(model = readRDS(paste(OUTPATH, 'JM_3td_5bs_1rx_mortoicc_M1_.rds', sep = '/')), Tstart = 3, Thorizon = 12, df_jm = NULL) {
-  if (is.null(df_jm)) {
-    df_jm <- model$Data$data
+auc_casero <- function(df_model, model, Tstart, Thorizon) {
+  if (is.null(df_model)) {
+    df_model <- model$Data$data
   }
   
-  df_predictions <- get_df_prediciones_jm(df_jm, Tstart)
+  df_predictions <- get_df_prediciones_jm(df_model, Tstart)
   
   id_scores_actuals <- get_id_scores_actuals_jm(df = df_predictions, model, Thorizon)
   

@@ -15,7 +15,7 @@ source(paste("src", "configuration.R", sep = "/"), encoding = "UTF-8")
 source(paste0(UTILSSCRIPTSPATH, "jm_utils.R"))
 source(paste0(UTILSSCRIPTSPATH, "table_utils.R"))
 
-rm("M1", "M2", "M3")  # delete models
+# rm("M1", "M2", "M3")  # delete models
 
 # functions ---------------------------------------------------------------
 apply_JM <- function(df_jm, patients_conditions, covariables, variable_longitudinal, model_name_prefix = 'JM', save_model = FALSE) {

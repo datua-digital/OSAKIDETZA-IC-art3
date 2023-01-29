@@ -156,17 +156,17 @@ df_jm <- preprocess_dfjm_paper(df_jm)
 summary(M1)
 
 # auc
-auc1_12_casero_M1 <- auc_casero(model = M1, Tstart = 1, Thorizon = 12, df_jm = df_jm)
-auc2_12_casero_M1 <- auc_casero(model = M1, Tstart = 2, Thorizon = 12, df_jm = df_jm)
-auc3_12_casero_M1 <- auc_casero(model = M1, Tstart = 3, Thorizon = 12, df_jm = df_jm)
-auc4_12_casero_M1 <- auc_casero(model = M1, Tstart = 4, Thorizon = 12, df_jm = df_jm)
-auc5_12_casero_M1 <- auc_casero(model = M1, Tstart = 5, Thorizon = 12, df_jm = df_jm)
-auc6_12_casero_M1 <- auc_casero(model = M1, Tstart = 6, Thorizon = 12, df_jm = df_jm)
-auc7_12_casero_M1 <- auc_casero(model = M1, Tstart = 7, Thorizon = 12, df_jm = df_jm)
-auc8_12_casero_M1 <- auc_casero(model = M1, Tstart = 8, Thorizon = 12, df_jm = df_jm)
-auc9_12_casero_M1 <- auc_casero(model = M1, Tstart = 9, Thorizon = 12, df_jm = df_jm)
-auc10_12_casero_M1 <- auc_casero(model = M1, Tstart = 10, Thorizon = 12, df_jm = df_jm)
-auc11_12_casero_M1 <- auc_casero(model = M1, Tstart = 11, Thorizon = 12, df_jm = df_jm)
+auc1_12_casero_M1 <- auc_casero(df_model = df_jm, model = M1, Tstart = 1, Thorizon = 12)
+auc2_12_casero_M1 <- auc_casero(df_model = df_jm, model = M1, Tstart = 2, Thorizon = 12)
+auc3_12_casero_M1 <- auc_casero(df_model = df_jm, model = M1, Tstart = 3, Thorizon = 12)
+auc4_12_casero_M1 <- auc_casero(df_model = df_jm, model = M1, Tstart = 4, Thorizon = 12)
+auc5_12_casero_M1 <- auc_casero(df_model = df_jm, model = M1, Tstart = 5, Thorizon = 12)
+auc6_12_casero_M1 <- auc_casero(df_model = df_jm, model = M1, Tstart = 6, Thorizon = 12)
+auc7_12_casero_M1 <- auc_casero(df_model = df_jm, model = M1, Tstart = 7, Thorizon = 12)
+auc8_12_casero_M1 <- auc_casero(df_model = df_jm, model = M1, Tstart = 8, Thorizon = 12)
+auc9_12_casero_M1 <- auc_casero(df_model = df_jm, model = M1, Tstart = 9, Thorizon = 12)
+auc10_12_casero_M1 <- auc_casero(df_model = df_jm, model = M1, Tstart = 10, Thorizon = 12)
+auc11_12_casero_M1 <- auc_casero(df_model = df_jm, model = M1, Tstart = 11, Thorizon = 12)
 
 auc_jm <- c(
   auc1_12_casero_M1, auc2_12_casero_M1, auc3_12_casero_M1, auc4_12_casero_M1,
@@ -174,17 +174,17 @@ auc_jm <- c(
   auc9_12_casero_M1, auc10_12_casero_M1, auc11_12_casero_M1
 )
 
-auc1_2_casero_M1 <- auc_casero(model = M1, Tstart = 1, Thorizon = 2, df_jm)
-auc2_3_casero_M1 <- auc_casero(model = M1, Tstart = 2, Thorizon = 3, df_jm)
-auc3_4_casero_M1 <- auc_casero(model = M1, Tstart = 3, Thorizon = 4, df_jm)
-auc4_5_casero_M1 <- auc_casero(model = M1, Tstart = 4, Thorizon = 5, df_jm)
-auc5_6_casero_M1 <- auc_casero(model = M1, Tstart = 5, Thorizon = 6, df_jm)
-auc6_7_casero_M1 <- auc_casero(model = M1, Tstart = 6, Thorizon = 7, df_jm)
-auc7_8_casero_M1 <- auc_casero(model = M1, Tstart = 7, Thorizon = 8, df_jm)
-auc8_9_casero_M1 <- auc_casero(model = M1, Tstart = 8, Thorizon = 9, df_jm)
-auc9_10_casero_M1 <- auc_casero(model = M1, Tstart = 9, Thorizon = 10, df_jm)
-auc10_11_casero_M1 <- auc_casero(model = M1, Tstart = 10, Thorizon = 11, df_jm)
-auc11_12_casero_M1 <- auc_casero(model = M1, Tstart = 11, Thorizon = 12, df_jm)
+auc1_2_casero_M1 <- auc_casero(df_model = df_jm, model = M1, Tstart = 1, Thorizon = 2)
+auc2_3_casero_M1 <- auc_casero(df_model = df_jm, model = M1, Tstart = 2, Thorizon = 3)
+auc3_4_casero_M1 <- auc_casero(df_model = df_jm, model = M1, Tstart = 3, Thorizon = 4)
+auc4_5_casero_M1 <- auc_casero(df_model = df_jm, model = M1, Tstart = 4, Thorizon = 5)
+auc5_6_casero_M1 <- auc_casero(df_model = df_jm, model = M1, Tstart = 5, Thorizon = 6)
+auc6_7_casero_M1 <- auc_casero(df_model = df_jm, model = M1, Tstart = 6, Thorizon = 7)
+auc7_8_casero_M1 <- auc_casero(df_model = df_jm, model = M1, Tstart = 7, Thorizon = 8)
+auc8_9_casero_M1 <- auc_casero(df_model = df_jm, model = M1, Tstart = 8, Thorizon = 9)
+auc9_10_casero_M1 <- auc_casero(df_model = df_jm, model = M1, Tstart = 9, Thorizon = 10)
+auc10_11_casero_M1 <- auc_casero(df_model = df_jm, model = M1, Tstart = 10, Thorizon = 11)
+auc11_12_casero_M1 <- auc_casero(df_model = df_jm, model = M1, Tstart = 11, Thorizon = 1)
 auc_jm2_casero_M1 <- c(
   auc1_2_casero_M1, auc2_3_casero_M1, auc3_4_casero_M1, auc4_5_casero_M1,  
   auc5_6_casero_M1, auc6_7_casero_M1, auc7_8_casero_M1, auc8_9_casero_M1, 
@@ -234,17 +234,17 @@ pe_M1 <- c(
 summary(M2)
 
 # auc
-auc1_12_casero_M2 <- auc_casero(model = M2, Tstart = 1, Thorizon = 12, df_jm = df_jm)
-auc2_12_casero_M2 <- auc_casero(model = M2, Tstart = 2, Thorizon = 12, df_jm = df_jm)
-auc3_12_casero_M2 <- auc_casero(model = M2, Tstart = 3, Thorizon = 12, df_jm = df_jm)
-auc4_12_casero_M2 <- auc_casero(model = M2, Tstart = 4, Thorizon = 12, df_jm = df_jm)
-auc5_12_casero_M2 <- auc_casero(model = M2, Tstart = 5, Thorizon = 12, df_jm = df_jm)
-auc6_12_casero_M2 <- auc_casero(model = M2, Tstart = 6, Thorizon = 12, df_jm = df_jm)
-auc7_12_casero_M2 <- auc_casero(model = M2, Tstart = 7, Thorizon = 12, df_jm = df_jm)
-auc8_12_casero_M2 <- auc_casero(model = M2, Tstart = 8, Thorizon = 12, df_jm = df_jm)
-auc9_12_casero_M2 <- auc_casero(model = M2, Tstart = 9, Thorizon = 12, df_jm = df_jm)
-auc10_12_casero_M2 <- auc_casero(model = M2, Tstart = 10, Thorizon = 12, df_jm = df_jm)
-auc11_12_casero_M2 <- auc_casero(model = M2, Tstart = 11, Thorizon = 12, df_jm = df_jm)
+auc1_12_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 1, Thorizon = 12)
+auc2_12_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 2, Thorizon = 12)
+auc3_12_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 3, Thorizon = 12)
+auc4_12_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 4, Thorizon = 12)
+auc5_12_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 5, Thorizon = 12)
+auc6_12_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 6, Thorizon = 12)
+auc7_12_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 7, Thorizon = 12)
+auc8_12_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 8, Thorizon = 12)
+auc9_12_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 9, Thorizon = 12)
+auc10_12_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 10, Thorizon = 12)
+auc11_12_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 11, Thorizon = 12)
 
 auc_jm_ <- c(
   auc1_12_casero_M2, auc2_12_casero_M2, auc3_12_casero_M2, auc4_12_casero_M2,
@@ -252,17 +252,17 @@ auc_jm_ <- c(
   auc9_12_casero_M2, auc10_12_casero_M2, auc11_12_casero_M2
 )
 
-auc1_2_casero_M2 <- auc_casero(model = M2, Tstart = 1, Thorizon = 2, df_jm)
-auc2_3_casero_M2 <- auc_casero(model = M2, Tstart = 2, Thorizon = 3, df_jm)
-auc3_4_casero_M2 <- auc_casero(model = M2, Tstart = 3, Thorizon = 4, df_jm)
-auc4_5_casero_M2 <- auc_casero(model = M2, Tstart = 4, Thorizon = 5, df_jm)
-auc5_6_casero_M2 <- auc_casero(model = M2, Tstart = 5, Thorizon = 6, df_jm)
-auc6_7_casero_M2 <- auc_casero(model = M2, Tstart = 6, Thorizon = 7, df_jm)
-auc7_8_casero_M2 <- auc_casero(model = M2, Tstart = 7, Thorizon = 8, df_jm)
-auc8_9_casero_M2 <- auc_casero(model = M2, Tstart = 8, Thorizon = 9, df_jm)
-auc9_10_casero_M2 <- auc_casero(model = M2, Tstart = 9, Thorizon = 10, df_jm)
-auc10_11_casero_M2 <- auc_casero(model = M2, Tstart = 10, Thorizon = 11, df_jm)
-auc11_12_casero_M2 <- auc_casero(model = M2, Tstart = 11, Thorizon = 12, df_jm)
+auc1_2_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 1, Thorizon = 2)
+auc2_3_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 2, Thorizon = 3)
+auc3_4_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 3, Thorizon = 4)
+auc4_5_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 4, Thorizon = 5)
+auc5_6_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 5, Thorizon = 6)
+auc6_7_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 6, Thorizon = 7)
+auc7_8_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 7, Thorizon = 8)
+auc8_9_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 8, Thorizon = 9)
+auc9_10_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 9, Thorizon = 10)
+auc10_11_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 10, Thorizon = 11)
+auc11_12_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 11, Thorizon = 12)
 auc_jm2_casero <- c(
   auc1_2_casero_M2, auc2_3_casero_M2, auc3_4_casero_M2, auc4_5_casero_M2,
   auc5_6_casero_M2, auc6_7_casero_M2, auc7_8_casero_M2, auc8_9_casero_M2, 
@@ -270,17 +270,17 @@ auc_jm2_casero <- c(
 )
 
 # brier score
-pe_1_12_casero_M2 <- precision_casero(df_model = df_jm, model = M1, Tstart = 1, Thorizon = 12)
-pe_2_12_casero_M2 <- precision_casero(df_model = df_jm, model = M1, Tstart = 2, Thorizon = 12)
-pe_3_12_casero_M2 <- precision_casero(df_model = df_jm, model = M1, Tstart = 3, Thorizon = 12)
-pe_4_12_casero_M2 <- precision_casero(df_model = df_jm, model = M1, Tstart = 4, Thorizon = 12)
-pe_5_12_casero_M2 <- precision_casero(df_model = df_jm, model = M1, Tstart = 5, Thorizon = 12)
-pe_6_12_casero_M2 <- precision_casero(df_model = df_jm, model = M1, Tstart = 6, Thorizon = 12)
-pe_7_12_casero_M2 <- precision_casero(df_model = df_jm, model = M1, Tstart = 7, Thorizon = 12)
-pe_8_12_casero_M2 <- precision_casero(df_model = df_jm, model = M1, Tstart = 8, Thorizon = 12)
-pe_9_12_casero_M2 <- precision_casero(df_model = df_jm, model = M1, Tstart = 9, Thorizon = 12)
-pe_10_12_casero_M2 <- precision_casero(df_model = df_jm, model = M1, Tstart = 10, Thorizon = 12)
-pe_11_12_casero_M2 <- precision_casero(df_model = df_jm, model = M1, Tstart = 11, Thorizon = 12)
+pe_1_12_casero_M2 <- precision_casero(df_model = df_jm, model = M2, Tstart = 1, Thorizon = 12)
+pe_2_12_casero_M2 <- precision_casero(df_model = df_jm, model = M2, Tstart = 2, Thorizon = 12)
+pe_3_12_casero_M2 <- precision_casero(df_model = df_jm, model = M2, Tstart = 3, Thorizon = 12)
+pe_4_12_casero_M2 <- precision_casero(df_model = df_jm, model = M2, Tstart = 4, Thorizon = 12)
+pe_5_12_casero_M2 <- precision_casero(df_model = df_jm, model = M2, Tstart = 5, Thorizon = 12)
+pe_6_12_casero_M2 <- precision_casero(df_model = df_jm, model = M2, Tstart = 6, Thorizon = 12)
+pe_7_12_casero_M2 <- precision_casero(df_model = df_jm, model = M2, Tstart = 7, Thorizon = 12)
+pe_8_12_casero_M2 <- precision_casero(df_model = df_jm, model = M2, Tstart = 8, Thorizon = 12)
+pe_9_12_casero_M2 <- precision_casero(df_model = df_jm, model = M2, Tstart = 9, Thorizon = 12)
+pe_10_12_casero_M2 <- precision_casero(df_model = df_jm, model = M2, Tstart = 10, Thorizon = 12)
+pe_11_12_casero_M2 <- precision_casero(df_model = df_jm, model = M2, Tstart = 11, Thorizon = 12)
 
 pe_casero_M2 <- c(
   pe_1_12_casero_M2, pe_2_12_casero_M2, pe_3_12_casero_M2, pe_4_12_casero_M2,
