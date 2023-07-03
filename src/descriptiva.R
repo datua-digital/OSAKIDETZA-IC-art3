@@ -76,7 +76,9 @@ plot_td_behaviour <- function(
     td_var, 
     strata_var=NULL, 
     filtering=list(event = c(0, 1), strata_var = NULL), 
-    plot_type='line_mean'
+    plot_type='line_mean',
+    adjust_ylim=NULL,
+    title=NULL
 ) {
   
   data <- readRDS(paste0(DATAOUTPATH, data_for_event("MortOingIcc"), ".rds"))
@@ -88,6 +90,9 @@ plot_td_behaviour <- function(
       strata_var <- paste0(strata_var, '_2')
     }
   }
+  if (is.null(title)) {
+    title <- "Comportamiento de la variable tiempo dependiente"
+  }
   
   
   if (plot_type %in% c('line_mean', 'line_median')) {
@@ -97,28 +102,33 @@ plot_td_behaviour <- function(
         median = median(.data[[td_var]])
       )
     if (plot_type == 'line_mean') {
-      ggplot(
-        data = data, 
-        mapping = aes_string(x = "month", y = "mean", color = strata_var)
-      ) + 
+      g <- ggplot(
+          data = data, 
+          mapping = aes_string(x = "month", y = "mean", color = strata_var)
+        ) + 
         geom_line() + 
         theme_bw() +
         ylab(td_var) +
         scale_x_continuous("Mes", breaks = c(1:12)) +
-        ggtitle("Comportamiento de la variable tiempo dependiente") +
+        ggtitle(title) +
         theme(plot.title = element_text(hjust = 0.5))
     } else if (plot_type == 'line_median') {
-      ggplot(
-        data = data, 
-        mapping = aes_string(x = "month", y = "median", color = strata_var)
-      ) + 
+      g <- ggplot(
+          data = data, 
+          mapping = aes_string(x = "month", y = "median", color = strata_var)
+        ) + 
         geom_line() + 
         theme_bw() +
         ylab(td_var) +
         scale_x_continuous("Mes", breaks = c(1:12)) +
-        ggtitle("Comportamiento de la variable tiempo dependiente") +
+        ggtitle(title) +
         theme(plot.title = element_text(hjust = 0.5))
+      
     }
+    if (!is.null(adjust_ylim)) {
+      g <- g + ylim(adjust_ylim[1], adjust_ylim[2])
+    }
+    g
   } else if (plot_type == 'boxplot') {
     data$month <- factor(data$month)
     ggplot(
@@ -254,6 +264,150 @@ plot_td_behaviour(td_var = "perc_adh_bbloq", strata_var = "bbloq_prescribed_fech
 plot_td_behaviour(td_var = "perc_adh_ieca", strata_var = "prescribediecaara2_fechaalta")
 plot_td_behaviour(td_var = "perc_adh_arm", strata_var = "arm_prescribed_fechaalta")
 plot_td_behaviour(td_var = "perc_adh_guia_arm", strata_var = "prescribedtoguia_fechaalta")
+
+## Plots del paper (Sacados por Eduardo):
+# parece ser que se aplicó un filter (¿queriendo? preguntar a Eduardo!)
+plot_td_behaviour(
+  td_var = "perc_adh_bbloq",
+  strata_var = NULL,
+  plot_type = 'line_mean',
+  adjust_ylim = c(0, 100),
+  title = "Beta blockers"
+)
+plot_td_behaviour(
+  td_var = "perc_adh_ara2oieca",
+  strata_var = NULL,
+  plot_type = 'line_mean',
+  adjust_ylim = c(0, 100),
+  title = "ACEi/ARB"
+)
+plot_td_behaviour(
+  td_var = "perc_adh_arm",
+  strata_var = NULL,
+  plot_type = 'line_mean',
+  adjust_ylim = c(0, 100),
+  title = "Mineralocorticoid receptor antagonist (MRA)"
+)
+
+plot_td_behaviour(
+  td_var = "perc_adh_bbloq",
+  strata_var = "sexo",
+  plot_type = 'line_mean',
+  adjust_ylim = c(0, 100),
+  title = "Beta blockers"
+)
+plot_td_behaviour(
+  td_var = "perc_adh_ara2oieca",
+  strata_var = "sexo",
+  plot_type = 'line_mean',
+  adjust_ylim = c(0, 100),
+  title = "ACEi/ARB"
+)
+
+plot_td_behaviour(
+  td_var = "perc_adh_arm",
+  strata_var = "sexo",
+  plot_type = 'line_mean',
+  adjust_ylim = c(0, 100),
+  title = "Mineralocorticoid receptor antagonist (MRA)"
+)
+
+plot_td_behaviour(
+  td_var = "perc_adh_bbloq",
+  strata_var = "fe.reducida.severa",
+  plot_type = 'line_mean',
+  adjust_ylim = c(0, 100),
+  title = "Beta blockers"
+)
+
+plot_td_behaviour(
+  td_var = "perc_adh_ara2oieca",
+  strata_var = "fe.reducida.severa",
+  plot_type = 'line_mean',
+  adjust_ylim = c(0, 100),
+  title = "ACEi/ARB"
+)
+
+plot_td_behaviour(
+  td_var = "perc_adh_arm",
+  strata_var = "fe.reducida.severa",
+  plot_type = 'line_mean',
+  adjust_ylim = c(0, 100),
+  title = "Mineralocorticoid receptor antagonist (MRA)"
+)
+
+plot_td_behaviour(
+  td_var = "perc_adh_bbloq",
+  strata_var = "denovo_ic_paciente",
+  plot_type = 'line_mean',
+  adjust_ylim = c(0, 100),
+  title = "Beta blockers"
+)
+
+plot_td_behaviour(
+  td_var = "perc_adh_ara2oieca",
+  strata_var = "denovo_ic_paciente",
+  plot_type = 'line_mean',
+  adjust_ylim = c(0, 100),
+  title = "ACEi/ARB"
+)
+
+plot_td_behaviour(
+  td_var = "perc_adh_arm",
+  strata_var = "denovo_ic_paciente",
+  plot_type = 'line_mean',
+  adjust_ylim = c(0, 100),
+  title = "Mineralocorticoid receptor antagonist (MRA)"
+)
+
+plot_td_behaviour(
+  td_var = "perc_adh_bbloq",
+  strata_var = "edad_ing1",
+  plot_type = 'line_mean',
+  adjust_ylim = c(0, 100),
+  title = "Beta blockers"
+)
+
+plot_td_behaviour(
+  td_var = "perc_adh_ara2oieca",
+  strata_var = "edad_ing1",
+  plot_type = 'line_mean',
+  adjust_ylim = c(0, 100),
+  title = "ACEi/ARB"
+)
+
+plot_td_behaviour(
+  td_var = "perc_adh_arm",
+  strata_var = "edad_ing1",
+  plot_type = 'line_mean',
+  adjust_ylim = c(0, 100),
+  title = "Mineralocorticoid receptor antagonist (MRA)"
+)
+
+plot_td_behaviour(
+  td_var = "perc_adh_bbloq",
+  strata_var = "charlson",
+  plot_type = 'line_mean',
+  adjust_ylim = c(0, 100),
+  title = "Beta blockers"
+)
+
+plot_td_behaviour(
+  td_var = "perc_adh_ara2oieca",
+  strata_var = "charlson",
+  plot_type = 'line_mean',
+  adjust_ylim = c(0, 100),
+  title = "ACEi/ARB"
+)
+
+plot_td_behaviour(
+  td_var = "perc_adh_arm",
+  strata_var = "charlson",
+  plot_type = 'line_mean',
+  adjust_ylim = c(0, 100),
+  title = "Mineralocorticoid receptor antagonist (MRA)"
+)
+
 
 ### si se quisieran hacer por separado:
 plot_td_behaviour(
