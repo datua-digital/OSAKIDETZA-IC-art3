@@ -440,3 +440,122 @@ data <- binarizar_variables(
   threshold
 )
 
+
+# Correlación -------------------------------------------------------------
+
+library(corrplot)
+
+data <- readRDS(paste0(DATAOUTPATH, data_for_event("MortOingIcc"), ".rds"))
+
+# A través de la media de la adherencia: Las adherencias se agrupan con medias
+
+data_covariables <- data %>% 
+  select("id", "sexo", "fe.reducida.severa", 
+         "arm_prescribed_fechaalta",
+         "bbloq_prescribed_fechaalta", 
+         "prescribediecaara2_fechaalta",
+         "denovo_ic_paciente", 
+         "edad_ing1", 
+         "charlson") %>%
+  group_by(id) %>% 
+  filter(row_number() == 1)
+
+data_adherences_summarised <- f_group_by(data, c('id')) %>% 
+  summarise(
+    mean_perc_adh_ara2oieca = mean(.data[['perc_adh_ara2oieca']]),
+    mean_perc_adh_arm = mean(.data[['perc_adh_arm']]),
+    mean_perc_adh_bbloq = mean(.data[['perc_adh_bbloq']])
+  )
+
+data_joined <- dplyr::inner_join(data_covariables, data_adherences_summarised, by = "id")
+
+# para prescripciones y adherencias
+
+data_joined_prescripionandadherence_vars <- data_joined[
+  c(
+    "mean_perc_adh_ara2oieca", "mean_perc_adh_arm", "mean_perc_adh_bbloq",
+    "bbloq_prescribed_fechaalta", "arm_prescribed_fechaalta", "prescribediecaara2_fechaalta"
+  )]
+
+cor_M <- cor(data_joined_prescripionandadherence_vars, method = "spearman")
+
+corrplot(cor_M, method = "pie")
+
+# para resto de variables y adherencias
+
+cols <- sapply(data_joined, is.logical)
+data_joined[,cols] <- lapply(data_joined[,cols], as.numeric)
+
+data_joined$sexo <- as.integer(data_joined$sexo)
+data_joined$fe.reducida.severa <- as.integer(data_joined$fe.reducida.severa)
+
+data_joined_restcovariablesandadherence_vars <- data_joined[
+  c(
+    "mean_perc_adh_ara2oieca", "mean_perc_adh_arm", "mean_perc_adh_bbloq",
+    "sexo", "fe.reducida.severa", "denovo_ic_paciente", "edad_ing1", 
+    "charlson"
+  )]
+
+cor_M <- cor(data_joined_restcovariablesandadherence_vars, method = "spearman")
+corrplot(cor_M, method = "pie")
+
+
+# A través del mes 3, 6 y 9 de la adherencia.
+
+data_covariables <- data %>% 
+  select("id", "sexo", "fe.reducida.severa", 
+         "arm_prescribed_fechaalta",
+         "bbloq_prescribed_fechaalta", 
+         "prescribediecaara2_fechaalta",
+         "denovo_ic_paciente", 
+         "edad_ing1", 
+         "charlson") %>%
+  group_by(id) %>% 
+  filter(row_number() == 1)
+
+data_adherences_filtered <- 
+  data %>% 
+  filter(month %in% c(3, 6, 9)) %>% 
+  select(id, month, perc_adh_ara2oieca, perc_adh_arm, perc_adh_bbloq) %>%
+  group_by(id, month) %>%
+  filter(row_number() == 1)
+
+data_adherences_filtered <- data_adherences_filtered %>% pivot_wider(names_from = month, values_from = c(perc_adh_ara2oieca, perc_adh_bbloq, perc_adh_arm))
+
+data_joined <- dplyr::inner_join(data_covariables, data_adherences_filtered, by = "id")
+
+colnames(data_joined)
+
+# para prescripciones y adherencias
+
+data_joined_prescripionandadherence_vars <- data_joined[
+  c(
+    "perc_adh_ara2oieca_3", "perc_adh_ara2oieca_6", "perc_adh_ara2oieca_9",
+    "perc_adh_bbloq_3", "perc_adh_bbloq_6", "perc_adh_bbloq_9",
+    "perc_adh_arm_3", "perc_adh_arm_6", "perc_adh_arm_9",
+    "bbloq_prescribed_fechaalta", "arm_prescribed_fechaalta", "prescribediecaara2_fechaalta"
+  )]
+
+cor_M <- cor(data_joined_prescripionandadherence_vars, method = "spearman", use = "pairwise.complete.obs")
+# View(cor_M)
+corrplot(cor_M, method = "pie")
+
+# para resto de variables y adherencias
+
+cols <- sapply(data_joined, is.logical)
+data_joined[,cols] <- lapply(data_joined[,cols], as.numeric)
+
+data_joined$sexo <- as.integer(data_joined$sexo)
+data_joined$fe.reducida.severa <- as.integer(data_joined$fe.reducida.severa)
+
+data_joined_restcovariablesandadherence_vars <- data_joined[
+  c(
+    "perc_adh_ara2oieca_3", "perc_adh_ara2oieca_6", "perc_adh_ara2oieca_9",
+    "perc_adh_bbloq_3", "perc_adh_bbloq_6", "perc_adh_bbloq_9",
+    "perc_adh_arm_3", "perc_adh_arm_6", "perc_adh_arm_9",
+    "sexo", "fe.reducida.severa", "denovo_ic_paciente", "edad_ing1", 
+    "charlson"
+  )]
+
+cor_M <- cor(data_joined_restcovariablesandadherence_vars, method = "spearman")
+corrplot(cor_M, method = "pie")
