@@ -1,4 +1,5 @@
 library(DescTools)
+library(caret)
 
 # Calculation functions ---------------------------------------------------
 
@@ -6,7 +7,7 @@ auc_casero <- function(df_model, model, Tstart, Thorizon) {
   if (is.null(df_model)) {
     df_model <- model$Data$data
   }
-  
+  browser()
   df_predictions <- get_df_prediciones_jm(df_model, Tstart)
   
   id_scores_actuals <- get_id_scores_actuals_jm(df = df_predictions, model, Thorizon)
@@ -24,6 +25,30 @@ precision_casero <- function(df_model, model, Tstart, Thorizon) {
   brier_score <- BrierScore(id_scores_actuals$actuals, id_scores_actuals$probability)
   return(brier_score)
 }
+
+get_confusion_matrix <- function(df_model, model, Tstart, Thorizon) {
+  
+  if (is.null(df_model)) {
+    df_model <- model$Data$data
+  }
+  
+  df_predictions <- get_df_prediciones_jm(df_model, Tstart)
+  
+  id_scores_actuals <- get_id_scores_actuals_jm(df = df_predictions, model, Thorizon)
+  
+  # invertir probabilidad y el positivo (de aqui adelante: IC o fallecer)
+  id_scores_actuals$probability <- 1 - id_scores_actuals$probability
+  id_scores_actuals$actuals <- id_scores_actuals$actuals == FALSE
+  
+  threshold <- 0.4
+  confusion_matrix <- confusionMatrix(
+    factor(id_scores_actuals$probability >= threshold), 
+    factor(id_scores_actuals$actuals)
+  )
+  
+  return(confusion_matrix)
+}
+
 
 
 get_df_prediciones_jm <- function(df_model, Tstart) {

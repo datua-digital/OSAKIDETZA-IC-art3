@@ -21,6 +21,14 @@ source(paste0(COMPARABLEEMETRICSSCRIPTSPATH, "utils.R"))
 df_jm <- readRDS(paste0(DATAOUTPATH, "df_JM_MortOingIcc.rds"))
 M1 <- readRDS(paste(OUTPATH, 'mv', 'JM_3td_5bs_1rx_mortoicc_M1_.rds', sep = '/'))
 M2 <- readRDS(paste(OUTPATH, 'mv', 'JM_3td_5bs_1rx_mortoicc_M2_.rds', sep = '/'))
+M3 <- readRDS(paste(OUTPATH, 'mv', 'JM_3td_2bs_mortoicc_M1_.rds', sep = '/'))
+M4 <- readRDS(paste(OUTPATH, 'mv', 'JM_3td_2bs_mortoicc_M2_.rds', sep = '/'))
+M5 <- readRDS(paste(OUTPATH, 'mv', 'JM_3td_3bs_mortoicc_M1_.rds', sep = '/'))
+M6 <- readRDS(paste(OUTPATH, 'mv', 'JM_3td_3bs_mortoicc_M2_.rds', sep = '/'))
+M7 <- readRDS(paste(OUTPATH, 'mv', 'JM_3td_4bs_mortoicc_M1_.rds', sep = '/'))
+M8 <- readRDS(paste(OUTPATH, 'mv', 'JM_3td_4bs_mortoicc_M2_.rds', sep = '/'))
+M9 <- readRDS(paste(OUTPATH, 'mv', 'JM_3td_5bs_mortoicc_M1_.rds', sep = '/'))
+M10 <- readRDS(paste(OUTPATH, 'mv', 'JM_3td_5bs_mortoicc_M2_.rds', sep = '/'))
 patients_conditions_ <- list(
   denovo_ic_paciente = NULL,
   denovo_tt_paciente_fing = NULL,
@@ -97,7 +105,49 @@ for (i in c(1:11)) {
   )
 }
 
+# confusion matrix Cox
+cm_cox <- c()
+for (i in c(1:11)) {
+  cm_cox <- c(
+    cm_cox, 
+    get_confusion_matrix_cox(
+      df_model = cox_df[c('event', 'time_to_event', 'sexo', 'edad_ing1', 'charlson', 'fe.reducida.severa', 'denovo_ic_paciente', 'ptot')], 
+      model = tprescribed_drugs_denovo_interac, 
+      Tstart = i, 
+      Thorizon = 12
+    )
+  )
+}
+cm_cox
+
+
+cm_cox_ <- c()
+for (i in c(1:11)) {
+  cm_cox_ <- c(
+    cm_cox_, 
+    get_confusion_matrix_cox(
+      df_model = cox_df[c('event', 'time_to_event', 'sexo', 'edad_ing1', 'charlson', 'fe.reducida.severa', 'denovo_ic_paciente', 'ptot')], 
+      model = tprescribed_drugs_denovo_interac, 
+      Tstart = i, 
+      Thorizon = i + 1
+    )
+  )
+}
+
 # precision casero
+precision_cox <- c()
+for (i in c(1:11)) {
+  precision_cox <- c(
+    precision_cox, 
+    precision_casero_cox(
+      df_model = cox_df[c('event', 'time_to_event', 'sexo', 'edad_ing1', 'charlson', 'fe.reducida.severa', 'denovo_ic_paciente', 'ptot')], 
+      model = tprescribed_drugs_denovo_interac, 
+      Tstart = i, 
+      Thorizon = 12
+    )
+  )
+}
+
 precision_cox_ <- c()
 for (i in c(1:11)) {
   precision_cox_ <- c(
@@ -106,7 +156,7 @@ for (i in c(1:11)) {
       df_model = cox_df[c('event', 'time_to_event', 'sexo', 'edad_ing1', 'charlson', 'fe.reducida.severa', 'denovo_ic_paciente', 'ptot')], 
       model = tprescribed_drugs_denovo_interac, 
       Tstart = i, 
-      Thorizon = 12
+      Thorizon = i + 1
     )
   )
 }
@@ -190,6 +240,41 @@ auc_jm2_casero_M1 <- c(
   auc5_6_casero_M1, auc6_7_casero_M1, auc7_8_casero_M1, auc8_9_casero_M1, 
   auc9_10_casero_M1, auc10_11_casero_M1, auc11_12_casero_M1
 )
+# confusion matrix
+cm1_12_casero_M1 <- get_confusion_matrix(df_model = df_jm, model = M1, Tstart = 1, Thorizon = 12)
+cm2_12_casero_M1 <- get_confusion_matrix(df_model = df_jm, model = M1, Tstart = 2, Thorizon = 12)
+cm3_12_casero_M1 <- get_confusion_matrix(df_model = df_jm, model = M1, Tstart = 3, Thorizon = 12)
+cm4_12_casero_M1 <- get_confusion_matrix(df_model = df_jm, model = M1, Tstart = 4, Thorizon = 12)
+cm5_12_casero_M1 <- get_confusion_matrix(df_model = df_jm, model = M1, Tstart = 5, Thorizon = 12)
+cm6_12_casero_M1 <- get_confusion_matrix(df_model = df_jm, model = M1, Tstart = 6, Thorizon = 12)
+cm7_12_casero_M1 <- get_confusion_matrix(df_model = df_jm, model = M1, Tstart = 7, Thorizon = 12)
+cm8_12_casero_M1 <- get_confusion_matrix(df_model = df_jm, model = M1, Tstart = 8, Thorizon = 12)
+cm9_12_casero_M1 <- get_confusion_matrix(df_model = df_jm, model = M1, Tstart = 9, Thorizon = 12)
+cm10_12_casero_M1 <- get_confusion_matrix(df_model = df_jm, model = M1, Tstart = 10, Thorizon = 12)
+cm11_12_casero_M1 <- get_confusion_matrix(df_model = df_jm, model = M1, Tstart = 11, Thorizon = 12)
+
+cm_jm <- c(
+  cm1_12_casero_M1, cm2_12_casero_M1, cm3_12_casero_M1, cm4_12_casero_M1,
+  cm5_12_casero_M1, cm6_12_casero_M1, cm7_12_casero_M1, cm8_12_casero_M1, 
+  cm9_12_casero_M1, cm10_12_casero_M1, cm11_12_casero_M1
+)
+
+cm1_2_casero_M1 <- get_confusion_matrix(df_model = df_jm, model = M1, Tstart = 1, Thorizon = 2)
+cm2_3_casero_M1 <- get_confusion_matrix(df_model = df_jm, model = M1, Tstart = 2, Thorizon = 3)
+cm3_4_casero_M1 <- get_confusion_matrix(df_model = df_jm, model = M1, Tstart = 3, Thorizon = 4)
+cm4_5_casero_M1 <- get_confusion_matrix(df_model = df_jm, model = M1, Tstart = 4, Thorizon = 5)
+cm5_6_casero_M1 <- get_confusion_matrix(df_model = df_jm, model = M1, Tstart = 5, Thorizon = 6)
+cm6_7_casero_M1 <- get_confusion_matrix(df_model = df_jm, model = M1, Tstart = 6, Thorizon = 7)
+cm7_8_casero_M1 <- get_confusion_matrix(df_model = df_jm, model = M1, Tstart = 7, Thorizon = 8)
+cm8_9_casero_M1 <- get_confusion_matrix(df_model = df_jm, model = M1, Tstart = 8, Thorizon = 9)
+cm9_10_casero_M1 <- get_confusion_matrix(df_model = df_jm, model = M1, Tstart = 9, Thorizon = 10)
+cm10_11_casero_M1 <- get_confusion_matrix(df_model = df_jm, model = M1, Tstart = 10, Thorizon = 11)
+# cm11_12_casero_M1 <- get_confusion_matrix(df_model = df_jm, model = M1, Tstart = 11, Thorizon = 12)
+cm_jm2_casero_M1 <- c(
+  cm1_2_casero_M1, cm2_3_casero_M1, cm3_4_casero_M1, cm4_5_casero_M1,  
+  cm5_6_casero_M1, cm6_7_casero_M1, cm7_8_casero_M1, cm8_9_casero_M1, 
+  cm9_10_casero_M1, cm10_11_casero_M1# , cm11_12_casero_M1
+)
 
 # brier score
 pe_1_12_casero_M1 <- precision_casero(df_model = df_jm, model = M1, Tstart = 1, Thorizon = 12)
@@ -208,6 +293,24 @@ pe_casero_M1 <- c(
   pe_1_12_casero_M1, pe_2_12_casero_M1, pe_3_12_casero_M1, pe_4_12_casero_M1,
   pe_5_12_casero_M1, pe_6_12_casero_M1, pe_7_12_casero_M1, pe_8_12_casero_M1, 
   pe_9_12_casero_M1, pe_10_12_casero_M1, pe_11_12_casero_M1
+)
+
+pe_1_2_casero_M1 <- precision_casero(df_model = df_jm, model = M1, Tstart = 1, Thorizon = 2)
+pe_2_3_casero_M1 <- precision_casero(df_model = df_jm, model = M1, Tstart = 2, Thorizon = 3)
+pe_3_4_casero_M1 <- precision_casero(df_model = df_jm, model = M1, Tstart = 3, Thorizon = 4)
+pe_4_5_casero_M1 <- precision_casero(df_model = df_jm, model = M1, Tstart = 4, Thorizon = 5)
+pe_5_6_casero_M1 <- precision_casero(df_model = df_jm, model = M1, Tstart = 5, Thorizon = 6)
+pe_6_7_casero_M1 <- precision_casero(df_model = df_jm, model = M1, Tstart = 6, Thorizon = 7)
+pe_7_8_casero_M1 <- precision_casero(df_model = df_jm, model = M1, Tstart = 7, Thorizon = 8)
+pe_8_9_casero_M1 <- precision_casero(df_model = df_jm, model = M1, Tstart = 8, Thorizon = 9)
+pe_9_10_casero_M1 <- precision_casero(df_model = df_jm, model = M1, Tstart = 9, Thorizon = 10)
+pe_10_11_casero_M1 <- precision_casero(df_model = df_jm, model = M1, Tstart = 10, Thorizon = 11)
+pe_11_12_casero_M1 <- precision_casero(df_model = df_jm, model = M1, Tstart = 11, Thorizon = 12)
+
+pe_caseroside_M1 <- c(
+  pe_1_2_casero_M1, pe_2_3_casero_M1, pe_3_4_casero_M1, pe_4_5_casero_M1,
+  pe_5_6_casero_M1, pe_6_7_casero_M1, pe_7_8_casero_M1, pe_8_9_casero_M1, 
+  pe_9_10_casero_M1, pe_10_11_casero_M1, pe_11_12_casero_M1
 )
 
 # prediction error
@@ -234,7 +337,7 @@ pe_M1 <- c(
 summary(M2)
 
 # auc
-auc1_12_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 1, Thorizon = 12)
+auc1_12_casero_M2 <- auc_casero(df_model = df_jm[1:500, ], model = M2, Tstart = 1, Thorizon = 12)
 auc2_12_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 2, Thorizon = 12)
 auc3_12_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 3, Thorizon = 12)
 auc4_12_casero_M2 <- auc_casero(df_model = df_jm, model = M2, Tstart = 4, Thorizon = 12)
@@ -288,6 +391,60 @@ pe_casero_M2 <- c(
   pe_9_12_casero_M2, pe_10_12_casero_M2, pe_11_12_casero_M2
 )
 
+pe_1_2_casero_M2 <- precision_casero(df_model = df_jm, model = M2, Tstart = 1, Thorizon = 2)
+pe_2_3_casero_M2 <- precision_casero(df_model = df_jm, model = M2, Tstart = 2, Thorizon = 3)
+pe_3_4_casero_M2 <- precision_casero(df_model = df_jm, model = M2, Tstart = 3, Thorizon = 4)
+pe_4_5_casero_M2 <- precision_casero(df_model = df_jm, model = M2, Tstart = 4, Thorizon = 5)
+pe_5_6_casero_M2 <- precision_casero(df_model = df_jm, model = M2, Tstart = 5, Thorizon = 6)
+pe_6_7_casero_M2 <- precision_casero(df_model = df_jm, model = M2, Tstart = 6, Thorizon = 7)
+pe_7_8_casero_M2 <- precision_casero(df_model = df_jm, model = M2, Tstart = 7, Thorizon = 8)
+pe_8_9_casero_M2 <- precision_casero(df_model = df_jm, model = M2, Tstart = 8, Thorizon = 9)
+pe_9_10_casero_M2 <- precision_casero(df_model = df_jm, model = M2, Tstart = 9, Thorizon = 10)
+pe_10_11_casero_M2 <- precision_casero(df_model = df_jm, model = M2, Tstart = 10, Thorizon = 11)
+pe_11_12_casero_M2 <- precision_casero(df_model = df_jm, model = M2, Tstart = 11, Thorizon = 12)
+
+pe_caseroside_M2 <- c(
+  pe_1_2_casero_M2, pe_2_3_casero_M2, pe_3_4_casero_M2, pe_4_5_casero_M2,
+  pe_5_6_casero_M2, pe_6_7_casero_M2, pe_7_8_casero_M2, pe_8_9_casero_M2, 
+  pe_9_10_casero_M2, pe_10_11_casero_M2, pe_11_12_casero_M2
+)
+
+# confusion matrix
+cm1_12_casero_M2 <- get_confusion_matrix(df_model = df_jm, model = M2, Tstart = 1, Thorizon = 12)
+cm2_12_casero_M2 <- get_confusion_matrix(df_model = df_jm, model = M2, Tstart = 2, Thorizon = 12)
+cm3_12_casero_M2 <- get_confusion_matrix(df_model = df_jm, model = M2, Tstart = 3, Thorizon = 12)
+cm4_12_casero_M2 <- get_confusion_matrix(df_model = df_jm, model = M2, Tstart = 4, Thorizon = 12)
+cm5_12_casero_M2 <- get_confusion_matrix(df_model = df_jm, model = M2, Tstart = 5, Thorizon = 12)
+cm6_12_casero_M2 <- get_confusion_matrix(df_model = df_jm, model = M2, Tstart = 6, Thorizon = 12)
+cm7_12_casero_M2 <- get_confusion_matrix(df_model = df_jm, model = M2, Tstart = 7, Thorizon = 12)
+cm8_12_casero_M2 <- get_confusion_matrix(df_model = df_jm, model = M2, Tstart = 8, Thorizon = 12)
+cm9_12_casero_M2 <- get_confusion_matrix(df_model = df_jm, model = M2, Tstart = 9, Thorizon = 12)
+cm10_12_casero_M2 <- get_confusion_matrix(df_model = df_jm, model = M2, Tstart = 10, Thorizon = 12)
+cm11_12_casero_M2 <- get_confusion_matrix(df_model = df_jm, model = M2, Tstart = 11, Thorizon = 12)
+
+cm_jm <- c(
+  cm1_12_casero_M2, cm2_12_casero_M2, cm3_12_casero_M2, cm4_12_casero_M2,
+  cm5_12_casero_M2, cm6_12_casero_M2, cm7_12_casero_M2, cm8_12_casero_M2, 
+  cm9_12_casero_M2, cm10_12_casero_M2, cm11_12_casero_M2
+)
+
+cm1_2_casero_M2 <- get_confusion_matrix(df_model = df_jm, model = M2, Tstart = 1, Thorizon = 2)
+cm2_3_casero_M2 <- get_confusion_matrix(df_model = df_jm, model = M2, Tstart = 2, Thorizon = 3)
+cm3_4_casero_M2 <- get_confusion_matrix(df_model = df_jm, model = M2, Tstart = 3, Thorizon = 4)
+cm4_5_casero_M2 <- get_confusion_matrix(df_model = df_jm, model = M2, Tstart = 4, Thorizon = 5)
+cm5_6_casero_M2 <- get_confusion_matrix(df_model = df_jm, model = M2, Tstart = 5, Thorizon = 6)
+cm6_7_casero_M2 <- get_confusion_matrix(df_model = df_jm, model = M2, Tstart = 6, Thorizon = 7)
+cm7_8_casero_M2 <- get_confusion_matrix(df_model = df_jm, model = M2, Tstart = 7, Thorizon = 8)
+cm8_9_casero_M2 <- get_confusion_matrix(df_model = df_jm, model = M2, Tstart = 8, Thorizon = 9)
+cm9_10_casero_M2 <- get_confusion_matrix(df_model = df_jm, model = M2, Tstart = 9, Thorizon = 10)
+cm10_11_casero_M2 <- get_confusion_matrix(df_model = df_jm, model = M2, Tstart = 10, Thorizon = 11)
+# cm11_12_casero_M1 <- get_confusion_matrix(df_model = df_jm, model = M2, Tstart = 11, Thorizon = 12)
+cm_jm2_casero_M2 <- c(
+  cm1_2_casero_M2, cm2_3_casero_M2, cm3_4_casero_M2, cm4_5_casero_M2,  
+  cm5_6_casero_M2, cm6_7_casero_M2, cm7_8_casero_M2, cm8_9_casero_M2, 
+  cm9_10_casero_M2, cm10_11_casero_M2# , cm11_12_casero_M1
+)
+
 # prediction error
 pe_1_12_M2 <- JMbayes::prederrJM(M2, df_jm, Tstart = 1, Thoriz = 12)
 pe_2_12_M2 <- JMbayes::prederrJM(M2, df_jm, Tstart = 2, Thoriz = 12)
@@ -306,3 +463,64 @@ pe_ <- c(
   pe_5_12_M2$prederr, pe_6_12_M2$prederr, pe_7_12_M2$prederr, pe_8_12_M2$prederr,
   pe_9_12_M2$prederr, pe_10_12_M2$prederr, pe_11_12_M2$prederr
 )
+
+
+# Probability distribution ------------------------------------------------
+# Tstart=1; Thorizon=12
+
+Tstart <- 1
+Thorizon <- 12
+distribution_test <- function(Tstart, Thorizon){
+  df_model <- df_jm
+  model <- M1
+  df_predictions <- get_df_prediciones_jm(df_model, Tstart)
+  id_scores_actuals_M1 <- get_id_scores_actuals_jm(df = df_predictions, model, Thorizon)
+  
+  model <- M2
+  df_predictions <- get_df_prediciones_jm(df_model, Tstart)
+  id_scores_actuals_M2 <- get_id_scores_actuals_jm(df = df_predictions, model, Thorizon)
+  
+  cox_df <- get_cox_data(
+    df_jm,
+    patients_conditions = patients_conditions_
+  )
+  tprescribed_drugs_denovo_interac <- coxph(
+    Surv(time_to_event, event) ~ sexo + edad_ing1  + charlson + fe.reducida.severa + denovo_ic_paciente + ptot, 
+    cox_df,
+    x = TRUE
+  )
+  df_model <- cox_df[c('event', 'time_to_event', 'sexo', 'edad_ing1', 'charlson', 'fe.reducida.severa', 'denovo_ic_paciente', 'ptot')]
+  model <- tprescribed_drugs_denovo_interac
+  
+  df_predictions <- get_df_predicciones_cox_(df_model, Tstart)
+  id_scores_actuals_cox <- get_id_scores_actuals_cox_(df_predictions, model, Thorizon)
+  
+  
+  probs <- data.frame(
+    probabilities = c(id_scores_actuals_M1$probability, id_scores_actuals_M2$probability, id_scores_actuals_cox$probability),
+    type = c(
+      rep('M1', length(id_scores_actuals_M1$probability)),
+      rep('M2', length(id_scores_actuals_M2$probability)),
+      rep('cox', length(id_scores_actuals_cox$probability))
+    )
+  )
+  return(probs)
+}
+probs <- distribution_test(Tstart = 4, Thorizon = 12)
+# probs <- distribution_test(Tstart = 7, Thorizon = 12)
+probs %>%
+  group_by(type) %>%
+  summarise(
+    min = min(probabilities),
+    p05 = quantile(probabilities, probs = c(.05)),
+    p25 = quantile(probabilities, probs = c(.25)),
+    mean = mean(probabilities),
+    median = median(probabilities),
+    p75 = quantile(probabilities, probs = c(.75)),
+    p95 = quantile(probabilities, probs = c(.95)),
+    max = max(probabilities)
+  )
+
+library(ggplot2)
+ggplot(probs, aes(x = probabilities, color = type, fill = type)) + 
+  geom_histogram(position="identity", alpha=0.5) + theme_bw()
