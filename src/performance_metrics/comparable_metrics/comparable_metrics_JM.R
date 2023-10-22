@@ -4,10 +4,11 @@ library(caret)
 # Calculation functions ---------------------------------------------------
 
 auc_casero <- function(df_model, model, Tstart, Thorizon) {
+  # browser()
   if (is.null(df_model)) {
     df_model <- model$Data$data
   }
-  browser()
+  
   df_predictions <- get_df_prediciones_jm(df_model, Tstart)
   
   id_scores_actuals <- get_id_scores_actuals_jm(df = df_predictions, model, Thorizon)
@@ -19,7 +20,7 @@ auc_casero <- function(df_model, model, Tstart, Thorizon) {
 
 precision_casero <- function(df_model, model, Tstart, Thorizon) {
   
-  df_predictions <- get_df_prediciones_jm(df_jm, Tstart)
+  df_predictions <- get_df_prediciones_jm(df_model, Tstart)
   id_scores_actuals <- get_id_scores_actuals_jm(df = df_predictions, model, Thorizon)
   # print(id_scores_actuals)
   brier_score <- BrierScore(id_scores_actuals$actuals, id_scores_actuals$probability)

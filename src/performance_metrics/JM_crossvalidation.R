@@ -1,8 +1,13 @@
-# Cross validation --------------------------------------------------------
+source(paste("src", "configuration.R", sep = "/"), encoding = "UTF-8")
+source(paste0(UTILSSCRIPTSPATH, "jm_utils.R"))
+source(paste0(UTILSSCRIPTSPATH, "table_utils.R"))
+library("parallel")
+
+# Cross validation JM --------------------------------------------------------
 # Univariant model
 
 # cargar librería paralel, para que haga cálculos en paralelo
-library("parallel")
+
 set.seed(123)
 
 # construir df_JM y Cox_JM:
@@ -182,3 +187,42 @@ ggplot(data = data_cv, mapping = aes(x = cv_sample, y = PE, group = 1)) +
   geom_line() +
   geom_hline(yintercept = pe_alldata, linetype = "dashed", color = "red", show.legend = TRUE) +
   theme_bw()
+
+# Dataset split for manual cross validation -------------------------------
+
+# Here we create three datasets to do cross validation
+df_jm <- readRDS(paste0(DATAOUTPATH, "df_JM_MortOingIcc.rds"))
+
+# crear grupos
+all_ids <- unique(df_jm$id)
+
+ids_cv_1 <- sample(all_ids, 1063, replace = FALSE)
+
+rest_ids <- setdiff(all_ids, ids_cv_1)
+
+ids_cv_2 <- sample(rest_ids, 1063, replace = FALSE)
+
+ids_cv_3 <- setdiff(rest_ids, ids_cv_2)
+
+# datos de entrenamiento
+ids_1_2_groups <- c(as.character(ids_cv_1), as.character(ids_cv_2))
+ids_1_3_groups <- c(as.character(ids_cv_1), as.character(ids_cv_3))
+ids_2_3_groups <- c(as.character(ids_cv_2), as.character(ids_cv_3))
+
+# datos de test
+df_jm_1_2 <- subset(df_jm, id %in% ids_1_2_groups)
+df_jm_1_3 <- subset(df_jm, id %in% ids_1_3_groups)
+df_jm_2_3 <- subset(df_jm, id %in% ids_2_3_groups)
+
+df_jm_1 <- subset(df_jm, id %in% as.character(ids_cv_1))
+df_jm_2 <- subset(df_jm, id %in% as.character(ids_cv_2))
+df_jm_3 <- subset(df_jm, id %in% as.character(ids_cv_3))
+
+EVENT <- "MortOingIcc"
+
+saveRDS(df_jm_1_2, paste0(DATAOUTPATH, "df_JM", "_", EVENT, "_1_2", ".rds"))
+saveRDS(df_jm_1_3, paste0(DATAOUTPATH, "df_JM", "_", EVENT, "_1_3", ".rds"))
+saveRDS(df_jm_2_3, paste0(DATAOUTPATH, "df_JM", "_", EVENT, "_2_3", ".rds"))
+saveRDS(df_jm_1, paste0(DATAOUTPATH, "df_JM", "_", EVENT, "_1", ".rds"))
+saveRDS(df_jm_2, paste0(DATAOUTPATH, "df_JM", "_", EVENT, "_2", ".rds"))
+saveRDS(df_jm_3, paste0(DATAOUTPATH, "df_JM", "_", EVENT, "_3", ".rds"))

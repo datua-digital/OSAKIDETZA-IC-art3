@@ -7,7 +7,7 @@ source(paste("src", "configuration.R", sep = "/"), encoding = "UTF-8")
 auc_casero_cox <- function(df_model, model, Tstart = 3, Thorizon = 12) {
   
   df_predictions <- get_df_predicciones_cox_(df_model, Tstart)
-  browser()
+  
   id_scores_actuals <- get_id_scores_actuals_cox_(df_predictions, model, Thorizon)
   
   auc <- calcular_auc_(id_scores_actuals$scores, id_scores_actuals$actuals)
