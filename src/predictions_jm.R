@@ -16,7 +16,6 @@ source(paste("src", "configuration.R", sep = "/"), encoding = "UTF-8")
 source(paste0(UTILSSCRIPTSPATH, "table_utils.R"))
 
 # Logic----------------------------------------------------------
-
 M2 <- readRDS(paste(OUTPATH, 'example.rds', sep = '/'))
 M1_multivariant <- readRDS(paste(OUTPATH, 'mv', 'JM_3td_5bs_1rx_mortoicc_M1_.rds', sep = '/'))
 M2_multivariant <- readRDS(paste(OUTPATH, 'mv', 'JM_3td_5bs_1rx_mortoicc_M2_.rds', sep = '/'))
@@ -149,11 +148,52 @@ pred_plots(ndata, name_v = paste0('pred_in_obs', c(2:6)), evol_window = c(1, 6))
 
 # age effect
 ndata <- read_prepare_multivariant('mockdata_edad_id1_multivariant.csv', DATAINPATH)
+
+ndata_3 <- read_prepare_multivariant('mockdata_edad_id1_multivariant_3months.csv', DATAINPATH)
+ndata_6 <- read_prepare_multivariant('mockdata_edad_id1_multivariant_6months.csv', DATAINPATH)
+ndata_9 <- read_prepare_multivariant('mockdata_edad_id1_multivariant_9months.csv', DATAINPATH)
+
 ndata2 <- read_prepare_multivariant('mockdata_edad_id2_multivariant.csv', DATAINPATH)
+
+ndata2_3 <- read_prepare_multivariant('mockdata_edad_id2_multivariant_3months.csv', DATAINPATH)
+ndata2_6 <- read_prepare_multivariant('mockdata_edad_id2_multivariant_6months.csv', DATAINPATH)
+ndata2_9 <- read_prepare_multivariant('mockdata_edad_id2_multivariant_9months.csv', DATAINPATH)
+
+ndata3_3 <- read_prepare_multivariant('mockdata_edad_id3_multivariant_3months.csv', DATAINPATH)
+ndata3_6 <- read_prepare_multivariant('mockdata_edad_id3_multivariant_6months.csv', DATAINPATH)
+ndata3_9 <- read_prepare_multivariant('mockdata_edad_id3_multivariant_9months.csv', DATAINPATH)
+
+
 # compare_pred_plots_multivariant(M1_multivariant, ndata, ndata2, name1 = "Patient - edad50", name2 = "Patient - edad89")
 
 probs1 <- survfitJM(M1_multivariant, newdata = ndata, idVar = 'id', survTimes = seq(1, 48, 1)/4)
+probs1_3 <- survfitJM(M1_multivariant, newdata = ndata_3, idVar = 'id', survTimes = seq(1, 48, 1)/4)
+probs1_6 <- survfitJM(M1_multivariant, newdata = ndata_6, idVar = 'id', survTimes = seq(1, 48, 1)/4)
+probs1_9 <- survfitJM(M1_multivariant, newdata = ndata_9, idVar = 'id', survTimes = seq(1, 48, 1)/4)
+
+probs1_3$summaries$A[12, 2] # 0.9717 3 hilabetetara
+probs1_6$summaries$A[12, 2] # 0.9780 3 hilabetetara
+probs1_9$summaries$A[12, 2] # 0.9786 3 hilabetetara
+
 probs2 <- survfitJM(M1_multivariant, newdata = ndata2, idVar = 'id', survTimes = seq(1, 48, 1)/4)
+
+probs2_3 <- survfitJM(M1_multivariant, newdata = ndata2_3, idVar = 'id', survTimes = seq(1, 48, 1)/4)
+probs2_6 <- survfitJM(M1_multivariant, newdata = ndata2_6, idVar = 'id', survTimes = seq(1, 48, 1)/4)
+probs2_9 <- survfitJM(M1_multivariant, newdata = ndata2_9, idVar = 'id', survTimes = seq(1, 48, 1)/4)
+
+probs2_3$summaries$A[12, 2] # 0.8450 3 hilabetetara
+probs2_6$summaries$A[12, 2] # 0.8774 3 hilabetetara
+probs2_9$summaries$A[12, 2] # 0.8808 3 hilabetetara
+
+
+probs3_3 <- survfitJM(M1_multivariant, newdata = ndata3_3, idVar = 'id', survTimes = seq(1, 48, 1)/4)
+probs3_6 <- survfitJM(M1_multivariant, newdata = ndata3_6, idVar = 'id', survTimes = seq(1, 48, 1)/4)
+probs3_9 <- survfitJM(M1_multivariant, newdata = ndata3_9, idVar = 'id', survTimes = seq(1, 48, 1)/4)
+
+probs3_3$summaries$A[12, 2] # 0.9056 3 hilabetetara
+probs3_6$summaries$A[12, 2] # 0.9259 3 hilabetetara
+probs3_9$summaries$A[12, 2] # 0.9280 3 hilabetetara
+
 
 prepare_multivariant_data <- function(probs) {
   predicted_risk_wide <- as.data.frame(probs$summaries$A) %>% select(times, Mean, Lower, Upper)
@@ -166,30 +206,30 @@ prepare_multivariant_data <- function(probs) {
   )
   
   observed_dependent_vars_wide <- data.frame(
-    bbloq = probs$y$A$cum_perc_adh_bbloq,
-    iecaara2 = probs$y$A$cum_perc_adh_ara2oieca,
-    mra = probs$y$A$cum_perc_adh_arm,
+    BB = probs$y$A$cum_perc_adh_bbloq,
+    `ACEi_ARB` = probs$y$A$cum_perc_adh_ara2oieca,
+    ARM = probs$y$A$cum_perc_adh_arm,
     times = probs$fitted.times$A
   ) 
   observed_dependent_vars_long <- gather(
     observed_dependent_vars_wide,
     serie,
     measurement,
-    bbloq:mra,
+    BB:ARM,
     factor_key = TRUE
   )
   
   fitted_dependent_vars_wide <- data.frame(
-    bbloq = probs$fitted.y$A$cum_perc_adh_bbloq,
-    iecaara2 = probs$fitted.y$A$cum_perc_adh_ara2oieca,
-    mra = probs$fitted.y$A$cum_perc_adh_arm,
+    BB = probs$fitted.y$A$cum_perc_adh_bbloq,
+    `ACEi_ARB` = probs$fitted.y$A$cum_perc_adh_ara2oieca,
+    ARM = probs$fitted.y$A$cum_perc_adh_arm,
     times = probs$fitted.times$A
   ) 
   fitted_dependent_vars_long <- gather(
     fitted_dependent_vars_wide,
     serie,
     measurement,
-    bbloq:mra,
+    BB:ARM,
     factor_key = TRUE
   )
   
@@ -202,37 +242,47 @@ prepare_multivariant_data <- function(probs) {
     )
   )
 }
-multivariant_data <- prepare_multivariant_data(probs1)
-grafica <- ggplot() + 
-  geom_line(
-    size = 0.5,
-    data = multivariant_data$fitted_dependent_vars_long, 
-    mapping = aes(x = times, y = measurement, color = serie)
-  ) + 
-  geom_point(
-    size = 1, 
-    data = multivariant_data$observed_dependent_vars_long,
-    mapping = aes(x = times, y = measurement, color = serie)
-  ) + 
-  geom_ribbon(
-    data = multivariant_data$predicted_risk_wide,
-    mapping = aes(
-      x = times,
-      ymin = Lower * 6,
-      ymax = Upper * 6),
-    fill = "steelblue2"
-  ) +
-  geom_line(
-    size = 0.7,
-    data = subset(multivariant_data$predicted_risk_long, serie == "Mean"), 
-    mapping = aes(x = times, y = measurement * 6), 
-    show.legend = FALSE
-  ) +
-  scale_y_continuous(
-    "Adherence", 
-    sec.axis = sec_axis(~. / 6 , name = "Event-Free Probability")
-  ) +
-  scale_x_continuous(breaks = seq(1, 12, 1)) +
-  geom_vline(xintercept = 6, linetype = "dotted", size = 1) +
-  theme_bw() +
-  theme() 
+pred_plots_multivariant <- function(probs){
+  multivariant_data <- prepare_multivariant_data(probs)
+  observed_time <- max(multivariant_data$fitted_dependent_vars_long$times)
+  
+  grafica <- ggplot() + 
+    geom_line(
+      size = 1,
+      data = multivariant_data$fitted_dependent_vars_long, 
+      mapping = aes(x = times, y = measurement, color = serie)
+    ) + 
+    geom_point(
+      size = 2, 
+      data = multivariant_data$observed_dependent_vars_long,
+      mapping = aes(x = times, y = measurement, color = serie)
+    ) + 
+    geom_ribbon(
+      data = multivariant_data$predicted_risk_wide,
+      mapping = aes(
+        x = times,
+        ymin = Lower * 6,
+        ymax = Upper * 6),
+      fill = "steelblue2"
+    ) +
+    geom_line(
+      size = 0.7,
+      data = subset(multivariant_data$predicted_risk_long, serie == "Mean"), 
+      mapping = aes(x = times, y = measurement * 6), 
+      show.legend = FALSE
+    ) +
+    scale_y_continuous(
+      "Cumulative adherence", 
+      sec.axis = sec_axis(~. / 6 , name = "Event-Free Probability")
+    ) +
+    scale_x_continuous("Follow-up (months)", breaks = seq(1, 12, 1)) +
+    geom_vline(xintercept = observed_time, linetype = "dotted", size = 1) +
+    theme_bw() +
+    theme(legend.title = element_blank())
+  
+  return(grafica)
+}
+pred_plots_multivariant(probs3_3)
+pred_plots_multivariant(probs3_6)
+pred_plots_multivariant(probs3_9)
+

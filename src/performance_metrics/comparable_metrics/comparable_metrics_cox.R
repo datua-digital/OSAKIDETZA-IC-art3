@@ -17,7 +17,6 @@ auc_casero_cox <- function(df_model, model, Tstart = 3, Thorizon = 12) {
 
 
 precision_casero_cox <- function(df_model, model, Tstart = 3, Thorizon = 12) {
-  
   df_predictions <- get_df_predicciones_cox_(df_model, Tstart)
   id_scores_actuals <- get_id_scores_actuals_cox_(df_predictions, model, Thorizon)
   # print(id_scores_actuals)

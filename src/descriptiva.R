@@ -196,15 +196,15 @@ event_distribution <- function(event_var, plot_type="histograma") {
     ggplot(data, aes(x = time_to_event)) + 
       geom_histogram(colour = "black", fill = "white") +
       theme_bw() +
-      scale_x_continuous("Mes", breaks = c(1:12)) +
-      ylab('conteo') +
-      ggtitle(paste("Distribución del evento", event_var)) +
+      scale_x_continuous("Follow-up (months)", breaks = c(1:12)) +
+      ylab('Frequency') +
+      # ggtitle(paste("Distribución del evento", event_var)) +
       theme(plot.title = element_text(hjust = 0.5))
   } else if (plot_type == 'densidad') {
     ggplot(data, aes(x = time_to_event)) + 
       geom_density(colour = "black", fill = "#FF6666", alpha = .2) +
       theme_bw() +
-      scale_x_continuous("Mes", breaks = c(1:12)) +
+      scale_x_continuous("Follow-up (months)", breaks = c(1:12)) +
       ylab('conteo') +
       ggtitle(paste("Distribución del evento", event_var)) +
       theme(plot.title = element_text(hjust = 0.5))

@@ -15,7 +15,7 @@
 rm(list = ls())
 library(constructedBases) # it needs to be installed constructedBases_0.1.1.tar.gz
 library(lintr)
-
+library(cohorteicc2)
 # builder variables --------------------------------------------
 
 # path and files parameters
@@ -43,7 +43,6 @@ source(paste0(BUILDINGSCRIPTSPATH, "input_months.R"), encoding = "UTF-8")
 load(paste0(DATAINPATH, PROJECTRDATA))
 load(paste0(DATAINPATH, CHARLSONDATA))
 df_farmacos <- constructedBases::farmacos_traye
-
 
 # preprocessing -----------------------------------------------------------
 

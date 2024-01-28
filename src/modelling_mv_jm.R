@@ -112,20 +112,20 @@ apply_MV2JM <- function(
 }
 
 
-apply_MV2JM(
-  df_jm = readRDS(paste0(DATAOUTPATH, "df_JM_MortOingIcc.rds")), 
-  patients_conditions = list(
-    denovo_ic_paciente = NULL,
-    denovo_tt_paciente_fing = NULL,
-    denovo_tt_paciente_falta = NULL,
-    early_death_patient_30 = NULL,
-    patient_with_prescription = NULL
-  ), 
-  covariables = c("sexo", "edad_ing1", "charlson", "fe.reducida.severa"),
-  variables_longitudinales = c("cum_perc_adh_ara2oieca", "cum_perc_adh_bbloq"),
-  model_name_prefix = 'JMMV2', 
-  save_model = TRUE
-)
+# apply_MV2JM(
+#   df_jm = readRDS(paste0(DATAOUTPATH, "df_JM_MortOingIcc.rds")), 
+#   patients_conditions = list(
+#     denovo_ic_paciente = NULL,
+#     denovo_tt_paciente_fing = NULL,
+#     denovo_tt_paciente_falta = NULL,
+#     early_death_patient_30 = NULL,
+#     patient_with_prescription = NULL
+#   ), 
+#   covariables = c("sexo", "edad_ing1", "charlson", "fe.reducida.severa"),
+#   variables_longitudinales = c("cum_perc_adh_ara2oieca", "cum_perc_adh_bbloq"),
+#   model_name_prefix = 'JMMV2', 
+#   save_model = TRUE
+# )
 
 
 # Joint model multivariante, 3 variables longitudinales -------------------
@@ -191,8 +191,7 @@ apply_MV3JM <- function(
   )
   
   survFit <- coxph(
-    Surv(time_to_event, event) ~ sexo + edad_ing1 + charlson + fe.reducida.severa
-    + denovo_ic_paciente + ptot, 
+    Surv(time_to_event, event) ~ sexo + edad_ing1 + charlson + fe.reducida.severa + denovo_ic_paciente + ptot, 
     data = cox_df, 
     model = TRUE
   )
@@ -241,10 +240,14 @@ apply_MV3JM <- function(
     saveRDS(M3, paste0(OUTPATH_MULTIV, paste0(model_name_prefix, "_M1_", ".rds")))
   }
 }
+df_jm <- readRDS(paste0(DATAOUTPATH, "df_JM_MortOingIcc.rds"))
+df_jm_2_3 <- readRDS(paste0(DATAOUTPATH, "df_JM_MortOingIcc_2_3.rds"))
+
+df_jm_2_3$id <- factor(df_jm_2_3$id)
 
 
 apply_MV3JM(
-  df_jm = readRDS(paste0(DATAOUTPATH, "df_JM_MortOingIcc.rds")), 
+  df_jm = df_jm_2_3, 
   patients_conditions = list(
     denovo_ic_paciente = NULL,
     denovo_tt_paciente_fing = NULL,
@@ -252,8 +255,7 @@ apply_MV3JM(
     early_death_patient_30 = NULL,
     patient_with_prescription = NULL
   ), 
-  covariables = c("sexo", "edad_ing1", "charlson", "fe.reducida.severa", 
-                  "denovo_ic_paciente", "ptot"),
-  model_name_prefix = 'JM_3td_5bs_1rx_mortoicc', 
+  covariables = c("sexo", "edad_ing1", "charlson", "fe.reducida.severa", "denovo_ic_paciente", "ptot"),
+  model_name_prefix = 'JM_3td_5bs_1rx_mortoicc_2_3', 
   save_model = TRUE
 )
